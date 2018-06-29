@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <title>ChatKaboo</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    {% include 'others/header_static.html' %}
+    {% load static from staticfiles %}
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+    <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
+    {% if user.is_authenticated %}
+    {% else %}
+    {% endif %}
+
+    <style>
+
+    </style>
+</head>
+<body>
+{% include 'others/bootstrap_tester.html' %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-offset-1 col-sm-10 col-md-offset-2 col-md-8">
+            {% include 'authapp/_logo.html' %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="padding_10"></div>
+        <div class="col-sm-offset-1 col-sm-10 col-md-offset-2 col-md-8">
+            <div class="col-sm-offset-2 col-sm-10 padding_right_0 padding_left_0">
+                <form method="post" action=".">
+                    {% csrf_token %}
+                    <div class="col-sm-5 form-group">
+                        {{ log_in_form.username }}
+                    </div>
+                    <div class="col-sm-5 form-group">
+                        {{ log_in_form.password }}
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="submit" class="btn btn-default pull-right login-form" name="type" value="log_in">
+                            Login
+                        </button>
+
+                        <p class="text-primary pull-right desktop_display_none text_forgot_password text_forgot_password_mobile">
+                            forgot password?</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="mobile_display_none">
+            <div class="col-sm-offset-1 col-sm-10 col-md-offset-2 col-md-8">
+                <div class="col-sm-10 padding_right_0">
+                    <p class="text-primary text-right text_forgot_password">forgot password?</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        {% if clue_log_in %}
+            <p class="text-primary text-center word_wrap_break_word">{{ clue_log_in.message }}</p>
+        {% endif %}
+    </div>
+    <div class="row">
+        <div class="desktop_display_none">
+            <div class="padding_10"></div>
+            <div class="padding_10"></div>
+            <div class="padding_10"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-offset-1 col-sm-10 col-md-offset-2 col-md-8">
+
+            <div class="col-sm-7">
+                <div class="mobile_display_none padding_35"></div>
+                <div class="mobile_display_none padding_35"></div>
+                <div class="mobile_display_none padding_35"></div>
+                <p>This site is for messaging</p>
+                <p>You can talk with your friends and lay your message to your friends or other your followers</p>
+            </div>
+            <div class="col-sm-5">
+                <div class="mobile_display_none padding_35"></div>
+                <div class="desktop_display_none padding_10"></div>
+                <p class="h3">Register</p>
+                <form method="post" action="." onsubmit="return validate_base();">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        {{ create_form.name }}
+                    </div>
+                    <div class="form-group">
+                        {{ create_form.username }}
+                    </div>
+                    <div class="form-group">
+                        {{ create_form.email }}
+                    </div>
+                    <div class="form-group">
+                        {{ create_form.password }}
+                    </div>
+                    <div class="form-group">
+                        {{ create_form.password_confirm }}
+                    </div>
+
+                    <div style="height: 10px"></div>
+
+                    <div class="row">
+                        <div class="col-xs-9">
+                            <p class="text-primary word_wrap_break_word" id="p_clue">{% if clue %}{{ clue.message }}{% endif %}</p>
+                        </div>
+                        <div class="col-xs-3">
+                            <button type="submit" class="btn btn-default pull-right" name="type" value="create_second">
+                                Create
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script defer>
+    var validate_base = (function validate_base() {
+
+        var banned_username_list = ['chatkaboo'];
+        var banned_password_list = [
+            'password', 'qwerty', 'superman', '123456', '1234567', '12345678', '123456789', '1234567890', '012345', '0123456',
+            '01234567', '012345678', '0123456789', '111111', 'aaaaaa'
+        ];
+
+        var name = $('#id_name').val();
+        var username = $('#id_username').val();
+        var email = $('#id_email').val();
+        var password = $('#id_password').val();
+        var password_confirm = $('#id_password_confirm').val();
+
+        if (typeof password === 'undefined'){
+            var username_validator=username_validate(username, banned_username_list);
+            if (username_validator===0){
+                $('#p_clue').html('It\'s unavailable username');
+                return false;
+            }
+            if (!(6 <= username.length && username.length <= 30)){
+                $('#p_clue').html('username should be 6 <= password <= 30 greater than or equal to 6, less than or equal to 30');
+                return false;
+            }
+            if (8 <= username.length && /^\d+$/.test(username)){
+                $('#p_clue').html('If username length is greater than or equal to 8, cannot be made of only digits');
+                return false;
+
+            }
+            if (!(/^([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)$/.test(username))){
+                $('#p_clue').html('username can be made of digit, alphabet, . or _');
+                return false;
+
+            }
+            if (!(6 <= name.length && name.length <= 30)){
+                $('#p_clue').html('name should be 6 <= password <= 30 greater than or equal to 6, less than or equal to 30');
+                return false;
+
+            }
+            if (!(/[^@]+@[^@]+\.[^@]+/.test(email))){
+                $('#p_clue').html('It\'s unavailable email');
+                return false;
+            }
+            if (255 < email.length){
+                $('#p_clue').html('You have to change email length');
+                return false;
+
+            }
+
+        }
+        else {
+            var username_validator=username_validate(username, banned_username_list);
+            if (username_validator===0){
+                $('#p_clue').html('It\'s unavailable username');
+                return false;
+            }
+            if (!(6 <= username.length && username.length <= 30)){
+                $('#p_clue').html('username should be 6 <= password <= 30 greater than or equal to 6, less than or equal to 30');
+                return false;
+            }
+            if (8 <= username.length && /^\d+$/.test(username)){
+                $('#p_clue').html('If username length is greater than or equal to 8, cannot be made of only digits');
+                return false;
+
+            }
+            if (!(/^([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)$/.test(username))){
+                $('#p_clue').html('username can be made of digit, alphabet, . or _');
+                return false;
+
+            }
+            if (!(6 <= name.length && name.length <= 30)){
+                $('#p_clue').html('name should be 6 <= password <= 30 greater than or equal to 6, less than or equal to 30');
+                return false;
+
+            }
+            if (!(/[^@]+@[^@]+\.[^@]+/.test(email))){
+                $('#p_clue').html('It\'s unavailable email');
+                return false;
+
+            }
+            if (255 < email.length){
+                $('#p_clue').html('You have to change email length');
+                return false;
+
+            }
+            if (password !== password_confirm) {
+                $('#p_clue').html('both passwords you submitted are not the same');
+                return false;
+
+            }
+            if (!(6 <= password.length && password.length <= 128)){
+                $('#p_clue').html('password should be 6 <= password <= 128 greater than or equal to 6, less than or equal to 128');
+                return false;
+
+            }
+            if (username === password){
+                $('#p_clue').html('password cannot be the same as username');
+                return false;
+
+            }
+            if ($.inArray(password, banned_password_list)!==-1){
+                $('#p_clue').html('It\'s unavailable password');
+                return false;
+            }
+
+        }
+        return true;
+    });
+
+    function username_validate(needle, haystack) {
+        var length = haystack.length;
+        for (var i = 0; i < length; i++) {
+            var result = needle.indexOf(haystack[i])!==-1;
+            if (result===true){
+                return 0;
+            }
+        }
+        return 1;
+    }
+</script>
+</html>
