@@ -351,10 +351,36 @@ class PostFollowCount(models.Model):
         return "post Like Count: %s" % self.pk
 
 
-
 # PostChat 이랑 PostComment 에 좋아요 구현, PostRest 는 보류. 안 하는 게 나을 것 같다. 아냐 하는 게 나을 것 같아.
 # 글을 많이 쓰게 하는 것이 원칙인데 구현하면 제안을 많이 쓰게 할 수 있다. 그러나 구현하지 않는다면 제안이 줄기 때문에 독창적인 사람만
 # 글을 쓰는 데에 스트레스를 덜 주게 된다. 그러나 독창적인 사람의 경우 남의 의견이 어떻든 상관하지 않을 수 있기 때문에 효과는 미미할
 # 것으로 예상한다. 필요하다면 제안을 제한하거나 제안을 장막으로 가리는 등의 도움이 될 수 있다. 글을 많이 쓰고 활동하게 하는 것이
 # 우선이다. 원칙과 우선순위. 우선순위와 원칙. 우선순위와 예외와 규칙.
 # ----------------------------------------------------------------------------------------------------------------------
+
+class MainURL(models.Model):
+
+    url = models.TextField(max_length=3000, null=True, unique=True, blank=True, default=None)
+    # 여기서 unique True 면 null값도 두 개 이상 넣을 수 없나?
+    http = models.BooleanField(default=True)
+    https = models.BooleanField(default=False)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "URL: %s" % self.url
+
+
+class SubURL(models.Model):
+    url = models.TextField(max_length=3000, null=True, unique=True, blank=True, default=None)
+    main_url = models.ForeignKey(MainURL, on_delete=models.CASCADE, null=True, blank=True)
+
+    # 여기서 unique True 면 null값도 두 개 이상 넣을 수 없나?
+    http = models.BooleanField(default=True)
+    https = models.BooleanField(default=False)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "URL: %s" % self.url
+

@@ -95,6 +95,19 @@
 
                 return false
             }
+
+            $.ajax({
+                url:'/accounts/email_ask/', type:'post', dataType:'json', cache:false,
+                data:{
+                    url: url
+                },
+                success:function (data) {
+                    if (data.res === 1){
+
+                    }
+                }
+            });
+
         })
         $('#add_keyword').click(function (e) {
             e.preventDefault()

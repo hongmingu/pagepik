@@ -2200,3 +2200,14 @@ def re_search_post(request):
                                  'post_next': post_next})
 
         return JsonResponse({'res': 2})
+# ---------------------------------------------------------------------------------------------------------------------------
+
+
+@ensure_csrf_cookie
+def re_search_post(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            url = request.POST.get('url', None)
+
+            return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
