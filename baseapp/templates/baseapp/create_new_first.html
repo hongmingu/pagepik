@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Demo</title>
+    {% include 'others/header_static.html' %}
+    {% include 'others/favicon.html' %}
+
+    {% load static from staticfiles %}
+    <script src="{% static 'js/navbar.js' %}"></script>
+    <script src="{% static 'js/a_selected.js' %}"></script>
+    <script src="{% static 'js/nav_badge.js' %}"></script>
+
+    <script src="{% static 'js/generate_uuid.js' %}"></script>
+    <script src="{% static 'js/strip.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'cropper/cropper.min.css' %}">
+    <script src="{% static 'cropper/cropper.min.js' %}"></script>
+    <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
+    {% if user.is_authenticated %}
+    {% else %}
+    {% endif %}
+
+    <style>
+
+    </style>
+
+
+</head>
+<body class="light_background_color height_100">
+{% include 'baseapp/_navbar.html' %}
+
+{% include 'others/bootstrap_tester.html' %}
+
+{% if user.is_authenticated %}
+    <div class="hidden" id="user_id">{{ user.username }}</div>
+{% else %}
+    <div class="hidden" id="user_id"></div>
+{% endif %}
+
+<div class="container-fluid margin_top_50">
+    <div class="row">
+        <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
+            <div class="row" id="content">
+
+                <div class="row div_base">
+                    <div class="url_check_wrapper">
+                        <div align="center"><span class="register">Resgister</span></div>
+                        <br>
+                        <div class="input-group-lg">
+                            <input class="url_input" id="url_input" placeholder="your url" type="url">
+                        </div>
+                        <div class="url_clue_wrapper"><span class="url_clue" id="url_clue"></span></div>
+                        <br>
+                        <a href=""><div align="center"><span class="clickable check_url" id="check">check</span></div></a>
+                    </div>
+                    <div class="add_keywords_wrapper">
+                        <div align="center"><span class="add_keywords">add keywords</span></div>
+                        <div><span class="intro_url">url: </span><span class="info_url">some url</span></div>
+                        <div><span class="intro_title">title: </span><span class="info_title">some title</span></div>
+                        <div class="input-group-lg">
+                            <input class="keyword_input" id="keyword_input" placeholder="your keyword" type="text">
+                        </div>
+                        <div class="keyword_clue_wrapper"><span class="keyword_clue" id="keyword_clue"></span></div>
+                        <br>
+                        <div align="center"><a href=""><span class="add_keyword clickable" id="add_keyword">add</span></a></div>
+
+                        <br>
+                        <div><span class="intro_keywords">keywords: </span></div>
+                        <div class="added_keyword_container" id="added_keywords_container"></div>
+
+                        <br>
+                        <div align="center"><a href=""><span class="complete_keyword clickable" id="complete_keyword">complete</span></a></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+
+<script>
+</script>
+<script>
+    $(function () {
+
+        $('#check').click(function (e) {
+            e.preventDefault()
+            var url = $('#url_input').val()
+
+            if (url.replace(/ /g,'')==='') {
+                $('#url_clue').html('url cannot be empty')
+
+                return false
+            }
+        })
+        $('#add_keyword').click(function (e) {
+            e.preventDefault()
+            var input = strip($('#keyword_input').val())
+
+            if (input.replace(/ /g,'')==='') {
+                $('#keyword_clue').html('keyword cannot be empty')
+
+                return false
+            }
+            if (input.length > 2048){
+                $('#keyword_clue').html('keyword is too long')
+                return false
+            }
+            var exist = false
+            if($('.added_keyword').length > 30){
+                $('#keyword_clue').html('keyword count cannot be over 30')
+                return false
+            }
+
+            $('.added_keyword').each(function () {
+                if(input===$(this).html()){
+                    exist = true
+                }
+            })
+            if(exist===true){
+                $('#keyword_clue').html('keyword cannot be the same')
+
+                return false
+            }
+
+            var uuid = generate_uuid()
+            var added_keyword = $('<span class="added_keyword_wrapper" id="added_keyword_wrapper_'+uuid+'"><span class="added_keyword">'+input+'</span><a href=""><span class="glyphicon glyphicon-repeat keyword_delete"></span></a></span>')
+
+            added_keyword.find('.keyword_delete').on('click', function (e) {
+                e.preventDefault()
+                $('#added_keyword_wrapper_'+uuid).remove()
+            })
+            $('#added_keywords_container').append(added_keyword)
+            $('#keyword_input').val('')
+
+        })
+        // added keywords 는 $('.added_keyword').length 를 이용해 30개를 맥스로 하자. 수정시에도 이걸 이용하면 편할 것이다.
+        // 그리고 수정시엔 keyword to add 랑 keyword to delete 를 만들고 그 아래 컴플릿을 해서 장고 서버에서도 다루기 쉽게 하자.
+        // F 카운터 걸어서 중복제거시에도 제거 안되게 하면 됨 .
+
+
+    });
+
+</script>
+</html>

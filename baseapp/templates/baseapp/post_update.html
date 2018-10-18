@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Demo</title>
+    {% include 'others/header_static.html' %}
+    {% include 'others/favicon.html' %}
+
+    {% load static from staticfiles %}
+    <script src="{% static 'js/navbar.js' %}"></script>
+    <script src="{% static 'js/a_selected.js' %}"></script>
+    <script src="{% static 'js/nav_badge.js' %}"></script>
+
+    <script src="{% static 'js/post_profile_upload_photo.js' %}"></script>
+    <script src="{% static 'js/post_update.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'cropper/cropper.min.css' %}">
+    <script src="{% static 'cropper/cropper.min.js' %}"></script>
+    <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
+    <style>
+
+    </style>
+
+
+</head>
+<body class="light_background_color height_100">
+{% autoescape on %}
+<!--navbar start-->
+{% include 'baseapp/_navbar.html' %}
+
+<!--navbar end-->
+<!--page info-->
+{% include 'others/bootstrap_tester.html' %}
+
+<div class="hidden" id="page_kind" data-u="create_new"></div>
+<div class="hidden" id="last_num" data-u=""></div>
+<div class="hidden" id="just_created" data-u="{{ just_created.ok }}"></div>
+
+{% if user.is_authenticated %}
+    <div class="hidden" id="user_id">{{ user.username }}</div>
+    <div class="hidden" id="num" data-u="{{ user.username }}"></div>
+{% else %}
+    <div class="hidden" id="user_id"></div>
+{% endif %}
+{% if post %}
+    <div class="hidden" id="post_id" data-u="{{ post.uuid }}">{{ post.uuid }}</div>
+{% endif %}
+<!--page info end -->
+{% if post.has_title %}
+    <div class="hidden" id="post_title" data-u="{{ post.posttitle.title }}"></div>
+{% endif %}
+
+{% if post.has_description %}
+    <div class="hidden" id="post_description" data-u="{{ post.postdescription.description}}"></div>
+{% endif %}
+
+{% if just_created.ok == "on" %}
+    <div class="hidden" id="just_created" data-u="on"></div>
+{% else %}
+    <div class="hidden" id="just_created" data-u="off"></div>
+
+    {% if just_created.current == "open" %}
+        <div class="hidden" id="current_open" data-u="open"></div>
+    {% else %}
+        <div class="hidden" id="current_open" data-u="close"></div>
+    {% endif %}
+{% endif %}
+
+<div class="container-fluid margin_top_50">
+    <div class="row">
+        <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
+            <div class="row" id="content">
+                <!--여기서 modal -->
+
+                <div class="row div_base">
+                    <br>
+                    <br>
+                    {% if post.title is not None %}
+                        <div class="div_title" id="title_discriminant">
+                            <div align="left"><span class="padding_5 created_title">title: </span></div>
+                            <div><input class="width_100_i" id="title_input" type="text" value="{{ post.title }}"></div>
+                            <br/>
+                            <div align="right">
+                                <a href=""><span class="padding_5 clickable remove_add_t_d title_toggle" id="remove_title">remove title</span></a>
+                            </div>
+                        </div>
+                        <div class="div_title hidden">
+                            <div align="right">
+                                <a href=""><span class="padding_5 clickable remove_add_t_d title_toggle" id="add_title">add title</span></a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="div_title hidden" id="title_discriminant">
+                            <div align="left"><span class="padding_5 created_title">title: </span></div>
+                            <div><input class="width_100_i" id="title_input" type="text" value=""></div>
+                            <br/>
+                            <div align="right">
+                                <a href=""><span class="padding_5 clickable remove_add_t_d title_toggle" id="remove_title">remove title</span></a>
+                            </div>
+                        </div>
+                        <div class="div_title">
+                            <div align="right">
+                                <a href=""><span class="padding_5 clickable remove_add_t_d title_toggle" id="add_title">add title</span></a>
+                            </div>
+                        </div>
+                    {% endif %}
+                <br/>
+                    {% if post.description is not None %}
+                        <div class="div_desc" id="desc_discriminant">
+                            <div align="left"><span class="padding_5 created_description">description: </span></div>
+                            <div><textarea class="width_100_i create_description_textarea" id="desc_input">{{ post.description }}</textarea></div>
+                            <br/>
+                            <div align="right">
+                                <a href=""><span class="padding_5 clickable remove_add_t_d desc_toggle" id="remove_description">remove description</span></a>
+                            </div>
+                        </div>
+                        <div class="div_desc hidden">
+                            <div align="right">
+                                <a href=""><span class="padding_5 clickable remove_add_t_d desc_toggle" id="add_description">add description</span></a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="div_desc hidden" id="desc_discriminant">
+                            <div align="left"><span class="padding_5 created_description">description: </span></div>
+                            <div><textarea class="width_100_i create_description_textarea" id="desc_input"></textarea></div>
+                            <br/>
+                            <div align="right">
+                                <a href=""><span class="padding_5 clickable remove_add_t_d desc_toggle" id="remove_description">remove description</span></a>
+                            </div>
+                        </div>
+                        <div class="div_desc">
+                            <div align="right">
+                                <a href=""><span class="padding_5 clickable remove_add_t_d desc_toggle" id="add_description">add description</span></a>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <!--여기는 프로필 사진 -->
+                    <br>
+                    <br>
+                    <br>
+                    <div class="col-xs-12 now_open_close_wrapper">
+                        <div>
+                            <div><span class="now_open_close_explain">now this post is: </span><span class="now_open_close">{% if post.is_open %}opened{% else %}closed{% endif %}</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="col-xs-6">
+                            <a href="">
+                                <div class="clickable padding_5 choice_selected" id="open" align="center">open</div>
+                            </a>
+                        </div>
+                        <div class="col-xs-6">
+                            <a href="">
+                                <div class="clickable padding_5 choice_unselected" id="close" align="center">close</div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <br>
+                    <br>
+                    <br>
+                    <div class="col-xs-12 normal_change_btn">
+                        <div align="center"><a href="">
+                            <div class="clickable padding_5 main_background_color write_new_post" id="ok">title, description, open-close change</div>
+                        </a></div>
+
+                    </div>
+
+                    <br/><br/><br/><br/>
+                    {% if post.has_another_profile %}
+
+                        <div align="left">
+                            <div class="padding_5 created_description">Profile name: </div>
+                            <div><input class="width_100_i" id="profile_name_input" type="text" value="{{ post.postprofile.name }}"></div>
+                            <div><span id="name_clue"></span></div>
+
+                        </div>
+                        <br>
+
+                        <div class="col-xs-12">
+                            <div align="center">
+                                <a href=""><div class="clickable padding_5 main_background_color write_new_post" id="profile_name_change">post profile's name change</div></a>
+                            </div>
+                        </div>
+                        <br>
+                        <br>
+                        <div align="center">
+                            <img class="img_300_300" id="img_300" src="{{ post.postprofile.file_300_url }}">
+                        </div>
+                        <div align="center">
+                            <p class="h4"><a href="#"><span class="clickable padding_5 main_background_color photo_change"
+                                                            id="span_change_photo">Change</span></a> <a href="#"><span
+                                    class="clickable padding_5 main_background_color photo_change"
+                                    id="span_base_reset">BaseReset</span></a></p>
+                        </div>
+
+
+                    {% endif %}
+                    <br/><br/>
+                    <br/>
+                    <div align="center"><span class="open_or_close">Add your chat?</span></div>
+
+                    <div class="chat_preview" id="chat_preview_wrapper">
+                        <div class="chat_preview_wrapper hidden" id="more_load" align="center">
+                            <a href=""><div class="chat_preview_more_load clickable">More Load</div></a>
+                        </div>
+                        <div id="chat_preview">
+
+                        </div>
+
+                    </div>
+                    <br><br>
+                    <div class="col-xs-6">
+                        <div align="center">
+                            <a href="">
+                                <div class="clickable padding_5 main_background_color choice_selected" id="you_say">
+                                    You Says
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div align="center">
+                            <a href="">
+                                <div class="clickable padding_5 main_background_color choice_unselected"
+                                     id="someone_says">
+                                    Someone Says
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                <br>
+                    <div class="add_photo_wrapper" align="center"><a href="#"><span class="add_photo_btn clickable" id="add_photo">add photo</span></a></div>
+<br>
+                    <div align="center">
+                        <form class="padding_top_5">
+                            <div class="input-group input-group-sm chat_detail_wrapper">
+                                <textarea class="form-control chat_detail_textarea" placeholder="Message" id="post_chat_textarea"></textarea>
+                                <div class="input-group-btn">
+                                    <button class="btn btn-default chat_detail_send" id="btn_add"><i
+                                            class="glyphicon glyphicon-send"></i></button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <br/>
+                    <div class="col-xs-12 normal_change_btn">
+                        <div align="center"><a href="">
+                            <div class="clickable padding_5 main_background_color write_new_post" id="go_to_main">go to main</div>
+                        </a></div>
+
+                    </div>
+                <br/>
+                <br/>
+                <br/>
+
+                </div>
+                <!--ajax는 ajax고 websocket은 websocket 이다. 둘을 분리한다. 구버전 브라우저는 포기해 일단 채팅과 알림만 websocket 쓴다.-->
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL TO CROP THE IMAGE -->
+<div class="modal fade" id="modal_crop" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Crop the photo</h4>
+            </div>
+            <div class="modal-body padding_0">
+                <img src="" id="img_crop" class="max_width_100p">
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group pull-left" role="group">
+                    <button type="button" class="btn btn-default js-zoom-in">
+                        <span class="glyphicon glyphicon-zoom-in"></span>
+                    </button>
+                    <button type="button" class="btn btn-default js-zoom-out">
+                        <span class="glyphicon glyphicon-zoom-out"></span>
+                    </button>
+                </div>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary js-crop-and-upload">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- MODAL TO CROP THE IMAGE -->
+<div class="modal fade" id="modal_chat" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Crop the photo</h4>
+            </div>
+            <div class="modal-body padding_0" align="center">
+                <img src="" id="img_chat" class="max_width_100p">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary chat-upload">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<img src="" id="img_chat_hidden" class="max_width_100p hidden">
+
+<div class="modal fade" id="modal_base_reset">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Reset Profile image?</h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btn_base_reset_ok">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form class="hidden" method="post" enctype="multipart/form-data" id="form_upload">
+    <input type="file" name="file" id="input_file" accept="image/jpeg, image/png" required>
+</form>
+
+<form class="hidden" method="post" enctype="multipart/form-data" id="chat_upload">
+    <input type="file" name="file" id="input_chat_file" accept="image/jpeg, image/png" required>
+</form>
+{% endautoescape %}
+</body>
+</html>

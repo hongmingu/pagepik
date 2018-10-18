@@ -6,7 +6,7 @@ from authapp.models import UserUsername, UserPrimaryEmail
 
 from PIL import Image
 from django.core.files import File
-from .models import UserPhoto
+from .models import UserPhoto, STATUS_CHOICES
 
 
 class UserCreateForm(forms.ModelForm):
@@ -19,9 +19,14 @@ class UserCreateForm(forms.ModelForm):
     password_confirm = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control',
                                                                          'placeholder': 'password_confirm'}))
 
+    year = forms.IntegerField(initial='', widget=forms.Select(attrs={'class': 'form-control', 'id': 'years', 'placeholder': 'Year'}), required=True)
+    month = forms.IntegerField(initial='', widget=forms.Select(attrs={'class': 'form-control', 'id': 'months', 'placeholder': 'Month'}), required=True)
+    day = forms.IntegerField(initial='', widget=forms.Select(attrs={'class': 'form-control', 'id': 'days', 'placeholder': 'Day'}), required=True)
+    gender = forms.ChoiceField(choices=STATUS_CHOICES, widget=forms.RadioSelect(), required=True)
+
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email', 'password', 'year', 'month', 'day', 'gender']
 
 
 class LoginForm(forms.ModelForm):
@@ -116,4 +121,3 @@ class UserPhotoForm(forms.ModelForm):
     class Meta:
         model = UserPhoto
         fields = ('file_300', 'file_50', 'x', 'y', 'width', 'height', 'rotate',)
-

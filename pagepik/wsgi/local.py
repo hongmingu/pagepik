@@ -1,3 +1,3 @@
 from .base import *
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "chatkaboo.settings.local")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "pagepik.settings.local")

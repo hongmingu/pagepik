@@ -94,7 +94,6 @@ $('#span_change_photo').click(function (e) {
         form_data.append('width', cropData["width"]);
         form_data.append('rotate', cropData["rotate"]);
 
-        console.log(form_data)
         $.ajax({
             url:'/re_settings/ajax/upload_user_photo/',
             type:'post',
@@ -104,7 +103,6 @@ $('#span_change_photo').click(function (e) {
             contentType: false,
             data:form_data,
             success:function (data) {
-                console.log(data)
                 $("#modal_crop").modal("hide");
                 if (data.res === 1){
                     $('#img_300').attr('src', data.url)

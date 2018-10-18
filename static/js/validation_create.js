@@ -1,6 +1,6 @@
 var validate_base = (function validate_base() {
 
-        var banned_username_list = ['chatkaboo'];
+        var banned_username_list = ['avastove'];
         var banned_password_list = [
             'password', 'qwerty', 'superman', '123456', '1234567', '12345678', '123456789', '1234567890', '012345', '0123456',
             '01234567', '012345678', '0123456789', '111111', 'aaaaaa'
@@ -19,7 +19,7 @@ var validate_base = (function validate_base() {
                 return false;
             }
             if (!(6 <= username.length && username.length <= 30)){
-                $('#p_clue').html('username should be 6 <= password <= 30 greater than or equal to 6, less than or equal to 30');
+                $('#p_clue').html('username should be 6 <= username <= 30 greater than or equal to 6, less than or equal to 30');
                 return false;
             }
             if (8 <= username.length && /^\d+$/.test(username)){
@@ -32,8 +32,8 @@ var validate_base = (function validate_base() {
                 return false;
 
             }
-            if (!(6 <= name.length && name.length <= 30)){
-                $('#p_clue').html('name should be 6 <= password <= 30 greater than or equal to 6, less than or equal to 30');
+            if (!(1 <= name.length && name.length <= 30)){
+                $('#p_clue').html('name should be 1 <= name <= 30 greater than or equal to 6, less than or equal to 30');
                 return false;
 
             }
@@ -55,7 +55,7 @@ var validate_base = (function validate_base() {
                 return false;
             }
             if (!(6 <= username.length && username.length <= 30)){
-                $('#p_clue').html('username should be 6 <= password <= 30 greater than or equal to 6, less than or equal to 30');
+                $('#p_clue').html('username should be 6 <= username <= 30 greater than or equal to 6, less than or equal to 30');
                 return false;
             }
             if (8 <= username.length && /^\d+$/.test(username)){
@@ -68,8 +68,8 @@ var validate_base = (function validate_base() {
                 return false;
 
             }
-            if (!(6 <= name.length && name.length <= 30)){
-                $('#p_clue').html('name should be 6 <= password <= 30 greater than or equal to 6, less than or equal to 30');
+            if (!(1 <= name.length && name.length <= 30)){
+                $('#p_clue').html('name should be 1 <= name <= 30 greater than or equal to 6, less than or equal to 30');
                 return false;
 
             }
@@ -100,6 +100,10 @@ var validate_base = (function validate_base() {
             }
             if ($.inArray(password, banned_password_list)!==-1){
                 $('#p_clue').html('It\'s unavailable password');
+                return false;
+            }
+            if ($('#years option:selected').val() === 'non' ||$('#months option:selected').val() === 'non' ||$('#days option:selected').val() === 'non'){
+                $('#p_clue').html('It\'s unavailable Birthday');
                 return false;
             }
 

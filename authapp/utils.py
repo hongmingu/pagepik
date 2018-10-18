@@ -53,6 +53,12 @@ def user_username_failure_validate(username):
 def user_text_name_failure_validate(user_text_name):
     if not (1 <= len(user_text_name) <= 30):
         return 1
+    if '/' in user_text_name:
+        return 1
+    if '<' in user_text_name:
+        return 1
+    if '$' in user_text_name:
+        return 1
     return 0
 
 

@@ -68,7 +68,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'chatkaboo.wsgi.application'
+WSGI_APPLICATION = 'pagepik.wsgi.application'
 
 
 # Database
