@@ -2203,11 +2203,188 @@ def re_search_post(request):
 # ---------------------------------------------------------------------------------------------------------------------------
 
 
+def get_redirected_url(url):
+    import ssl
+    context = ssl._create_unverified_context()
+    result = 'no good url'
+    try:
+        result = urllib.request.urlopen(url, context=context).geturl()
+    except Exception as e:
+        print(e)
+        return 'error occurred: ' + url
+    return result
+
+
+def redirectTest(item):
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
+        }
+        r = None
+        try:
+            r = requests.head(item, allow_redirects=False, headers=headers)
+        except Exception as e:
+            print(e)
+        if r is not None:
+            print('redirected_url: ' + get_redirected_url(item))
+            if r.status_code == 301:
+                print("Tested:", item, "\n\t", r.url, "\n\t", r.status_code, "\n\t", r.headers['Location'])
+            elif r.status_code == 302:
+                print("Tested:", item, "\n\t", r.url, "\n\t", r.status_code, "\n\t", r.headers['Location'])
+                # 이 로케이션이 이상한 곳으로 갈 경우 그것도 테스트.
+                # 301과 302는 다르다고 한다.
+            else:
+                print("Tested:", item, "\n\t", r.url, "\n\t", r.status_code)
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        print("Tested:", item, "\n\t", 'error: ', e)
+    pass
+
+
 @ensure_csrf_cookie
-def re_search_post(request):
+def re_check_url(request):
     if request.method == "POST":
         if request.is_ajax():
             url = request.POST.get('url', None)
 
+            print(url)
+            print(get_redirected_url(url))
+            import re
+            regex = re.compile(
+                r'^(?:http|ftp)s?://'  # http:// or https://
+                r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+                r'localhost|'  # localhost...
+                r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+                r'(?::\d+)?'  # optional port
+                r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+            try:
+                print('re.match result: ' + re.match(regex, url))
+            except Exception as e:
+                print(e)
+
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
+            }
+
+
+            print('here')
+
+            url = url.strip().strip('/')
+            import re
+            if url.startswith('http://www.'):
+                url = url.replace('http://www.', '', 1)
+            elif url.startswith('http://'):
+                url = url.replace('http://', '', 1)
+            elif url.startswith('https://www.'):
+                url = url.replace('https://www.', '', 1)
+            elif url.startswith('https://'):
+                url = url.replace('https://', '', 1)
+            else:
+                pass
+            # url_re = re.compile(r"https?://(www\.)?")
+
+            # dom_raw = url_re.sub('',
+            #                   url).replace(
+            #     " ", "").strip(
+            #     '/')
+
+            # dom = [dom_raw]
+            # print(dom)
+
+            def concatenate_url(url_item):
+                scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
+                for item in scheme_list:
+                    made_item = item + url_item
+                    #		print domTest
+                    redirectTest(made_item)
+
+            concatenate_url(url)
+            print('Done')
+            import metadata_parser
+
+            # 위에서 200이건 300이건 301이건 302 이건 뽑힌 것에서 메타데이터 파싱을 진행해야 한다.
+            # 티스토리 캐노니컬 주소 아닌 곳에서 어떻게 리스폰스가 오는지 확인하라. 그것도 200이면 그걸 고려해야하고
+            # 대표주소 아닐 경우 200 안 오면 그것을 고려해야 한다. 
+            # moneycake.tistory.com/43 여기에 요청했을 시 왜 403인데도 제대로 작동하지 않는지 확인해봐야한다.
+            page = metadata_parser.MetadataParser(url=url, search_head_only=False, url_headers=headers)
+            print('-----------------')
+            print('discrete url: ' + page.get_discrete_url())
+            print('title :' + page.get_metadata('title'))
+            print('description: ' + page.get_metadata('description'))
+            # 사주포춘보고 타이틀, meta title, 그다음 meta description
+            print('title og: ' + page.get_metadatas('title', strategy=['og', ]))
+            print('title og, page, dc' + page.get_metadatas('title', strategy=['og', 'page', 'dc', ]))
+            print('----------get_redirect_url: ' + get_redirected_url(url))
             return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
+
+
+def test10(request):
+    if request.method == 'POST':
+        if request.is_ajax():
+            ajax_url = request.POST.get('ajax_url', None)
+            refresh_url = request.POST.get('refresh_url', None)
+
+            '''
+
+            a = 'http://www.cwi.nl:80/%7Eguido/Python.html'
+            b = '/create/new/'
+            c = 532
+            d = u'dkakasdkjdjakdjadjfalskdjfalk'
+            f1 = 'http://localhost'
+            f2 = 'localhost:8000'
+            print(re.match(regex, "http://www.example.com"))
+            print(re.match(regex, "example.com"))
+            print('-----')
+            print(re.match(regex, a))
+            print(re.match(regex, b))
+            url = "https://goo.gl/7Gt5nQ"
+            url2 = "http://f-st.co/THHI6hC"
+            url_refresh_sample = "http://www.isthe.com/chongo/tech/comp/cgi/redirect.html"
+            url_google = "http://google.com"
+            redirect_url = get_redirected_url(url_refresh_sample)
+            print(redirect_url)
+            ssl._create_default_https_context = ssl._create_unverified_context
+            html = urllib.request.urlopen(ajax_url)
+            bs_object = BeautifulSoup(html.read(), "html.parser")
+            bs_refresh = bs_object.find('link', attrs={'rel': 'canonical'})
+            # bs_refresh = bs_object.find('meta', attrs={'http-equiv': 'Refresh'})
+
+            print(bs_refresh)
+            #refresh 랑 Refresh 구별해야함 그리고 smtp, ftp 그외 는 따로 분류할수도 있어야함.
+            # bs_refresh_content = bs_refresh['content']
+            # print(bs_refresh_content)
+            # got_url = bs_refresh_content.partition('=')[2]
+            # print(got_url)
+
+            bs_pretty = bs_refresh.prettify()
+            '''
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
+            }
+
+            try:
+                r = requests.head('http://moneycake.tistory.com/43', allow_redirects=False, headers=headers)
+                print(r.status_code)
+            except requests.exceptions.RequestException as e:
+                pass
+
+            return JsonResponse({'success': 'yeah'})
+    else:
+        return render(request, 'testapp/test10.html')
+
+
+import requests
+
+
+def strip_scheme(url):
+    parsed = urlparse(url)
+    scheme = "%s://" % parsed.scheme
+    return parsed.geturl().replace(scheme, '', 1)
+
+
+# 301이면 어디로 가는지 확인하고 http랑 https 다 되면 https를 추천하는 방향으로.
+
+# That's it!
+
+
+#localhost, http:///change/new/, 이런거 확인. 그리고 줄임 주소 변경 여부 확인. get_current_url 이용
