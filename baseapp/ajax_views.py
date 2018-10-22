@@ -2203,6 +2203,20 @@ def re_search_post(request):
 # ---------------------------------------------------------------------------------------------------------------------------
 
 
+def url_without_scheme(url):
+    if url.startswith('http://www.'):
+        url = url.replace('http://www.', '', 1)
+    elif url.startswith('http://'):
+        url = url.replace('http://', '', 1)
+    elif url.startswith('https://www.'):
+        url = url.replace('https://www.', '', 1)
+    elif url.startswith('https://'):
+        url = url.replace('https://', '', 1)
+    else:
+        pass
+    return url
+
+
 def get_redirected_url(url):
     import ssl
     context = ssl._create_unverified_context()
@@ -2226,98 +2240,127 @@ def redirectTest(item):
         except Exception as e:
             print(e)
         if r is not None:
-            print('redirected_url: ' + get_redirected_url(item))
+            # print('redirected_url: ' + get_redirected_url(item))
             if r.status_code == 301:
-                print("Tested:", item, "\n\t", r.url, "\n\t", r.status_code, "\n\t", r.headers['Location'])
+                print(' r_status_code: '+ str(r.status_code))
+                # print("Tested: " + item + ' r_url: ' + r.url + ' r_status_code: '+ str(r.status_code) + ' r_header_location: '+r.headers['Location'])
             elif r.status_code == 302:
-                print("Tested:", item, "\n\t", r.url, "\n\t", r.status_code, "\n\t", r.headers['Location'])
+                print(' r_status_code: '+ str(r.status_code))
+
+                # print("Tested: " + item + ' r_url: ' + r.url + ' r_status_code: '+ str(r.status_code) + ' r_header_location: '+r.headers['Location'])
                 # 이 로케이션이 이상한 곳으로 갈 경우 그것도 테스트.
                 # 301과 302는 다르다고 한다.
             else:
-                print("Tested:", item, "\n\t", r.url, "\n\t", r.status_code)
+                print(' r_status_code: '+ str(r.status_code))
+                # print("Tested: " + item + ' r_url: ' + r.url + ' r_status_code: '+ str(r.status_code))
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        print("Tested:", item, "\n\t", 'error: ', e)
-    pass
+        print(' r_status_code: ' + str(r.status_code))
+        # print("Tested: " + item + ' error: ' + e)
+    return
+
+def sleep_and_print():
+    import time
+    time.sleep(2)
+    print('some word')
+
 
 
 @ensure_csrf_cookie
 def re_check_url(request):
     if request.method == "POST":
         if request.is_ajax():
-            url = request.POST.get('url', None)
+            # url = 'bit.do/ey9Qx'
+            # url = url.strip().strip('/')
+            # url = url_without_scheme(url)
+            # scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
+            # print('base url: ' + url)
+            # resolved_urls = []
+            # for item in scheme_list:
+            #     made_url = item + url
+            #
+            #     import ssl
+            #     context = ssl._create_unverified_context()
+            #     redirected_url = None
+            #
+            #     try:
+            #         redirected_url = urllib.request.urlopen(made_url, context=context).geturl()
+            #     except Exception as e:
+            #         print(e)
+            #     if redirected_url is not None:
+            #         redirected_url = url_without_scheme(redirected_url)
+            #         if redirected_url not in resolved_urls:
+            #             resolved_urls.append(redirected_url)
+            # print(resolved_urls)
+            resolved_urls = ['twitch.tv/yumyumyu77']
 
-            print(url)
-            print(get_redirected_url(url))
-            import re
-            regex = re.compile(
-                r'^(?:http|ftp)s?://'  # http:// or https://
-                r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
-                r'localhost|'  # localhost...
-                r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
-                r'(?::\d+)?'  # optional port
-                r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-            try:
-                print('re.match result: ' + re.match(regex, url))
-            except Exception as e:
-                print(e)
+            scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
 
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
-            }
-
-
-            print('here')
-
-            url = url.strip().strip('/')
-            import re
-            if url.startswith('http://www.'):
-                url = url.replace('http://www.', '', 1)
-            elif url.startswith('http://'):
-                url = url.replace('http://', '', 1)
-            elif url.startswith('https://www.'):
-                url = url.replace('https://www.', '', 1)
-            elif url.startswith('https://'):
-                url = url.replace('https://', '', 1)
-            else:
-                pass
-            # url_re = re.compile(r"https?://(www\.)?")
-
-            # dom_raw = url_re.sub('',
-            #                   url).replace(
-            #     " ", "").strip(
-            #     '/')
-
-            # dom = [dom_raw]
-            # print(dom)
-
-            def concatenate_url(url_item):
-                scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
-                for item in scheme_list:
-                    made_item = item + url_item
-                    #		print domTest
-                    redirectTest(made_item)
-
-            concatenate_url(url)
-            print('Done')
-            import metadata_parser
-
-            # 위에서 200이건 300이건 301이건 302 이건 뽑힌 것에서 메타데이터 파싱을 진행해야 한다.
-            # 티스토리 캐노니컬 주소 아닌 곳에서 어떻게 리스폰스가 오는지 확인하라. 그것도 200이면 그걸 고려해야하고
-            # 대표주소 아닐 경우 200 안 오면 그것을 고려해야 한다. 
-            # moneycake.tistory.com/43 여기에 요청했을 시 왜 403인데도 제대로 작동하지 않는지 확인해봐야한다.
-            page = metadata_parser.MetadataParser(url=url, search_head_only=False, url_headers=headers)
-            print('-----------------')
-            print('discrete url: ' + page.get_discrete_url())
-            print('title :' + page.get_metadata('title'))
-            print('description: ' + page.get_metadata('description'))
-            # 사주포춘보고 타이틀, meta title, 그다음 meta description
-            print('title og: ' + page.get_metadatas('title', strategy=['og', ]))
-            print('title og, page, dc' + page.get_metadatas('title', strategy=['og', 'page', 'dc', ]))
-            print('----------get_redirect_url: ' + get_redirected_url(url))
+            for item in resolved_urls:
+                for scheme_item in scheme_list:
+                    redirectTest(scheme_item + item)
             return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
 
 
+'''
+print('accepted url: '+url)
+print('redirected_url: '+redirected_url)
+import re
+regex = re.compile(
+    r'^(?:http|ftp)s?://'  # http:// or https://
+    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+    r'localhost|'  # localhost...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+    r'(?::\d+)?'  # optional port
+    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+try:
+    print('re.match result: ' + re.match(regex, url))
+except Exception as e:
+    print(e)
+
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
+}
+
+
+print('here')
+
+
+# url_re = re.compile(r"https?://(www\.)?")
+
+# dom_raw = url_re.sub('',
+#                   url).replace(
+#     " ", "").strip(
+#     '/')
+
+# dom = [dom_raw]
+# print(dom)
+
+def concatenate_url(url_item):
+    scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
+    for item in scheme_list:
+        made_item = item + url_item
+        #		print domTest
+        redirectTest(made_item)
+
+concatenate_url(url)
+print('Done')
+import metadata_parser
+
+# 위에서 200이건 300이건 301이건 302 이건 뽑힌 것에서 메타데이터 파싱을 진행해야 한다.
+# 티스토리 캐노니컬 주소 아닌 곳에서 어떻게 리스폰스가 오는지 확인하라. 그것도 200이면 그걸 고려해야하고
+# 대표주소 아닐 경우 200 안 오면 그것을 고려해야 한다.
+# moneycake.tistory.com/43 여기에 요청했을 시 왜 403인데도 제대로 작동하지 않는지 확인해봐야한다.
+page = metadata_parser.MetadataParser(url=url, search_head_only=False, url_headers=headers)
+print('-----------------')
+print('discrete url: ' + page.get_discrete_url())
+print('title :' + page.get_metadata('title'))
+print('description: ' + page.get_metadata('description'))
+# 사주포춘보고 타이틀, meta title, 그다음 meta description
+print('title og: ' + page.get_metadatas('title', strategy=['og', ]))
+print('title og, page, dc' + page.get_metadatas('title', strategy=['og', 'page', 'dc', ]))
+print('----------get_redirect_url: ' + get_redirected_url(url))
+'''
 def test10(request):
     if request.method == 'POST':
         if request.is_ajax():
