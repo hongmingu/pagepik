@@ -2220,85 +2220,116 @@ def url_without_scheme(url):
 def get_redirected_url(url):
     import ssl
     context = ssl._create_unverified_context()
-    result = 'no good url'
+    result = None
     try:
         result = urllib.request.urlopen(url, context=context).geturl()
     except Exception as e:
         print(e)
-        return 'error occurred: ' + url
     return result
 
 
+from threading import Lock
+
+_lock = Lock()
+
 def redirectTest(item):
+    r = None
     try:
         headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
         }
-        r = None
         try:
-            r = requests.head(item, allow_redirects=False, headers=headers)
+            r = requests.get(item, allow_redirects=False, headers=headers)
+            # r = requests.head(item, allow_redirects=False, headers=headers)
+
         except Exception as e:
             print(e)
         if r is not None:
-            # print('redirected_url: ' + get_redirected_url(item))
             if r.status_code == 301:
-                print(' r_status_code: '+ str(r.status_code))
-                # print("Tested: " + item + ' r_url: ' + r.url + ' r_status_code: '+ str(r.status_code) + ' r_header_location: '+r.headers['Location'])
+                print('301')
+                return {'status': str(r.status_code), 'url': r.url, 'header_location': r.headers['Location']}
             elif r.status_code == 302:
-                print(' r_status_code: '+ str(r.status_code))
+                print('302')
+                return {'status': str(r.status_code), 'url': r.url, 'header_location': r.headers['Location']}
 
-                # print("Tested: " + item + ' r_url: ' + r.url + ' r_status_code: '+ str(r.status_code) + ' r_header_location: '+r.headers['Location'])
                 # 이 로케이션이 이상한 곳으로 갈 경우 그것도 테스트.
                 # 301과 302는 다르다고 한다.
+            elif r.status_code == 405:
+                r = requests.get(item, allow_redirects=False, headers=headers)
+                print('here')
+                return {'status': str(r.status_code), 'url': r.url}
             else:
-                print(' r_status_code: '+ str(r.status_code))
-                # print("Tested: " + item + ' r_url: ' + r.url + ' r_status_code: '+ str(r.status_code))
+                return {'status': str(r.status_code), 'url': r.url}
     except requests.exceptions.RequestException as e:  # This is the correct syntax
-        print(' r_status_code: ' + str(r.status_code))
-        # print("Tested: " + item + ' error: ' + e)
-    return
-
-def sleep_and_print():
-    import time
-    time.sleep(2)
-    print('some word')
-
-
+        pass
+    return r
 
 @ensure_csrf_cookie
 def re_check_url(request):
     if request.method == "POST":
         if request.is_ajax():
-            # url = 'bit.do/ey9Qx'
-            # url = url.strip().strip('/')
-            # url = url_without_scheme(url)
-            # scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
-            # print('base url: ' + url)
-            # resolved_urls = []
-            # for item in scheme_list:
-            #     made_url = item + url
-            #
-            #     import ssl
-            #     context = ssl._create_unverified_context()
-            #     redirected_url = None
-            #
-            #     try:
-            #         redirected_url = urllib.request.urlopen(made_url, context=context).geturl()
-            #     except Exception as e:
-            #         print(e)
-            #     if redirected_url is not None:
-            #         redirected_url = url_without_scheme(redirected_url)
-            #         if redirected_url not in resolved_urls:
-            #             resolved_urls.append(redirected_url)
-            # print(resolved_urls)
-            resolved_urls = ['twitch.tv/yumyumyu77']
+            url = request.POST.get('url', None)
 
+            from urllib.parse import urlparse
+            # from urlparse import urlparse  # Python 2
+            if not (url.startswith('http://') or url.startswith('https://')):
+                url = 'https://' + url
+            import re
+            regex = re.compile(
+                r'^(?:http|ftp)s?://'  # http:// or https://
+                r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+                r'localhost|'  # localhost...
+                r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+                r'(?::\d+)?'  # optional port
+                r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+            re_match = None
+            try:
+                re_match = re.match(regex, url)
+            except Exception as e:
+                print(e)
+            if re_match is None:
+                print('nono')
+                # url 이 아닙니다.
+            parsed_uri = urlparse(url)
+            result = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
+            is_ip = ((url_without_scheme(result).strip().strip('/')).replace('.', '').replace(':', '')).isdigit()
+            is_localhost = ((url_without_scheme(result).strip().strip('/')).replace('.', '').replace(':', '').lower().startswith('localhost'))
+            if is_ip or is_localhost:
+                print('hoho')
+                # localhost 랑 ip는 안 받는다.
+            url = url.strip().strip('/')
+            url = url_without_scheme(url)
             scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
+            print('base url: ' + url)
+            resolved_urls = []
 
+            for item in scheme_list:
+                made_url = item + url
+
+                import ssl
+                context = ssl._create_unverified_context()
+                redirected_url = None
+
+                try:
+                    redirected_url = urllib.request.urlopen(made_url, context=context).geturl()
+                except Exception as e:
+                    # 안 열림
+                    print(e)
+                if redirected_url is not None:
+                    redirected_url = url_without_scheme(redirected_url).strip().strip('/')
+                    if redirected_url not in resolved_urls:
+                        resolved_urls.append(redirected_url)
+
+            print(resolved_urls)
+            appender = []
+            scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
             for item in resolved_urls:
                 for scheme_item in scheme_list:
-                    redirectTest(scheme_item + item)
-            return JsonResponse({'res': 1})
+                    print('test url: '+ scheme_item+item)
+                    get_value = redirectTest(scheme_item + item)
+                    print(get_value)
+                    appender.append(get_value)
+            return JsonResponse({'res': 1, 'appender': appender})
         return JsonResponse({'res': 2})
 
 
