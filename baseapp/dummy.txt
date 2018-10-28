@@ -1,0 +1,30 @@
+base url: bitly.com
+D:\pythonDev\interpreters\forMultichat\lib\site-packages\metadata_parser\__init__.py:922: FutureWarning: `get_metadata` returns a string and is being deprecatedin favor of `get_metadatas` which returns a list.
+  warn_future("""`get_metadata` returns a string and is being deprecated"""
+discrete_url: https://bitly.com/
+discrete_url: https://bitly.com/
+test_url: http://www.bitly.com/
+result: {'status': '301', 'url': 'http://www.bitly.com/', 'location': 'http://bitly.com/'}
+url_was: http://www.bitly.com/
+test_url: http://bitly.com/
+result: {'status': '302', 'url': 'http://bitly.com/', 'location': 'https://bitly.com/'}
+url_was: http://bitly.com/
+test_url: https://www.bitly.com/
+result: {'status': '301', 'url': 'https://www.bitly.com/', 'location': 'http://bitly.com/'}
+url_was: https://www.bitly.com/
+test_url: https://bitly.com/
+result: {'status': '200', 'url': 'https://bitly.com/'}
+url_was: https://bitly.com/
+test_url: http://www.bitly.com
+result: {'status': '301', 'url': 'http://www.bitly.com/', 'location': 'http://bitly.com/'}
+url_was: http://www.bitly.com
+test_url: http://bitly.com
+result: {'status': '302', 'url': 'http://bitly.com/', 'location': 'https://bitly.com/'}
+url_was: http://bitly.com
+test_url: https://www.bitly.com
+result: {'status': '301', 'url': 'https://www.bitly.com/', 'location': 'http://bitly.com/'}
+url_was: https://www.bitly.com
+test_url: https://bitly.com
+[25/Oct/2018 00:31:09] "POST /re/check/url/ HTTP/1.1" 200 10
+result: {'status': '200', 'url': 'https://bitly.com/'}
+url_was: https://bitly.com

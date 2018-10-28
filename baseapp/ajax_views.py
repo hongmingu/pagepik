@@ -2212,6 +2212,8 @@ def url_without_scheme(url):
         url = url.replace('https://www.', '', 1)
     elif url.startswith('https://'):
         url = url.replace('https://', '', 1)
+    elif url.startswith('www.'):
+        url = url.replace('www.', '', 1)
     else:
         pass
     return url
@@ -2264,43 +2266,160 @@ def redirectTest(item):
         pass
     return r
 
+def is_local_ip(url):
+    from urllib.parse import urlparse
+    import re
+
+    # from urlparse import urlparse  # Python 2
+    if not (url.startswith('http://') or url.startswith('https://')):
+        url = 'https://' + url
+
+    regex = re.compile(
+        r'^(?:http|ftp)s?://'  # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+        r'localhost|'  # localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+        r'(?::\d+)?'  # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    re_match = None
+    try:
+        re_match = re.match(regex, url)
+    except Exception as e:
+        print(e)
+    if re_match is None:
+        return False
+        # url 이 아닙니다.
+    parsed_uri = urlparse(url)
+    url_formatted = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
+    is_ip = ((url_without_scheme(url_formatted).strip().strip('/')).replace('.', '').replace(':', '')).isdigit()
+    is_localhost = (
+        (url_without_scheme(url_formatted).strip().strip('/')).replace('.', '').replace(':', '').lower().startswith('localhost'))
+    if is_ip or is_localhost:
+        return True
+
+    return False
+        # localhost 랑 ip는 안 받는다.
+
+def check_success_url(url, o_count, success_list):
+    if o_count > 20:
+        return
+    req = None
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
+    }
+    is_success = False
+    count = 0
+    can_save = True
+    if success_list is None:
+        success_list = []
+    while is_success is False:
+
+        count = count + 1
+        if count > 7:
+            return
+
+        url = url.strip()
+
+        from furl import furl
+        furl_obj = furl(url)
+        furl_obj.path.normalize()
+        url = furl_obj.url
+
+        try:
+            req = requests.get(url, allow_redirects=False, headers=headers)
+        except Exception as e:
+            print('requests error: ' + str(e) + ' at: ' + url)
+            return
+        if req is not None:
+            if req.status_code == 301:
+                print('1'+url)
+                url = req.headers['Location']
+                can_save = True
+                continue
+            elif req.status_code == 302:
+                url = req.headers['Location']
+                can_save = False
+
+                print('2'+url)
+                # 이 로케이션이 이상한 곳으로 갈 경우 그것도 테스트.
+                # 301과 302는 다르다고 한다.
+                continue
+            elif req.status_code == 200:
+                print('3')
+                # 다음은 어이없게도 daum.net 입력시 301 redirect 가 없다.
+
+                if req.url not in success_list:
+                    if can_save is True:
+                        success_list.append(req.url)
+                else:
+                    return
+                o_count = o_count + 1
+                # discrete url 체크
+
+                import metadata_parser
+                page = metadata_parser.MetadataParser(url=req.url, search_head_only=False, url_headers=headers)
+                discrete_url = page.get_discrete_url()
+                if discrete_url != req.url:
+                    print(discrete_url)
+                    check_success_url(discrete_url, o_count, success_list)
+                else:
+                    pass
+                no_args_url = furl_obj.remove(args=True, fragment=True).url
+                if no_args_url != req.url:
+                    print(no_args_url)
+                    check_success_url(no_args_url, o_count, success_list)
+                else:
+                    pass
+                is_success = True
+                continue
+            else:
+                print(req.status_code)
+                try:
+                    url = req.headers['Location']
+                    can_save = False
+                    print(url)
+                except Exception as e:
+                    print(e)
+                    return
+                continue
+    return
+
+
 @ensure_csrf_cookie
 def re_check_url(request):
     if request.method == "POST":
         if request.is_ajax():
             url = request.POST.get('url', None)
+            has_scheme = True
+            if not (url.startswith('https://') or url.startswith('http://')):
+                has_scheme = False
 
-            from urllib.parse import urlparse
-            # from urlparse import urlparse  # Python 2
-            if not (url.startswith('http://') or url.startswith('https://')):
-                url = 'https://' + url
-            import re
-            regex = re.compile(
-                r'^(?:http|ftp)s?://'  # http:// or https://
-                r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
-                r'localhost|'  # localhost...
-                r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
-                r'(?::\d+)?'  # optional port
-                r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-            re_match = None
-            try:
-                re_match = re.match(regex, url)
-            except Exception as e:
-                print(e)
-            if re_match is None:
-                print('nono')
-                # url 이 아닙니다.
-            parsed_uri = urlparse(url)
-            result = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
-            is_ip = ((url_without_scheme(result).strip().strip('/')).replace('.', '').replace(':', '')).isdigit()
-            is_localhost = ((url_without_scheme(result).strip().strip('/')).replace('.', '').replace(':', '').lower().startswith('localhost'))
-            if is_ip or is_localhost:
-                print('hoho')
-                # localhost 랑 ip는 안 받는다.
-            url = url.strip().strip('/')
-            url = url_without_scheme(url)
+            # if not check_local_ip(url):
+            #     return JsonResponse({'res': 0, 'message': 'localhost or ip'})
+            print(is_local_ip(url))
+            is_success = False
+            count = 0
+            success_list = []
+            if has_scheme is False:
+                check_success_url('http://' + url, 0, success_list)
+                check_success_url('https://' + url, 0, success_list)
+            else:
+                check_success_url(url, 0, success_list)
+
+            print(success_list)
+
+            # url = url_without_scheme(url)
+            '''
             scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
             print('base url: ' + url)
+            '''
+
+
+            import metadata_parser
+            # page = metadata_parser.MetadataParser(url='http://'+url, search_head_only=False, url_headers=headers)
+            # print('discrete_url: '+page.get_discrete_url())
+            # print('discrete_url: '+page.get_discrete_url())
+            '''
             resolved_urls = []
 
             for item in scheme_list:
@@ -2314,22 +2433,52 @@ def re_check_url(request):
                     redirected_url = urllib.request.urlopen(made_url, context=context).geturl()
                 except Exception as e:
                     # 안 열림
-                    print(e)
+                    print('redirect error: ' + str(e))
+                    print('url_was: ' + made_url)
+
                 if redirected_url is not None:
-                    redirected_url = url_without_scheme(redirected_url).strip().strip('/')
+                    redirected_url = url_without_scheme(redirected_url).strip()
+                    # 여기서 리다이렉트 url 이 끝에 / 있는 경우도 있고 없는 경우도 있어서 해야함. 만약 스트립 '/' 이 아니라
+                    # '/'을 더해주는 것으로 한다면 get parameter 있는 경우가 귀찮아진다.
                     if redirected_url not in resolved_urls:
                         resolved_urls.append(redirected_url)
 
-            print(resolved_urls)
-            appender = []
             scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
+
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
+            }
             for item in resolved_urls:
                 for scheme_item in scheme_list:
-                    print('test url: '+ scheme_item+item)
-                    get_value = redirectTest(scheme_item + item)
-                    print(get_value)
-                    appender.append(get_value)
-            return JsonResponse({'res': 1, 'appender': appender})
+                    test_url = scheme_item + item
+                    req = None
+                    try:
+                        req = requests.get(test_url, allow_redirects=False, headers=headers)
+                    except Exception as e:
+                        print('requests error: '+str(e))
+                        print('url_was: '+ test_url)
+                    if req is not None:
+                        url_response = None
+                        print('test_url: ' + test_url)
+                        if req.status_code == 301:
+                            url_response = {'status': str(req.status_code), 'url': req.url,
+                                    'location': req.headers['Location']}
+                        elif req.status_code == 302:
+                            url_response = {'status': str(req.status_code), 'url': req.url,
+                                    'location': req.headers['Location']}
+
+                            # 이 로케이션이 이상한 곳으로 갈 경우 그것도 테스트.
+                            # 301과 302는 다르다고 한다.
+                        elif req.status_code == 200:
+                            url_response = {'status': str(req.status_code), 'url': req.url}
+                        else:
+                            url_response = {'status': str(req.status_code), 'url': req.url}
+                        print('result: '+ str(url_response) )
+                        print('url_was: '+ test_url)
+                    else:
+                        req = None
+            '''
+            return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
 
 
