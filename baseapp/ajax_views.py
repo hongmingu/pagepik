@@ -2300,7 +2300,7 @@ def is_local_ip(url):
     return False
         # localhost 랑 ip는 안 받는다.
 
-def check_success_url(url, o_count, success_list):
+def check_success_url(url, o_count, success_list, not_301_redirect_list):
     if o_count > 20:
         return
     req = None
@@ -2309,9 +2309,11 @@ def check_success_url(url, o_count, success_list):
     }
     is_success = False
     count = 0
-    can_save = True
     if success_list is None:
         success_list = []
+    if not_301_redirect_list is None:
+        not_301_redirect_list = []
+
     while is_success is False:
 
         count = count + 1
@@ -2334,12 +2336,10 @@ def check_success_url(url, o_count, success_list):
             if req.status_code == 301:
                 print('1'+url)
                 url = req.headers['Location']
-                can_save = True
                 continue
             elif req.status_code == 302:
                 url = req.headers['Location']
-                can_save = False
-
+                not_301_redirect_list.append(url)
                 print('2'+url)
                 # 이 로케이션이 이상한 곳으로 갈 경우 그것도 테스트.
                 # 301과 302는 다르다고 한다.
@@ -2349,8 +2349,7 @@ def check_success_url(url, o_count, success_list):
                 # 다음은 어이없게도 daum.net 입력시 301 redirect 가 없다.
 
                 if req.url not in success_list:
-                    if can_save is True:
-                        success_list.append(req.url)
+                    success_list.append(req.url)
                 else:
                     return
                 o_count = o_count + 1
@@ -2361,13 +2360,13 @@ def check_success_url(url, o_count, success_list):
                 discrete_url = page.get_discrete_url()
                 if discrete_url != req.url:
                     print(discrete_url)
-                    check_success_url(discrete_url, o_count, success_list)
+                    check_success_url(discrete_url, o_count, success_list, not_301_redirect_list)
                 else:
                     pass
                 no_args_url = furl_obj.remove(args=True, fragment=True).url
                 if no_args_url != req.url:
                     print(no_args_url)
-                    check_success_url(no_args_url, o_count, success_list)
+                    check_success_url(no_args_url, o_count, success_list, not_301_redirect_list)
                 else:
                     pass
                 is_success = True
@@ -2376,7 +2375,8 @@ def check_success_url(url, o_count, success_list):
                 print(req.status_code)
                 try:
                     url = req.headers['Location']
-                    can_save = False
+                    not_301_redirect_list.append(url)
+
                     print(url)
                 except Exception as e:
                     print(e)
@@ -2400,14 +2400,18 @@ def re_check_url(request):
             is_success = False
             count = 0
             success_list = []
+            not_301_redirect_list = []
             if has_scheme is False:
-                check_success_url('http://' + url, 0, success_list)
-                check_success_url('https://' + url, 0, success_list)
+                check_success_url('http://' + url, 0, success_list, not_301_redirect_list)
+                check_success_url('https://' + url, 0, success_list, not_301_redirect_list)
             else:
-                check_success_url(url, 0, success_list)
+                check_success_url(url, 0, success_list, not_301_redirect_list)
 
             print(success_list)
-
+            print(not_301_redirect_list)
+            # 여기서 not_301_redirect_list 에 있는 거랑 겹치면 후순위로 밀리게 한다.
+            # 유튜브 줄임에서 찾아가면 302 로케이션이 후순위로 오는게 적절할 것 같다.
+            # 301 로케이션은 그대로 괜찮음. 알규먼트 없앤건 그것도 괜찮음. 이건 생각해보자.
             # url = url_without_scheme(url)
             '''
             scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
