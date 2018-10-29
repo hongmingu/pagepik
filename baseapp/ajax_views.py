@@ -2334,38 +2334,73 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list):
             return
         if req is not None:
             if req.status_code == 301:
-                print('1'+url)
                 url = req.headers['Location']
                 continue
             elif req.status_code == 302:
                 url = req.headers['Location']
                 not_301_redirect_list.append(url)
-                print('2'+url)
                 # 이 로케이션이 이상한 곳으로 갈 경우 그것도 테스트.
                 # 301과 302는 다르다고 한다.
                 continue
             elif req.status_code == 200:
-                print('3')
+                discrete_url = None
+                no_args_url = None
+                import metadata_parser
                 # 다음은 어이없게도 daum.net 입력시 301 redirect 가 없다.
+                if not any(i.get('url') == req.url for i in success_list):
+                    got_url = req.url
 
-                if req.url not in success_list:
-                    success_list.append(req.url)
+                    page = None
+                    discrete_url = None
+
+                    try:
+                        page = metadata_parser.MetadataParser(url=got_url, search_head_only=False, url_headers=headers)
+                    except Exception as e:
+                        print(e)
+                    no_args_url = furl_obj.remove(args=True, fragment=True).url
+                    f = furl(got_url)
+
+                    loc = got_url.replace(f.scheme+'://', '', 1)
+                    title = page.get_metadatas('title', strategy=['page'])
+
+                    scheme = f.scheme
+
+                    discrete_loc = None
+                    discrete_scheme = None
+
+                    if page is not None:
+                        discrete_url = page.get_discrete_url()
+                        f_discrete = furl(discrete_url)
+                        discrete_loc = discrete_url.replace(f_discrete.scheme+'://', '', 1)
+                        discrete_scheme = f_discrete.scheme
+
+                    is_discrete = False
+                    if discrete_url == req.url:
+                        is_discrete = True
+
+                    not_301_redirect = False
+                    if got_url in not_301_redirect_list:
+                        not_301_redirect = True
+
+                    sub_appender = {'loc': loc,
+                                    'title': title,
+                                    'scheme': scheme,
+                                    'is_discrete': is_discrete,
+                                    'discrete_loc': discrete_loc,
+                                    'discrete_scheme': discrete_scheme,
+                                    'in_not_301': not_301_redirect
+                                    }
+                    success_list.append(sub_appender)
                 else:
                     return
                 o_count = o_count + 1
                 # discrete url 체크
 
-                import metadata_parser
-                page = metadata_parser.MetadataParser(url=req.url, search_head_only=False, url_headers=headers)
-                discrete_url = page.get_discrete_url()
                 if discrete_url != req.url:
-                    print(discrete_url)
                     check_success_url(discrete_url, o_count, success_list, not_301_redirect_list)
                 else:
                     pass
-                no_args_url = furl_obj.remove(args=True, fragment=True).url
                 if no_args_url != req.url:
-                    print(no_args_url)
                     check_success_url(no_args_url, o_count, success_list, not_301_redirect_list)
                 else:
                     pass
@@ -2390,10 +2425,33 @@ def re_check_url(request):
     if request.method == "POST":
         if request.is_ajax():
             url = request.POST.get('url', None)
+
+            if is_local_ip(url):
+                return JsonResponse({'res': 0, 'message': 'localhost or ip'})
             has_scheme = True
             if not (url.startswith('https://') or url.startswith('http://')):
                 has_scheme = False
 
+            success_list = []
+            not_301_redirect_list = []
+            if has_scheme is False:
+                check_success_url('http://' + url, 0, success_list, not_301_redirect_list)
+                check_success_url('https://' + url, 0, success_list, not_301_redirect_list)
+            else:
+                check_success_url(url, 0, success_list, not_301_redirect_list)
+
+            print(success_list)
+            print(not_301_redirect_list)
+            '''
+            url: https://github.com/gruns/furl/blob/master/API.md
+            furl.netloc: github.com
+            furl.origin: https://github.com
+            '''
+            '''
+            has_scheme = True
+            if not (url.startswith('https://') or url.startswith('http://')):
+                has_scheme = False
+            
             # if not check_local_ip(url):
             #     return JsonResponse({'res': 0, 'message': 'localhost or ip'})
             print(is_local_ip(url))
@@ -2409,6 +2467,7 @@ def re_check_url(request):
 
             print(success_list)
             print(not_301_redirect_list)
+            '''
             # 여기서 not_301_redirect_list 에 있는 거랑 겹치면 후순위로 밀리게 한다.
             # 유튜브 줄임에서 찾아가면 302 로케이션이 후순위로 오는게 적절할 것 같다.
             # 301 로케이션은 그대로 괜찮음. 알규먼트 없앤건 그것도 괜찮음. 이건 생각해보자.
@@ -2417,8 +2476,7 @@ def re_check_url(request):
             scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
             print('base url: ' + url)
             '''
-
-
+            url_set = []
             import metadata_parser
             # page = metadata_parser.MetadataParser(url='http://'+url, search_head_only=False, url_headers=headers)
             # print('discrete_url: '+page.get_discrete_url())
