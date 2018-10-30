@@ -1,1 +1,35 @@
-$(document).ready(function(){var select_year,select_month,select_day,i_birth;var currentDate=new Date(new Date().getTime());var current_year=currentDate.getFullYear();select_year=$('#select_year');for(i_birth=current_year;i_birth>=1900;i_birth-=1){select_year.append("<option value=\""+i_birth+"\">"+i_birth+"</option>")}select_month=$('#select_month');for(i_birth=1;i_birth<=12;i_birth+=1){select_month.append("<option value=\""+i_birth+"\">"+i_birth+"</option>")}select_day=$('#select_day');for(i_birth=1;i_birth<=31;i_birth+=1){select_day.append("<option value=\""+i_birth+"\">"+i_birth+"</option>")}});
+$(function () {
+    $('#years').append('<option selected disabled value="non">Year</option>');
+    $('#months').append('<option selected disabled value="non">Month</option>');
+
+for (i = new Date().getFullYear(); i > 1900; i--){
+    $('#years').append($('<option />').val(i).html(i));
+}
+
+for (i = 1; i < 13; i++){
+    $('#months').append($('<option />').val(i).html(i));
+}
+ updateNumberOfDays();
+
+$('#years, #months').on("change", function(){
+    updateNumberOfDays();
+});
+
+
+
+function updateNumberOfDays(){
+    $('#days').html('');
+    month=$('#months').val();
+    year=$('#years').val();
+    days=daysInMonth(month, year);
+    $('#days').append('<option selected disabled value="non">Day</option>');
+
+    for(i=1; i < days+1 ; i++){
+            $('#days').append($('<option />').val(i).html(i));
+    }
+}
+
+function daysInMonth(month, year) {
+    return new Date(year, month, 0).getDate();
+}
+})

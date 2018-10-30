@@ -2325,7 +2325,9 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list):
         from furl import furl
         furl_obj = furl(url)
         furl_obj.path.normalize()
-        url = furl_obj.url
+
+        url = furl_obj.remove(fragment=True).url
+        # url = furl_obj.url
 
         try:
             req = requests.get(url, allow_redirects=False, headers=headers)
@@ -2382,7 +2384,8 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list):
                     if got_url in not_301_redirect_list:
                         not_301_redirect = True
 
-                    sub_appender = {'loc': loc,
+                    sub_appender = {'url': got_url,
+                                    'loc': loc,
                                     'title': title,
                                     'scheme': scheme,
                                     'is_discrete': is_discrete,
