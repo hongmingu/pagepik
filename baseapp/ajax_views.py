@@ -2266,7 +2266,7 @@ def redirectTest(item):
         pass
     return r
 
-def is_local_ip(url):
+def is_unable_url(url):
     from urllib.parse import urlparse
     import re
 
@@ -2287,7 +2287,7 @@ def is_local_ip(url):
     except Exception as e:
         print(e)
     if re_match is None:
-        return False
+        return True
         # url 이 아닙니다.
     parsed_uri = urlparse(url)
     url_formatted = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
@@ -2301,7 +2301,7 @@ def is_local_ip(url):
         # localhost 랑 ip는 안 받는다.
 
 def check_success_url(url, o_count, success_list, not_301_redirect_list):
-    if o_count > 20:
+    if o_count > 30:
         return
     req = None
     headers = {
@@ -2317,7 +2317,7 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list):
     while is_success is False:
 
         count = count + 1
-        if count > 7:
+        if count > 10:
             return
 
         url = url.strip()
@@ -2364,6 +2364,7 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list):
 
                     loc = got_url.replace(f.scheme+'://', '', 1)
                     title = page.get_metadatas('title', strategy=['page'])
+                    title = title[0]
 
                     scheme = f.scheme
 
@@ -2410,7 +2411,6 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list):
                 is_success = True
                 continue
             else:
-                print(req.status_code)
                 try:
                     url = req.headers['Location']
                     not_301_redirect_list.append(url)
@@ -2429,8 +2429,8 @@ def re_check_url(request):
         if request.is_ajax():
             url = request.POST.get('url', None)
 
-            if is_local_ip(url):
-                return JsonResponse({'res': 0, 'message': 'localhost or ip'})
+            if is_unable_url(url):
+                return JsonResponse({'res': 0, 'message': 'unable'})
             has_scheme = True
             if not (url.startswith('https://') or url.startswith('http://')):
                 has_scheme = False
@@ -2445,6 +2445,8 @@ def re_check_url(request):
 
             print(success_list)
             print(not_301_redirect_list)
+            return JsonResponse({'res': 1, 'output': success_list})
+
             '''
             url: https://github.com/gruns/furl/blob/master/API.md
             furl.netloc: github.com
@@ -2457,7 +2459,7 @@ def re_check_url(request):
             
             # if not check_local_ip(url):
             #     return JsonResponse({'res': 0, 'message': 'localhost or ip'})
-            print(is_local_ip(url))
+            print(is_unable_url(url))
             is_success = False
             count = 0
             success_list = []
@@ -2543,7 +2545,6 @@ def re_check_url(request):
                     else:
                         req = None
             '''
-            return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
 
 
