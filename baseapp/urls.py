@@ -26,7 +26,8 @@ urlpatterns = [
 
     re_path(r'^re/check/url/$', base_ajax_views.re_check_url,
             name='re_check_url'),
-
+    re_path(r'^re/register/url/$', base_ajax_views.re_register_url,
+            name='re_register_url'),
     # re_path(r'^email/key/send/$', views.email_key_send, name='email_key_send'),
     # re_path(r'^email/key/confirm/(?P<uid>([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?))/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         # views.email_key_confirm, name='email_key_confirm'),

@@ -2442,111 +2442,38 @@ def re_check_url(request):
                 check_success_url('https://' + url, 0, success_list, not_301_redirect_list)
             else:
                 check_success_url(url, 0, success_list, not_301_redirect_list)
-
-            print(success_list)
-            print(not_301_redirect_list)
             return JsonResponse({'res': 1, 'output': success_list})
-
-            '''
-            url: https://github.com/gruns/furl/blob/master/API.md
-            furl.netloc: github.com
-            furl.origin: https://github.com
-            '''
-            '''
-            has_scheme = True
-            if not (url.startswith('https://') or url.startswith('http://')):
-                has_scheme = False
-            
-            # if not check_local_ip(url):
-            #     return JsonResponse({'res': 0, 'message': 'localhost or ip'})
-            print(is_unable_url(url))
-            is_success = False
-            count = 0
-            success_list = []
-            not_301_redirect_list = []
-            if has_scheme is False:
-                check_success_url('http://' + url, 0, success_list, not_301_redirect_list)
-                check_success_url('https://' + url, 0, success_list, not_301_redirect_list)
-            else:
-                check_success_url(url, 0, success_list, not_301_redirect_list)
-
-            print(success_list)
-            print(not_301_redirect_list)
-            '''
-            # 여기서 not_301_redirect_list 에 있는 거랑 겹치면 후순위로 밀리게 한다.
-            # 유튜브 줄임에서 찾아가면 302 로케이션이 후순위로 오는게 적절할 것 같다.
-            # 301 로케이션은 그대로 괜찮음. 알규먼트 없앤건 그것도 괜찮음. 이건 생각해보자.
-            # url = url_without_scheme(url)
-            '''
-            scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
-            print('base url: ' + url)
-            '''
-            url_set = []
-            import metadata_parser
-            # page = metadata_parser.MetadataParser(url='http://'+url, search_head_only=False, url_headers=headers)
-            # print('discrete_url: '+page.get_discrete_url())
-            # print('discrete_url: '+page.get_discrete_url())
-            '''
-            resolved_urls = []
-
-            for item in scheme_list:
-                made_url = item + url
-
-                import ssl
-                context = ssl._create_unverified_context()
-                redirected_url = None
-
-                try:
-                    redirected_url = urllib.request.urlopen(made_url, context=context).geturl()
-                except Exception as e:
-                    # 안 열림
-                    print('redirect error: ' + str(e))
-                    print('url_was: ' + made_url)
-
-                if redirected_url is not None:
-                    redirected_url = url_without_scheme(redirected_url).strip()
-                    # 여기서 리다이렉트 url 이 끝에 / 있는 경우도 있고 없는 경우도 있어서 해야함. 만약 스트립 '/' 이 아니라
-                    # '/'을 더해주는 것으로 한다면 get parameter 있는 경우가 귀찮아진다.
-                    if redirected_url not in resolved_urls:
-                        resolved_urls.append(redirected_url)
-
-            scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
-
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
-            }
-            for item in resolved_urls:
-                for scheme_item in scheme_list:
-                    test_url = scheme_item + item
-                    req = None
-                    try:
-                        req = requests.get(test_url, allow_redirects=False, headers=headers)
-                    except Exception as e:
-                        print('requests error: '+str(e))
-                        print('url_was: '+ test_url)
-                    if req is not None:
-                        url_response = None
-                        print('test_url: ' + test_url)
-                        if req.status_code == 301:
-                            url_response = {'status': str(req.status_code), 'url': req.url,
-                                    'location': req.headers['Location']}
-                        elif req.status_code == 302:
-                            url_response = {'status': str(req.status_code), 'url': req.url,
-                                    'location': req.headers['Location']}
-
-                            # 이 로케이션이 이상한 곳으로 갈 경우 그것도 테스트.
-                            # 301과 302는 다르다고 한다.
-                        elif req.status_code == 200:
-                            url_response = {'status': str(req.status_code), 'url': req.url}
-                        else:
-                            url_response = {'status': str(req.status_code), 'url': req.url}
-                        print('result: '+ str(url_response) )
-                        print('url_was: '+ test_url)
-                    else:
-                        req = None
-            '''
         return JsonResponse({'res': 2})
 
+
+@ensure_csrf_cookie
+def re_register_url(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            print('1')
+            discrete_loc = request.POST.get('discrete_loc', None)
+            discrete_scheme = request.POST.get('discrete_scheme', None)
+            in_not_301 = request.POST.get('in_not_301', None)
+            is_discrete = request.POST.get('is_discrete', None)
+            loc = request.POST.get('loc', None)
+            scheme = request.POST.get('scheme', None)
+            title = request.POST.get('title', None)
+            url = request.POST.get('url', None)
+            if discrete_loc is None \
+                    or discrete_scheme is None \
+                    or in_not_301 is None \
+                    or is_discrete is None \
+                    or loc is None \
+                    or scheme is None \
+                    or title is None \
+                    or url is None:
+                return JsonResponse({'res': 0})
+            keyword_list = request.POST.getlist('keyword_list[]')
+            
+
+
+            return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
 
 '''
 print('accepted url: '+url)

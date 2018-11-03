@@ -432,3 +432,35 @@ transform: translateX(10px) translateY(-10px)
     font-size: 11px; padding: 3px; border-radius: 3px; background-color: #d2d8ff;
 
 }
+.url_example{
+    background-color: #dce5ff;
+    border-radius: 3px;
+    font-size: 14px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+.url_example_title{
+    white-space:pre-wrap; word-wrap: break-word; font-weight: bold;
+}
+.url_example_url{
+    white-space:pre-wrap; word-wrap: break-word;
+}
+.add_keyword_content{
+    background-color: #f9ffc3;
+    border-radius: 3px;
+    font-size: 14px;
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+.add_keyword_title{
+    white-space:pre-wrap; word-wrap: break-word; font-weight: bold;
+}
+.add_keyword_url{
+    white-space:pre-wrap; word-wrap: break-word;
+}
+.register_cancel{
+    background-color: lightgoldenrodyellow;
+}
+.register_yes{
+    background-color: #8e97ed;
+}
