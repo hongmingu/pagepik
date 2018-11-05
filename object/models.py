@@ -358,29 +358,117 @@ class PostFollowCount(models.Model):
 # 우선이다. 원칙과 우선순위. 우선순위와 원칙. 우선순위와 예외와 규칙.
 # ----------------------------------------------------------------------------------------------------------------------
 
-class MainURL(models.Model):
+class UrlObject(models.Model):
 
-    url = models.TextField(max_length=3000, null=True, unique=True, blank=True, default=None)
-    # 여기서 unique True 면 null값도 두 개 이상 넣을 수 없나?
-    http = models.BooleanField(default=True)
-    https = models.BooleanField(default=False)
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return "URL: %s" % self.url
-
-
-class SubURL(models.Model):
-    url = models.TextField(max_length=3000, null=True, unique=True, blank=True, default=None)
-    main_url = models.ForeignKey(MainURL, on_delete=models.CASCADE, null=True, blank=True)
+    loc = models.TextField(max_length=2050, null=True, unique=True, blank=True, default=None)
 
     # 여기서 unique True 면 null값도 두 개 이상 넣을 수 없나?
     http = models.BooleanField(default=True)
     https = models.BooleanField(default=False)
+    is_discrete = models.BooleanField(default=False)
+    in_not_301 = models.BooleanField(default=False)
+    discrete_loc = models.TextField(max_length=2050, null=True, unique=True, blank=True, default=None)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "URL: %s" % self.url
+        return "URL: %s" % self.loc
 
+
+class Keyword(models.Model):
+    url_object = models.ForeignKey(UrlObject, on_delete=models.CASCADE, null=True, blank=True)
+    text = models.TextField(max_length=2048, null=True, blank=True)
+    up_count = models.PositiveIntegerField(default=0)
+    down_count = models.PositiveIntegerField(default=0)
+    register_count = models.PositiveIntegerField(default=0)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "pk: %s" % self.pk
+
+    class Meta:
+        unique_together = ('url_object', 'text',)
+
+
+class KeywordUp(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    keyword = models.ForeignKey(Keyword, on_delete=models.CASCADE, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "pk: %s" % self.pk
+
+    class Meta:
+        unique_together = ('user', 'keyword',)
+
+
+class KeywordDown(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    keyword = models.ForeignKey(Keyword, on_delete=models.CASCADE, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "pk: %s" % self.pk
+
+    class Meta:
+        unique_together = ('user', 'keyword',)
+
+
+class Title(models.Model):
+    url_object = models.ForeignKey(UrlObject, on_delete=models.CASCADE, null=True, blank=True)
+    text = models.TextField(max_length=1000, null=True, blank=True)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+
+class SubUrlObject(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    title = models.ForeignKey(Title, on_delete=models.CASCADE, null=True, blank=True)
+    url_object = models.ForeignKey(UrlObject, on_delete=models.CASCADE, null=True, blank=True)
+    uuid = models.CharField(max_length=34, unique=True, null=True, default=None, blank=True)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "pk: %s" % self.pk
+
+
+class SubKeyword(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    keyword = models.ForeignKey(Keyword, on_delete=models.CASCADE, null=True, blank=True)
+    sub_url_object = models.ForeignKey(SubUrlObject, on_delete=models.CASCADE, null=True, blank=True)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "pk: %s" % self.pk
+
+    class Meta:
+        unique_together = ('user', 'keyword',)
+
+
+class SubRawKeyword(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    sub_url_object = models.ForeignKey(SubUrlObject, on_delete=models.CASCADE, null=True, blank=True)
+    sub_keyword = models.ForeignKey(SubKeyword, on_delete=models.CASCADE, null=True, blank=True)
+
+    text = models.TextField(max_length=2048, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'text',)
+
+
+class SubRawKeywordCount(models.Model):
+    sub_url_object = models.OneToOneField(SubUrlObject, on_delete=models.CASCADE, null=True, blank=True)
+    count = models.PositiveSmallIntegerField(default=0)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
