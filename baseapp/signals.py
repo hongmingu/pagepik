@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from object.models import *
 from relation.models import *
@@ -282,4 +282,126 @@ def deleted_notice_post_chat_rest_like(sender, instance, **kwargs):
                 pass
     except:
         pass
+# ----------------------------------------------------------------------------------
+# notice post_chat_rest_like
 
+@receiver(post_save, sender=SubKeyword)
+def created_sub_keyword(sender, instance, created, **kwargs):
+    if created:
+        try:
+            with transaction.atomic():
+                keyword = instance.keyword
+                keyword.register_count = F('register_count') + 1
+                keyword.save()
+        except Exception as e:
+            print(e)
+            pass
+
+
+@receiver(post_delete, sender=SubKeyword)
+def deleted_sub_keyword(sender, instance, **kwargs):
+    try:
+        with transaction.atomic():
+            keyword = instance.keyword
+            keyword.register_count = F('register_count') - 1
+            keyword.save()
+            if keyword.register_count == 0 and keyword.up_count == 0 and keyword.down_count == 0:
+                keyword.delete()
+                # 이거 놓치지말고 down_count 랑 up_count 도 0 될 때 다 지운다.
+    except Exception as e:
+        print(e)
+        pass
+
+
+# notice post_chat_rest_like
+@receiver(post_save, sender=KeywordUp)
+def created_sub_keyword(sender, instance, created, **kwargs):
+    if created:
+        try:
+            with transaction.atomic():
+                keyword = instance.keyword
+                keyword.up_count = F('up_count') + 1
+                keyword.save()
+        except Exception as e:
+            print(e)
+            pass
+
+
+@receiver(post_delete, sender=KeywordUp)
+def deleted_sub_keyword(sender, instance, **kwargs):
+    try:
+        with transaction.atomic():
+            keyword = instance.keyword
+            keyword.up_count = F('up_count') - 1
+            keyword.save()
+            if keyword.register_count == 0 and keyword.up_count == 0 and keyword.down_count == 0:
+                keyword.delete()
+    except Exception as e:
+        print(e)
+        pass
+
+
+# notice post_chat_rest_like
+@receiver(post_save, sender=KeywordDown)
+def created_sub_keyword(sender, instance, created, **kwargs):
+    if created:
+        try:
+            with transaction.atomic():
+                keyword = instance.keyword
+                keyword.down_count = F('down_count') + 1
+                keyword.save()
+        except Exception as e:
+            print(e)
+            pass
+
+
+@receiver(post_delete, sender=KeywordDown)
+def deleted_sub_keyword(sender, instance, **kwargs):
+    try:
+        with transaction.atomic():
+            keyword = instance.keyword
+            keyword.down_count = F('down_count') - 1
+            keyword.save()
+            if keyword.register_count == 0 and keyword.up_count == 0 and keyword.down_count == 0:
+                keyword.delete()
+    except Exception as e:
+        print(e)
+        pass
+
+# -------------------------------------------
+
+
+@receiver(post_save, sender=SubUrlObject)
+def created_sub_url_object(sender, instance, created, **kwargs):
+    if created:
+        try:
+            with transaction.atomic():
+                sub_raw_keyword_count = SubRawKeywordCount.objects.create(sub_url_object=instance)
+        except Exception as e:
+            print(e)
+            pass
+
+
+@receiver(post_save, sender=SubRawKeyword)
+def created_sub_raw_keyword(sender, instance, created, **kwargs):
+    if created:
+        try:
+            with transaction.atomic():
+                sub_raw_keyword_count = instance.sub_url_object.subrawkeywordcount
+                sub_raw_keyword_count.count = F('count') + 1
+                sub_raw_keyword_count.save()
+        except Exception as e:
+            print(e)
+            pass
+
+
+@receiver(post_delete, sender=SubRawKeyword)
+def deleted_sub_raw_keyword(sender, instance, **kwargs):
+    try:
+        with transaction.atomic():
+            sub_raw_keyword_count = instance.sub_url_object.subrawkeywordcount
+            sub_raw_keyword_count.count = F('count') - 1
+            sub_raw_keyword_count.save()
+    except Exception as e:
+        print(e)
+        pass

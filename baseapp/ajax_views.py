@@ -332,6 +332,7 @@ def re_post_update(request):
 
         return JsonResponse({'res': 2})
 
+
 @ensure_csrf_cookie
 def re_post_update_profile_name(request):
     if request.method == "POST":
@@ -359,6 +360,8 @@ def re_post_update_profile_name(request):
                 return JsonResponse({'res': 1})
 
         return JsonResponse({'res': 2})
+
+
 @ensure_csrf_cookie
 def re_post_chat_remove(request):
     if request.method == "POST":
@@ -441,7 +444,8 @@ def re_home_feed(request):
 
                     posts = Post.objects.filter(
                         (Q(user__is_followed__user=request.user) | Q(post_follow__user=request.user)) & Q(
-                            is_open=True) & Q(post_chat_created__lte=last_post.post_chat_created)).exclude(pk=last_post.pk).order_by('-post_chat_created').distinct()[:30]
+                            is_open=True) & Q(post_chat_created__lte=last_post.post_chat_created)).exclude(
+                        pk=last_post.pk).order_by('-post_chat_created').distinct()[:30]
 
                 ################################
                 output = []
@@ -466,6 +470,7 @@ def re_home_feed(request):
                 return JsonResponse({'res': 1, 'set': output, 'last': last})
 
         return JsonResponse({'res': 2})
+
 
 @ensure_csrf_cookie
 def re_comment_add(request):
@@ -496,12 +501,12 @@ def re_comment_add(request):
                 sub_output = {}
                 if post_comment is not None:
                     sub_output = {
-                            'comment_user_id': post_comment.user.username,
-                            'comment_username': post_comment.user.userusername.username,
-                            'comment_text': escape(post_comment.text),
-                            'comment_created': post_comment.created,
-                            'comment_uuid': post_comment.uuid,
-                        }
+                        'comment_user_id': post_comment.user.username,
+                        'comment_username': post_comment.user.userusername.username,
+                        'comment_text': escape(post_comment.text),
+                        'comment_created': post_comment.created,
+                        'comment_uuid': post_comment.uuid,
+                    }
                 output.append(sub_output)
                 return JsonResponse({'res': 1, 'set': output})
 
@@ -541,6 +546,7 @@ def re_comment_delete(request):
                 return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
 
+
 @ensure_csrf_cookie
 def re_comment_more_load(request):
     if request.method == "POST":
@@ -556,7 +562,8 @@ def re_comment_more_load(request):
 
                 post_comment_last = PostComment.objects.get(uuid=last_comment_id)
 
-                post_comments = PostComment.objects.filter(Q(post=post) & Q(created__gt=post_comment_last.created)).order_by('created')[:20]
+                post_comments = PostComment.objects.filter(
+                    Q(post=post) & Q(created__gt=post_comment_last.created)).order_by('created')[:20]
 
                 post_comment_uuids = [post_comment.uuid for post_comment in post_comments]
                 output = []
@@ -629,6 +636,7 @@ def re_comment_more_load(request):
 
         return JsonResponse({'res': 2})
 
+
 @ensure_csrf_cookie
 def re_post_like(request):
     if request.method == "POST":
@@ -675,6 +683,7 @@ def re_post_like(request):
 
         return JsonResponse({'res': 2})
 
+
 @ensure_csrf_cookie
 def re_user_home_populate(request):
     if request.method == "POST":
@@ -706,9 +715,10 @@ def re_user_home_populate(request):
                     if post_chat is not None:
                         if post_chat.kind == POSTCHAT_TEXT:
                             post_chat_last_chat = {'kind': 'text', 'you_say': post_chat.you_say,
-                                    'text': escape(post_chat.postchattext.text)}
+                                                   'text': escape(post_chat.postchattext.text)}
                         elif post_chat.kind == POSTCHAT_PHOTO:
-                            post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say, 'url': post_chat.postchatphoto.file.url}
+                            post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say,
+                                                   'url': post_chat.postchatphoto.file.url}
                 else:
                     if post_chat_read.post_chat.kind == POSTCHAT_START:
                         try:
@@ -718,16 +728,18 @@ def re_user_home_populate(request):
                         if post_chat is not None:
                             if post_chat.kind == POSTCHAT_TEXT:
                                 post_chat_last_chat = {'kind': 'text', 'you_say': post_chat.you_say,
-                                                  'text': escape(post_chat.postchattext.text)}
+                                                       'text': escape(post_chat.postchattext.text)}
                             elif post_chat.kind == POSTCHAT_PHOTO:
                                 post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say,
-                                                  'url': post_chat.postchatphoto.file.url}
+                                                       'url': post_chat.postchatphoto.file.url}
                     elif post_chat_read.post_chat.kind == POSTCHAT_TEXT:
                         post_chat = post_chat_read.post_chat
-                        post_chat_last_chat = {'kind': 'text', 'you_say': post_chat.you_say, 'text': escape(post_chat.postchattext.text)}
+                        post_chat_last_chat = {'kind': 'text', 'you_say': post_chat.you_say,
+                                               'text': escape(post_chat.postchattext.text)}
                     elif post_chat_read.post_chat.kind == POSTCHAT_PHOTO:
                         post_chat = post_chat_read.post_chat
-                        post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say, 'url': post_chat.postchatphoto.file.url}
+                        post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say,
+                                               'url': post_chat.postchatphoto.file.url}
 
                 new = True
                 post_chat_last = PostChat.objects.filter(post=post).last()
@@ -792,9 +804,10 @@ def re_user_home_populate(request):
                     if post_chat is not None:
                         if post_chat.kind == POSTCHAT_TEXT:
                             post_chat_last_chat = {'kind': 'text', 'you_say': post_chat.you_say,
-                                    'text': escape(post_chat.postchattext.text)}
+                                                   'text': escape(post_chat.postchattext.text)}
                         elif post_chat.kind == POSTCHAT_PHOTO:
-                            post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say, 'url': post_chat.postchatphoto.file.url}
+                            post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say,
+                                                   'url': post_chat.postchatphoto.file.url}
 
                 new = True
 
@@ -839,7 +852,8 @@ def re_post_already_read(request):
                     return JsonResponse({'res': 0})
 
                 try:
-                    post_chat_reads = PostChatRead.objects.filter(post_chat__post=post, user=request.user).order_by('-created')[:20]
+                    post_chat_reads = PostChatRead.objects.filter(post_chat__post=post, user=request.user).order_by(
+                        '-created')[:20]
                 except:
                     return JsonResponse({'res': 0})
 
@@ -980,7 +994,8 @@ def re_post_reading_more_load(request):
                 except:
                     return JsonResponse({'res': 0})
 
-                post_chats = PostChat.objects.filter(Q(post__uuid=post_id) & Q(pk__lt=last_post_chat.pk)).order_by('-created')[:11]
+                post_chats = PostChat.objects.filter(Q(post__uuid=post_id) & Q(pk__lt=last_post_chat.pk)).order_by(
+                    '-created')[:11]
 
                 output = []
                 if post_chats:
@@ -1040,7 +1055,8 @@ def re_post_chat_next_load(request):
                         'rest_count': post_chat.postchatrestmessagecount.count,
                         'you_like': you_like
                     }
-                    post_chat_read = PostChatRead.objects.create(post=post_chat.post, post_chat=post_chat, user=request.user)
+                    post_chat_read = PostChatRead.objects.create(post=post_chat.post, post_chat=post_chat,
+                                                                 user=request.user)
 
                     output.append(sub_output)
                     try:
@@ -1160,7 +1176,9 @@ def re_post_chat_add_rest(request):
                 post_chat_rest_message = None
                 sub_output = None
                 if post_chat is not None:
-                    post_chat_rest_message = PostChatRestMessage.objects.create(text=text, user=request.user, uuid=uuid.uuid4().hex, post_chat=post_chat)
+                    post_chat_rest_message = PostChatRestMessage.objects.create(text=text, user=request.user,
+                                                                                uuid=uuid.uuid4().hex,
+                                                                                post_chat=post_chat)
 
                     from django.db.models import F
                     post_chat_rest_message_count = post_chat.postchatrestmessagecount
@@ -1179,6 +1197,7 @@ def re_post_chat_add_rest(request):
                 return JsonResponse({'res': 1, 'set': sub_output})
         return JsonResponse({'res': 2})
 
+
 @ensure_csrf_cookie
 def re_post_chat_rest_more_load(request):
     if request.method == "POST":
@@ -1193,14 +1212,16 @@ def re_post_chat_rest_more_load(request):
                     return JsonResponse({'res': 0})
                 post_chat_rest_messages = None
                 if last_id == '' and post_chat is not None:
-                    post_chat_rest_messages = PostChatRestMessage.objects.filter(post_chat=post_chat).order_by('created')[:11]
+                    post_chat_rest_messages = PostChatRestMessage.objects.filter(post_chat=post_chat).order_by(
+                        'created')[:11]
                 elif last_id != '' and post_chat is not None:
                     try:
                         last_post_chat_rest_message = PostChatRestMessage.objects.get(uuid=last_id)
                     except:
                         return JsonResponse({'res': 0})
 
-                    post_chat_rest_messages = PostChatRestMessage.objects.filter(Q(post_chat=post_chat) & Q(pk__gt=last_post_chat_rest_message.pk)).order_by('created')[:11]
+                    post_chat_rest_messages = PostChatRestMessage.objects.filter(
+                        Q(post_chat=post_chat) & Q(pk__gt=last_post_chat_rest_message.pk)).order_by('created')[:11]
                 count = 0
                 next = False
                 output = []
@@ -1211,7 +1232,8 @@ def re_post_chat_rest_more_load(request):
                             next = True
                             break
                         you_like = False
-                        if PostChatRestMessageLike.objects.filter(user=request.user, post_chat_rest_message=post_chat_rest_message).exists():
+                        if PostChatRestMessageLike.objects.filter(user=request.user,
+                                                                  post_chat_rest_message=post_chat_rest_message).exists():
                             you_like = True
                         sub_output = {
                             'id': post_chat_rest_message.uuid,
@@ -1238,14 +1260,16 @@ def re_post_chat_rest_more_load(request):
                     return JsonResponse({'res': 0})
                 post_chat_rest_messages = None
                 if last_id == '' and post_chat is not None:
-                    post_chat_rest_messages = PostChatRestMessage.objects.filter(post_chat=post_chat).order_by('created')[:11]
+                    post_chat_rest_messages = PostChatRestMessage.objects.filter(post_chat=post_chat).order_by(
+                        'created')[:11]
                 elif last_id != '' and post_chat is not None:
                     try:
                         last_post_chat_rest_message = PostChatRestMessage.objects.get(uuid=last_id)
                     except:
                         return JsonResponse({'res': 0})
 
-                    post_chat_rest_messages = PostChatRestMessage.objects.filter(Q(post_chat=post_chat) & Q(pk__gt=last_post_chat_rest_message.pk)).order_by('created')[:11]
+                    post_chat_rest_messages = PostChatRestMessage.objects.filter(
+                        Q(post_chat=post_chat) & Q(pk__gt=last_post_chat_rest_message.pk)).order_by('created')[:11]
                 count = 0
                 next = False
                 output = []
@@ -1273,6 +1297,7 @@ def re_post_chat_rest_more_load(request):
 
         return JsonResponse({'res': 2})
 
+
 @ensure_csrf_cookie
 def re_post_chat_rest_like(request):
     if request.method == "POST":
@@ -1284,7 +1309,8 @@ def re_post_chat_rest_like(request):
                 except:
                     return JsonResponse({'res': 0})
                 try:
-                    post_chat_rest_message_like = PostChatRestMessageLike.objects.get(post_chat_rest_message=post_chat_rest_message, user=request.user)
+                    post_chat_rest_message_like = PostChatRestMessageLike.objects.get(
+                        post_chat_rest_message=post_chat_rest_message, user=request.user)
                 except PostChatRestMessageLike.DoesNotExist:
                     post_chat_rest_message_like = None
 
@@ -1304,7 +1330,8 @@ def re_post_chat_rest_like(request):
                 else:
                     try:
                         with transaction.atomic():
-                            post_chat_rest_message_like = PostChatRestMessageLike.objects.create(post_chat_rest_message=post_chat_rest_message, user=request.user)
+                            post_chat_rest_message_like = PostChatRestMessageLike.objects.create(
+                                post_chat_rest_message=post_chat_rest_message, user=request.user)
                             from django.db.models import F
                             post_chat_rest_message_like_count = post_chat_rest_message.postchatrestmessagelikecount
                             post_chat_rest_message_like_count.count = F('count') + 1
@@ -1434,10 +1461,11 @@ def re_profile_following(request):
                             last_following = Follow.objects.get(follow__username=next_id, user=user)
                         except:
                             return JsonResponse({'res': 0})
-                        followings = Follow.objects.filter(Q(user=user) & Q(pk__gte=last_following.pk)).order_by('created')[:31]
+                        followings = Follow.objects.filter(Q(user=user) & Q(pk__gte=last_following.pk)).order_by(
+                            'created')[:31]
                     count = 0
                     for follow in followings:
-                        count = count+1
+                        count = count + 1
                         if count == 31:
                             next = follow.follow.username
                             break
@@ -1447,7 +1475,7 @@ def re_profile_following(request):
                         }
                         output.append(sub_output)
 
-                return JsonResponse({'res': 1, 'set': output, 'next':next})
+                return JsonResponse({'res': 1, 'set': output, 'next': next})
 
         return JsonResponse({'res': 2})
 
@@ -1476,10 +1504,11 @@ def re_profile_follower(request):
                             last_follower = Follow.objects.get(follow=user, user__username=next_id)
                         except:
                             return JsonResponse({'res': 0})
-                        followers = Follow.objects.filter(Q(follow=user) & Q(pk__gte=last_follower.pk)).order_by('created')[:31]
+                        followers = Follow.objects.filter(Q(follow=user) & Q(pk__gte=last_follower.pk)).order_by(
+                            'created')[:31]
                     count = 0
                     for follow in followers:
-                        count = count+1
+                        count = count + 1
                         if count == 31:
                             next = follow.user.username
                             break
@@ -1489,7 +1518,7 @@ def re_profile_follower(request):
                         }
                         output.append(sub_output)
 
-                return JsonResponse({'res': 1, 'set': output, 'next':next})
+                return JsonResponse({'res': 1, 'set': output, 'next': next})
 
         return JsonResponse({'res': 2})
 
@@ -1522,12 +1551,15 @@ def re_profile_post(request):
                             print(e)
                             pass
                         if last_post is not None:
-                            posts = Post.objects.filter((Q(user=user)) & Q(post_chat_created__lte=last_post.post_chat_created)).exclude(pk=last_post.pk).order_by('-post_chat_created').distinct()[:21]
+                            posts = Post.objects.filter(
+                                (Q(user=user)) & Q(post_chat_created__lte=last_post.post_chat_created)).exclude(
+                                pk=last_post.pk).order_by('-post_chat_created').distinct()[:21]
                         else:
                             posts = Post.objects.filter(Q(user=user)).order_by('-post_chat_created').distinct()[:21]
                 else:
                     if last_id == '':
-                        posts = Post.objects.filter((Q(user=user) & Q(is_open=True))).order_by('-post_chat_created').distinct()[:21]
+                        posts = Post.objects.filter((Q(user=user) & Q(is_open=True))).order_by(
+                            '-post_chat_created').distinct()[:21]
                     else:
                         last_post = None
                         try:
@@ -1536,9 +1568,12 @@ def re_profile_post(request):
                             print(e)
                             pass
                         if last_post is not None:
-                            posts = Post.objects.filter((Q(user=user)) & Q(is_open=True) & Q(post_chat_created__lte=last_post.post_chat_created)).exclude(pk=last_post.pk).order_by('-post_chat_created').distinct()[:21]
+                            posts = Post.objects.filter((Q(user=user)) & Q(is_open=True) & Q(
+                                post_chat_created__lte=last_post.post_chat_created)).exclude(pk=last_post.pk).order_by(
+                                '-post_chat_created').distinct()[:21]
                         else:
-                            posts = Post.objects.filter(Q(user=user) & Q(is_open=True)).order_by('-post_chat_created').distinct()[:21]
+                            posts = Post.objects.filter(Q(user=user) & Q(is_open=True)).order_by(
+                                '-post_chat_created').distinct()[:21]
                 # 이제 리스트 만드는 코드가 필요하다. #########
 
                 # filter(Q(post__uuid=post_id) & Q(pk__lt=last_post_chat.pk))
@@ -1586,6 +1621,8 @@ def re_profile_post_delete(request):
                 return JsonResponse({'res': 1})
 
         return JsonResponse({'res': 2})
+
+
 @ensure_csrf_cookie
 def re_profile_populate(request):
     if request.method == "POST":
@@ -1617,9 +1654,10 @@ def re_profile_populate(request):
                     if post_chat is not None:
                         if post_chat.kind == POSTCHAT_TEXT:
                             post_chat_last_chat = {'kind': 'text', 'you_say': post_chat.you_say,
-                                    'text': escape(post_chat.postchattext.text)}
+                                                   'text': escape(post_chat.postchattext.text)}
                         elif post_chat.kind == POSTCHAT_PHOTO:
-                            post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say, 'url': post_chat.postchatphoto.file.url}
+                            post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say,
+                                                   'url': post_chat.postchatphoto.file.url}
                 else:
                     if post_chat_read.post_chat.kind == POSTCHAT_START:
                         try:
@@ -1629,16 +1667,18 @@ def re_profile_populate(request):
                         if post_chat is not None:
                             if post_chat.kind == POSTCHAT_TEXT:
                                 post_chat_last_chat = {'kind': 'text', 'you_say': post_chat.you_say,
-                                                  'text': escape(post_chat.postchattext.text)}
+                                                       'text': escape(post_chat.postchattext.text)}
                             elif post_chat.kind == POSTCHAT_PHOTO:
                                 post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say,
-                                                  'url': post_chat.postchatphoto.file.url}
+                                                       'url': post_chat.postchatphoto.file.url}
                     elif post_chat_read.post_chat.kind == POSTCHAT_TEXT:
                         post_chat = post_chat_read.post_chat
-                        post_chat_last_chat = {'kind': 'text', 'you_say': post_chat.you_say, 'text': escape(post_chat.postchattext.text)}
+                        post_chat_last_chat = {'kind': 'text', 'you_say': post_chat.you_say,
+                                               'text': escape(post_chat.postchattext.text)}
                     elif post_chat_read.post_chat.kind == POSTCHAT_PHOTO:
                         post_chat = post_chat_read.post_chat
-                        post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say, 'url': post_chat.postchatphoto.file.url}
+                        post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say,
+                                               'url': post_chat.postchatphoto.file.url}
 
                 new = True
                 post_chat_last = PostChat.objects.filter(post=post).last()
@@ -1703,9 +1743,10 @@ def re_profile_populate(request):
                     if post_chat is not None:
                         if post_chat.kind == POSTCHAT_TEXT:
                             post_chat_last_chat = {'kind': 'text', 'you_say': post_chat.you_say,
-                                    'text': escape(post_chat.postchattext.text)}
+                                                   'text': escape(post_chat.postchattext.text)}
                         elif post_chat.kind == POSTCHAT_PHOTO:
-                            post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say, 'url': post_chat.postchatphoto.file.url}
+                            post_chat_last_chat = {'kind': 'photo', 'you_say': post_chat.you_say,
+                                                   'url': post_chat.postchatphoto.file.url}
 
                 new = True
 
@@ -1736,6 +1777,7 @@ def re_profile_populate(request):
 
         return JsonResponse({'res': 2})
 
+
 @ensure_csrf_cookie
 def re_post_like_list(request):
     if request.method == "POST":
@@ -1763,7 +1805,7 @@ def re_post_like_list(request):
                         likes = PostLike.objects.filter(Q(post=post) & Q(pk__gte=last_like.pk)).order_by('created')[:31]
                     count = 0
                     for like in likes:
-                        count = count+1
+                        count = count + 1
                         if count == 31:
                             next = like.user.username
                             break
@@ -1802,10 +1844,11 @@ def re_post_chat_like_list(request):
                             last_like = PostChatLike.objects.get(post_chat=post_chat, user__username=next_id)
                         except:
                             return JsonResponse({'res': 0})
-                        likes = PostChatLike.objects.filter(Q(post_chat=post_chat) & Q(pk__gte=last_like.pk)).order_by('created')[:31]
+                        likes = PostChatLike.objects.filter(Q(post_chat=post_chat) & Q(pk__gte=last_like.pk)).order_by(
+                            'created')[:31]
                     count = 0
                     for like in likes:
-                        count = count+1
+                        count = count + 1
                         if count == 31:
                             next = like.user.username
                             break
@@ -1837,17 +1880,21 @@ def re_post_chat_rest_like_list(request):
                 output = []
                 if post_chat_rest_message is not None:
                     if next_id == '':
-                        likes = PostChatRestMessageLike.objects.filter(post_chat_rest_message=post_chat_rest_message).order_by('created')[:31]
+                        likes = PostChatRestMessageLike.objects.filter(
+                            post_chat_rest_message=post_chat_rest_message).order_by('created')[:31]
                     else:
                         try:
 
-                            last_like = PostChatRestMessageLike.objects.get(post_chat_rest_message=post_chat_rest_message, user__username=next_id)
+                            last_like = PostChatRestMessageLike.objects.get(
+                                post_chat_rest_message=post_chat_rest_message, user__username=next_id)
                         except:
                             return JsonResponse({'res': 0})
-                        likes = PostChatRestMessageLike.objects.filter(Q(post_chat_rest_message=post_chat_rest_message) & Q(pk__gte=last_like.pk)).order_by('created')[:31]
+                        likes = PostChatRestMessageLike.objects.filter(
+                            Q(post_chat_rest_message=post_chat_rest_message) & Q(pk__gte=last_like.pk)).order_by(
+                            'created')[:31]
                     count = 0
                     for like in likes:
-                        count = count+1
+                        count = count + 1
                         if count == 31:
                             next = like.user.username
                             break
@@ -1909,6 +1956,7 @@ def re_post_follow(request):
 
         return JsonResponse({'res': 2})
 
+
 @ensure_csrf_cookie
 def re_post_follow_list(request):
     if request.method == "POST":
@@ -1934,10 +1982,11 @@ def re_post_follow_list(request):
                             last_post_follow = PostFollow.objects.get(post=post, user__username=next_id)
                         except:
                             return JsonResponse({'res': 0})
-                        post_follows = PostFollow.objects.filter(Q(post=post) & Q(pk__gte=last_post_follow.pk)).order_by('created')[:31]
+                        post_follows = PostFollow.objects.filter(
+                            Q(post=post) & Q(pk__gte=last_post_follow.pk)).order_by('created')[:31]
                     count = 0
                     for post_follow in post_follows:
-                        count = count+1
+                        count = count + 1
                         if count == 31:
                             next = post_follow.user.username
                             break
@@ -1960,7 +2009,8 @@ def re_explore_feed(request):
                 last_id = request.POST.get('last_id', None)
                 posts = None
                 if last_id == '':
-                    posts = Post.objects.filter(~Q(user__is_followed__user=request.user) & Q(is_open=True) & ~Q(user=request.user)).exclude(
+                    posts = Post.objects.filter(
+                        ~Q(user__is_followed__user=request.user) & Q(is_open=True) & ~Q(user=request.user)).exclude(
                         Q(post_follow__user=request.user)).order_by('-post_chat_created').distinct()[:20]
                 else:
                     last_post = None
@@ -1969,8 +2019,10 @@ def re_explore_feed(request):
                     except Exception as e:
                         print(e)
                         return JsonResponse({'res': 0})
-                    posts = Post.objects.filter(~Q(user__is_followed__user=request.user) & Q(is_open=True) & Q(post_chat_created__lte=last_post.post_chat_created) & ~Q(user=request.user)).exclude(
-                        Q(post_follow__user=request.user) | Q(uuid=last_id)).order_by('-post_chat_created').distinct()[:20]
+                    posts = Post.objects.filter(~Q(user__is_followed__user=request.user) & Q(is_open=True) & Q(
+                        post_chat_created__lte=last_post.post_chat_created) & ~Q(user=request.user)).exclude(
+                        Q(post_follow__user=request.user) | Q(uuid=last_id)).order_by('-post_chat_created').distinct()[
+                            :20]
 
                 # 여기서 posts 옵션 준다. 20개씩 줄 것이므로 21로 잡는다. #########
                 # 여기서 포스트 팔로우 된 건 피드에 뜨지 않게 Q 설정해야한다 .
@@ -2010,7 +2062,8 @@ def re_note_all(request):
                     except Exception as e:
                         print(e)
                         return JsonResponse({'res': 0})
-                    notices = Notice.objects.filter(Q(user=request.user) & Q(pk__lte=next_notice.pk)).order_by('-created').distinct()[:31]
+                    notices = Notice.objects.filter(Q(user=request.user) & Q(pk__lte=next_notice.pk)).order_by(
+                        '-created').distinct()[:31]
 
                 # 여기서 posts 옵션 준다. 20개씩 줄 것이므로 21로 잡는다. #########
                 # 여기서 포스트 팔로우 된 건 피드에 뜨지 않게 Q 설정해야한다 .
@@ -2059,7 +2112,8 @@ def re_search_all(request):
         if request.is_ajax():
             search_word = request.POST.get('search_word', None)
             users = User.objects.filter(Q(userusername__username__icontains=search_word)
-                                        | Q(usertextname__name__icontains=search_word)).order_by('-noticecount__created').distinct()[:11]
+                                        | Q(usertextname__name__icontains=search_word)).order_by(
+                '-noticecount__created').distinct()[:11]
             user_output = []
             users_count = 0
             user_next = None
@@ -2079,7 +2133,8 @@ def re_search_all(request):
             posts = Post.objects.filter(Q(user__userusername__username__icontains=search_word)
                                         | Q(title__icontains=search_word)
                                         | Q(description__icontains=search_word)
-                                        | Q(user__usertextname__name__icontains=search_word)).order_by('-post_chat_created').distinct()[:11]
+                                        | Q(user__usertextname__name__icontains=search_word)).order_by(
+                '-post_chat_created').distinct()[:11]
 
             post_output = []
             posts_count = 0
@@ -2120,7 +2175,8 @@ def re_search_user(request):
             next_id = request.POST.get('next_id', None)
             if next_id == '':
                 users = User.objects.filter(Q(userusername__username__icontains=search_word)
-                                            | Q(usertextname__name__icontains=search_word)).order_by('-noticecount__created').distinct()[:31]
+                                            | Q(usertextname__name__icontains=search_word)).order_by(
+                    '-noticecount__created').distinct()[:31]
             else:
                 next_user = None
                 try:
@@ -2130,7 +2186,8 @@ def re_search_user(request):
                     return JsonResponse({'res': 0})
 
                 users = User.objects.filter((Q(userusername__username__icontains=search_word)
-                                            | Q(usertextname__name__icontains=search_word)) & Q(noticecount__created__lte=next_user.noticecount.created)).exclude(pk=next_user.pk).order_by(
+                                             | Q(usertextname__name__icontains=search_word)) & Q(
+                    noticecount__created__lte=next_user.noticecount.created)).exclude(pk=next_user.pk).order_by(
                     '-noticecount__created').distinct()[:31]
             user_output = []
             users_count = 0
@@ -2176,10 +2233,11 @@ def re_search_post(request):
                     return JsonResponse({'res': 0})
 
                 posts = Post.objects.filter((Q(user__userusername__username__icontains=search_word)
-                                            | Q(title__icontains=search_word)
-                                            | Q(description__icontains=search_word)
-                                            | Q(user__usertextname__name__icontains=search_word))
-                                            & Q(post_chat_created__lte=next_post.post_chat_created)).order_by('-post_chat_created').distinct()[:2]
+                                             | Q(title__icontains=search_word)
+                                             | Q(description__icontains=search_word)
+                                             | Q(user__usertextname__name__icontains=search_word))
+                                            & Q(post_chat_created__lte=next_post.post_chat_created)).order_by(
+                    '-post_chat_created').distinct()[:2]
 
             post_output = []
             posts_count = 0
@@ -2200,6 +2258,8 @@ def re_search_post(request):
                                  'post_next': post_next})
 
         return JsonResponse({'res': 2})
+
+
 # ---------------------------------------------------------------------------------------------------------------------------
 
 
@@ -2234,6 +2294,7 @@ from threading import Lock
 
 _lock = Lock()
 
+
 def redirectTest(item):
     r = None
     try:
@@ -2266,6 +2327,7 @@ def redirectTest(item):
         pass
     return r
 
+
 def is_unable_url(url):
     from urllib.parse import urlparse
     import re
@@ -2293,14 +2355,17 @@ def is_unable_url(url):
     url_formatted = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
     is_ip = ((url_without_scheme(url_formatted).strip().strip('/')).replace('.', '').replace(':', '')).isdigit()
     is_localhost = (
-        (url_without_scheme(url_formatted).strip().strip('/')).replace('.', '').replace(':', '').lower().startswith('localhost'))
+        (url_without_scheme(url_formatted).strip().strip('/')).replace('.', '').replace(':', '').lower().startswith(
+            'localhost'))
     if is_ip or is_localhost:
         return True
 
     return False
-        # localhost 랑 ip는 안 받는다.
+    # localhost 랑 ip는 안 받는다.
 
-def check_success_url(url, o_count, success_list, not_301_redirect_list):
+
+def check_success_url(url, o_count, success_list, not_301_redirect_list, user):
+    user = user
     if o_count > 30:
         return
     req = None
@@ -2362,7 +2427,7 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list):
                     no_args_url = furl_obj.remove(args=True, fragment=True).url
                     f = furl(got_url)
 
-                    loc = got_url.replace(f.scheme+'://', '', 1)
+                    loc = got_url.replace(f.scheme + '://', '', 1)
                     title = page.get_metadatas('title', strategy=['page'])
                     title = title[0]
 
@@ -2374,7 +2439,7 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list):
                     if page is not None:
                         discrete_url = page.get_discrete_url()
                         f_discrete = furl(discrete_url)
-                        discrete_loc = discrete_url.replace(f_discrete.scheme+'://', '', 1)
+                        discrete_loc = discrete_url.replace(f_discrete.scheme + '://', '', 1)
                         discrete_scheme = f_discrete.scheme
 
                     is_discrete = False
@@ -2385,6 +2450,11 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list):
                     if got_url in not_301_redirect_list:
                         not_301_redirect = True
 
+                    user_has_it = False
+                    if SubUrlObject.objects.filter(user=user, url_object__loc=loc).exists():
+                        user_has_it = True
+
+# 이제 여기서 update_url 로 바로 넘어가게 하는 템플릿을 register_url에 만들어라.
                     sub_appender = {'url': got_url,
                                     'loc': loc,
                                     'title': title,
@@ -2392,7 +2462,8 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list):
                                     'is_discrete': is_discrete,
                                     'discrete_loc': discrete_loc,
                                     'discrete_scheme': discrete_scheme,
-                                    'in_not_301': not_301_redirect
+                                    'in_not_301': not_301_redirect,
+                                    'user_has_it': user_has_it
                                     }
                     success_list.append(sub_appender)
                 else:
@@ -2401,11 +2472,11 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list):
                 # discrete url 체크
 
                 if discrete_url != req.url:
-                    check_success_url(discrete_url, o_count, success_list, not_301_redirect_list)
+                    check_success_url(discrete_url, o_count, success_list, not_301_redirect_list, user)
                 else:
                     pass
                 if no_args_url != req.url:
-                    check_success_url(no_args_url, o_count, success_list, not_301_redirect_list)
+                    check_success_url(no_args_url, o_count, success_list, not_301_redirect_list, user)
                 else:
                     pass
                 is_success = True
@@ -2438,10 +2509,10 @@ def re_check_url(request):
             success_list = []
             not_301_redirect_list = []
             if has_scheme is False:
-                check_success_url('http://' + url, 0, success_list, not_301_redirect_list)
-                check_success_url('https://' + url, 0, success_list, not_301_redirect_list)
+                check_success_url('http://' + url, 0, success_list, not_301_redirect_list, request.user)
+                check_success_url('https://' + url, 0, success_list, not_301_redirect_list, request.user)
             else:
-                check_success_url(url, 0, success_list, not_301_redirect_list)
+                check_success_url(url, 0, success_list, not_301_redirect_list, request.user)
             return JsonResponse({'res': 1, 'output': success_list})
         return JsonResponse({'res': 2})
 
@@ -2450,14 +2521,13 @@ def re_check_url(request):
 def re_register_url(request):
     if request.method == "POST":
         if request.is_ajax():
-            print('1')
             discrete_loc = request.POST.get('discrete_loc', None)
             discrete_scheme = request.POST.get('discrete_scheme', None)
             in_not_301 = request.POST.get('in_not_301', None)
             is_discrete = request.POST.get('is_discrete', None)
             loc = request.POST.get('loc', None)
             scheme = request.POST.get('scheme', None)
-            title = request.POST.get('title', None)
+            title_text = request.POST.get('title', None)
             url = request.POST.get('url', None)
             if discrete_loc is None \
                     or discrete_scheme is None \
@@ -2465,15 +2535,90 @@ def re_register_url(request):
                     or is_discrete is None \
                     or loc is None \
                     or scheme is None \
-                    or title is None \
+                    or title_text is None \
                     or url is None:
                 return JsonResponse({'res': 0})
+            if discrete_loc == '' \
+                    or discrete_scheme == '' \
+                    or in_not_301 == '' \
+                    or is_discrete == '' \
+                    or loc == '' \
+                    or scheme == '' \
+                    or title_text == '' \
+                    or url == '':
+                return JsonResponse({'res': 0})
+
+            if in_not_301 == 'true':
+                in_not_301 = True
+            else:
+                in_not_301 = False
+            if is_discrete == 'true':
+                is_discrete = True
+            else:
+                is_discrete = False
+
             keyword_list = request.POST.getlist('keyword_list[]')
-            
+            url_object = None
+            try:
+                url_object = UrlObject.objects.get(loc=loc)
+            except Exception as e:
+                pass
 
+            if url_object is not None:
+                if scheme == 'http':
+                    url_object.http = True
+                    url_object.is_discrete = is_discrete
+                    url_object.in_not_301 = in_not_301
+                    url_object.discrete_loc = discrete_loc
+                    url_object.save()
+                elif scheme == 'https':
+                    url_object.https = True
+                    url_object.is_discrete = is_discrete
+                    url_object.in_not_301 = in_not_301
+                    url_object.discrete_loc = discrete_loc
+                    url_object.save()
+                title = None
+                try:
+                    title = Title.objects.last()
+                except Exception as e:
+                    pass
+                if title is not None:
+                    if title.text != title_text:
+                        title = Title.objects.create(text=title_text, url_object=url_object)
+                else:
+                    title = Title.objects.create(text=title_text, url_object=url_object)
+                sub_url_object = SubUrlObject.objects.create(user=request.user,
+                                                             title=title,
+                                                             url_object=url_object,
+                                                             uuid=uuid.uuid4().hex)
 
-            return JsonResponse({'res': 1})
+            else:
+                # url_object가 없다. 키워드고 뭐고 없음.
+                if scheme == 'http':
+                    url_object = UrlObject.objects.create(loc=loc, http=True, https=False, is_discrete=is_discrete,
+                                                          in_not_301=in_not_301, discrete_loc=discrete_loc)
+                elif scheme == 'https':
+                    url_object = UrlObject.objects.create(loc=loc, http=False, https=True, is_discrete=is_discrete,
+                                                          in_not_301=in_not_301, discrete_loc=discrete_loc)
+                title = Title.objects.create(text=title_text, url_object=url_object)
+                sub_url_object = SubUrlObject.objects.create(user=request.user,
+                                                             title=title,
+                                                             url_object=url_object,
+                                                             uuid=uuid.uuid4().hex)
+
+            for item in keyword_list:
+                text = item.replace(" ", "")
+                keyword = Keyword.objects.get_or_create(url_object=url_object, text=text)
+                sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword, user=request.user)
+                sub_raw_keyword_count = SubRawKeywordCount.objects.get_or_create(sub_url_object=sub_url_object)
+                if sub_raw_keyword_count.count < 31:
+                    sub_raw_keyword = SubRawKeyword.objects.get_or_create(text=text,
+                                                                          sub_keyword=sub_keyword,
+                                                                          sub_url_object=sub_url_object,
+                                                                          user=request.user)
+            return JsonResponse({'res': 1, 'id':})
         return JsonResponse({'res': 2})
+
 
 '''
 print('accepted url: '+url)
@@ -2534,6 +2679,8 @@ print('title og: ' + page.get_metadatas('title', strategy=['og', ]))
 print('title og, page, dc' + page.get_metadatas('title', strategy=['og', 'page', 'dc', ]))
 print('----------get_redirect_url: ' + get_redirected_url(url))
 '''
+
+
 def test10(request):
     if request.method == 'POST':
         if request.is_ajax():
@@ -2597,10 +2744,9 @@ def strip_scheme(url):
     scheme = "%s://" % parsed.scheme
     return parsed.geturl().replace(scheme, '', 1)
 
-
 # 301이면 어디로 가는지 확인하고 http랑 https 다 되면 https를 추천하는 방향으로.
 
 # That's it!
 
 
-#localhost, http:///change/new/, 이런거 확인. 그리고 줄임 주소 변경 여부 확인. get_current_url 이용
+# localhost, http:///change/new/, 이런거 확인. 그리고 줄임 주소 변경 여부 확인. get_current_url 이용

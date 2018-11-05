@@ -37,48 +37,6 @@ def user_profile(request, user_username):
                 return render(request, 'baseapp/user_profile.html',
                               {'chosen_user': chosen_user, 'following': following})
 
-def create_new(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            form = PostCreateForm(request.POST)
-            if form.is_valid():
-                title = None
-                description = None
-                has_another_profile = False
-                profile_name = None
-
-                if form.cleaned_data['whose'] == 'other':
-                    has_another_profile = True
-                    profile_name = form.cleaned_data['name']
-                    profile_name = profile_name.strip()
-                if form.cleaned_data['title'] == 'on':
-                    title = form.cleaned_data['title_content']
-                    title = title.strip()
-                if form.cleaned_data['description'] == 'on':
-                    description = form.cleaned_data['description_content']
-                    description = description.strip()
-                uuid_made = uuid.uuid4().hex
-                post = Post.objects.create(user=request.user,
-                                           title=title,
-                                           description=description,
-                                           has_another_profile=has_another_profile,
-                                           uuid=uuid_made,
-                                           is_open=False)
-                if has_another_profile:
-                    PostProfile.objects.create(post=post, name=profile_name)
-                post_first_check = PostFirstCheck.objects.create(post=post)
-                post_like_count = PostLikeCount.objects.create(post=post)
-                post_comment_count = PostCommentCount.objects.create(post=post)
-                post_follow_count = PostFollowCount.objects.create(post=post)
-                post_chat = PostChat.objects.create(post=post, before=None, kind=POSTCHAT_START, uuid=uuid.uuid4().hex)
-                # 여기서 post unique constraint 처리 해주면 좋긴 하나 지금 하기엔 하고 싶지 않다.
-                return redirect(reverse('baseapp:post_update', kwargs={'uuid': uuid_made}))
-    if request.method == "GET":
-        if not request.user.is_authenticated:
-            return redirect(reverse('baseapp:main_create_log_in'))
-        form = PostCreateForm
-        return render(request, 'baseapp/create_new_first.html', {'form': form})
-
 
 def post_update(request, uuid):
     if request.method == "GET":
@@ -165,3 +123,23 @@ def search_post(request):
         word = {}
         word['q'] = q
         return render(request, 'baseapp/user_search_post.html', {'word': word})
+
+
+def register_url(request):
+    if request.method == "GET":
+        if not request.user.is_authenticated:
+            return redirect(reverse('baseapp:main_create_log_in'))
+        return render(request, 'baseapp/register_url.html')
+
+
+def update_url(request, uuid):
+    if request.method == "GET":
+        if not request.user.is_authenticated:
+            return redirect(reverse('baseapp:main_create_log_in'))
+        sub_url_object = None
+        try:
+            sub_url_object = SubUrlObject.objects.get(uuid=uuid, user=request.user)
+        except Exception as e:
+            return redirect(reverse('baseapp:main_create_log_in'))
+        return render(request, 'baseapp/register_url.html', {'id': uuid})
+

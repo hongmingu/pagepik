@@ -9,7 +9,10 @@ app_name = 'baseapp'
 urlpatterns = [
 
     re_path(r'^$', authviews.main_create_log_in, name='main_create_log_in'),
-    re_path(r'^create/new/$', views.create_new, name='create_new'),
+
+    re_path(r'^register/url/$', views.register_url, name='register_url'),
+    re_path(r'^update/url/(?P<uuid>([0-9a-f]{32}))/$', views.register_url, name='register_url'),
+
     re_path(r'^explore/feed/$', views.explore_feed, name='explore_feed'),
     re_path(r'^note/all/$', views.note_all, name='note_all'),
     re_path(r'^(?P<user_username>([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?))/$', views.user_profile, name='user_profile'),

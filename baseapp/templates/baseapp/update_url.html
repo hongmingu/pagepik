@@ -30,6 +30,7 @@
 
 {% include 'others/bootstrap_tester.html' %}
 
+    <div class="hidden" id="id">{{ id }}</div>
 {% if user.is_authenticated %}
     <div class="hidden" id="user_id">{{ user.username }}</div>
 {% else %}
@@ -44,26 +45,14 @@
     <div class="hidden" id="title"></div>
     <div class="hidden" id="url"></div>
 
+
 <div class="container-fluid margin_top_50">
     <div class="row">
         <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
             <div class="row" id="content">
 
                 <div class="row div_base">
-                    <div class="url_check_wrapper" id="url_check_wrapper">
-                        <div align="center"><span class="register">Register</span></div>
-                        <br>
-                        <div class="input-group-lg">
-                            <input class="url_input" id="url_input" placeholder="your url" type="url">
-                        </div>
-                        <div class="url_clue_wrapper"><span class="url_clue" id="url_clue"></span></div>
-                        <br>
-                        <a href=""><div align="center"><span class="clickable check_url" id="check">check</span></div></a>
-                    </div>
-                    <div class="url_example_wrapper" id="url_example_wrapper">
-
-                    </div>
-                    <div class="add_keyword_wrapper hidden" id="add_keyword_wrapper">
+                    <div class="add_keyword_wrapper" id="add_keyword_wrapper">
 
                         <div class="add_keyword_content">
                             <div class="add_keyword_title" id="add_keyword_title"></div>
@@ -239,7 +228,9 @@
                 },
                 success:function (data) {
                     if (data.res === 1){
-                        alert('성공했으니 수정요망')
+                        var scheme = window.location.protocol == "https:" ? "https://" : "http://";
+                        var update_location = scheme + window.location.host + "/update/url/" + data.id + '/';
+                        location.href=update_location
                     }
                 }
             });
@@ -265,7 +256,9 @@
                 },
                 success:function (data) {
                     if (data.res === 1){
-                        alert('성공했으니 수정요망')
+                        var scheme = window.location.protocol == "https:" ? "https://" : "http://";
+                        var update_location = scheme + window.location.host + "/update/url/" + data.id + '/';
+                        location.href=update_location
                     }
                 }
             });
