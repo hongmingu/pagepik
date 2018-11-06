@@ -36,15 +36,9 @@
 {% else %}
     <div class="hidden" id="user_id"></div>
 {% endif %}
-    <div class="hidden" id="discrete_loc"></div>
-    <div class="hidden" id="discrete_scheme"></div>
-    <div class="hidden" id="in_not_301"></div>
-    <div class="hidden" id="is_discrete"></div>
-    <div class="hidden" id="loc"></div>
-    <div class="hidden" id="scheme"></div>
+    <div class="hidden" id="refresh">false</div>
+    <div class="hidden" id="status_code"></div>
     <div class="hidden" id="title"></div>
-    <div class="hidden" id="url"></div>
-
 
 <div class="container-fluid margin_top_50">
     <div class="row">
@@ -58,6 +52,9 @@
                             <div class="add_keyword_title" id="add_keyword_title"></div>
                             <div class="add_keyword_url" id="add_keyword_url"></div>
                         </div>
+                        <br>
+                        <div align="center"><a href=""><span class="add_keyword clickable" id="refresh_title">refresh title</span></a></div>
+
                         <div class="h3" align="center">add keywords</div>
                         <div class="input-group-lg">
                             <input class="keyword_input" id="keyword_input" placeholder="add keyword" type="text">
@@ -67,8 +64,12 @@
                         <div align="center"><a href=""><span class="add_keyword clickable" id="add_keyword">add</span></a></div>
 
                         <br>
-                        <div class="h4" align="center">your keywords</div>
+                        <div class="h4" align="center">keywords</div>
                         <div class="added_keyword_container" id="added_keyword_container"></div>
+
+                        <br>
+                        <div class="h4" align="center">These will be deleted</div>
+                        <div class="deleted_keyword_container" id="deleted_keyword_container"></div>
 
                         <br>
                         <div align="center"><a href=""><span class="complete_keyword clickable" id="complete_keyword">complete</span></a></div>
@@ -84,82 +85,60 @@
 
 <script>
     $(function () {
+        $.ajax({
+            url:'/re/update/url/', type:'post', dataType:'json', cache:false,
+            data:{
+                id: $('#id').html(),
+            },
+            success:function (data) {
+                console.log(data)
+                if (data.res === 1){
+                    $('#add_keyword_title').html(data.title)
+                    $('#add_keyword_url').html(data.url)
+                    $.each(data.keyword_output, function (key, value) {
 
-        $('#check').click(function (e) {
-            if ($('#check').html() === 'waiting...'){
+                        var uuid = generate_uuid()
+                        var added_keyword = $('<span class="added_keyword_wrapper" id="added_keyword_wrapper_'+uuid+'"><span class="added_keyword">'+value+'</span><a href=""><span class="glyphicon glyphicon-remove keyword_delete"></span></a></span>')
+                        added_keyword.find('.keyword_delete').on('click', function (e) {
+                            e.preventDefault()
+                            var deleted_keyword = $('<span class="deleted_keyword_wrapper" id="deleted_keyword_wrapper_'+uuid+'"><span class="deleted_keyword">'+value+'</span><a href=""><span class="glyphicon glyphicon-remove keyword_delete"></span></a></span>')
+                            deleted_keyword.find('.keyword_delete').on('click', function (e) {
+                                e.preventDefault()
+                                $('#deleted_keyword_wrapper_'+uuid).remove()
+                            })
+                            if (!($('#deleted_keyword_wrapper_'+uuid).length)){
+                                $('#deleted_keyword_container').append(deleted_keyword)
+                            } else {
+                                return false
+                            }
+                        })
+                        $('#added_keyword_container').append(added_keyword)
+                    })
+                }
+            }
+        });
+        $('#refresh_title').click(function (e) {
+            if ($('#refresh_title').html() === 'waiting...'){
                 return false
             }
             e.preventDefault()
-            $('#url_example_wrapper').empty()
-            var url = $('#url_input').val()
-
-            if (url.replace(/ /g,'')==='') {
-                $('#url_clue').html('url cannot be empty')
-
-                return false
-            }
-            $('#url_clue').html('')
-            $('#check').html('waiting...')
+            $('#refresh_title').html('waiting...')
             $.ajax({
-                url:'/re/check/url/', type:'post', dataType:'json', cache:false,
+                url:'/re/refresh/url/', type:'post', dataType:'json', cache:false,
                 data:{
-                    url: url
+                    url: $('#add_keyword_url').html(),
                 },
                 success:function (data) {
-                    $('#check').html('check')
+                    $('#refresh_title').html('refresh title')
                     console.log(data)
                     if (data.res === 1){
-                        if ($('#url_example_wrapper').hasClass('hidden')){
-                            $('.url_example_wrapper').removeClass('hidden')
-                        }
-                        var append_array = []
-
-                        $.each(data.output, function (key, value) {
-                            if (value.in_not_301 === true){
-                                append_array.push(value)
-                                // 이러면 뒤로 가야 한다.
-                            } else {
-                                append_array.unshift(value)
-                            }
-                        })
-                        $.each(append_array, function (key, value) {
-                            var appender = $('<a href="">' +
-                                '<div class="url_example clickable">' +
-                                '<div class="url_example_title">'+value.title+'</div>' +
-                                '<div class="url_example_url">'+value.url+'</div>' +
-                                '</div>' +
-                                '</a>')
-                            appender.on('click', function (e) {
-                                e.preventDefault()
-                                $('#discrete_loc').html(value.loc)
-                                $('#discrete_scheme').html(value.discrete_scheme)
-                                $('#in_not_301').html(value.in_not_301)
-                                $('#is_discrete').html(value.is_discrete)
-                                $('#loc').html(value.loc)
-                                $('#scheme').html(value.scheme)
-                                $('#title').html(value.title)
-                                $('#url').html(value.url)
-                                $('#add_keyword_title').html(value.title)
-                                $('#add_keyword_url').html(value.url)
-                                $('#url_check_wrapper').remove()
-                                $('#url_example_wrapper').remove()
-                                if ($('#add_keyword_wrapper').hasClass('hidden')){
-                                    $('#add_keyword_wrapper').removeClass('hidden')
-                                }
-                            })
-                            $('#url_example_wrapper').append(appender)
-                        })
-                        $('#url_example_wrapper').append()
-
-                    } else if (data.res === 0){
-                        if(data.message === 'unable'){
-                            $('#url_clue').html('url is unable to check')
-                        }
+                        $('#refresh').html('true')
+                        $('#add_keyword_title').html(data.title)
+                        $('#title').html(data.title)
+                        $('#status_code').html(data.status_code)
                     }
-
                 }
             });
-
         })
         $('#add_keyword').click(function (e) {
             e.preventDefault()
@@ -193,10 +172,18 @@
 
             var uuid = generate_uuid()
             var added_keyword = $('<span class="added_keyword_wrapper" id="added_keyword_wrapper_'+uuid+'"><span class="added_keyword">'+input+'</span><a href=""><span class="glyphicon glyphicon-remove keyword_delete"></span></a></span>')
-
             added_keyword.find('.keyword_delete').on('click', function (e) {
                 e.preventDefault()
-                $('#added_keyword_wrapper_'+uuid).remove()
+                var deleted_keyword = $('<span class="deleted_keyword_wrapper" id="deleted_keyword_wrapper_'+uuid+'"><span class="deleted_keyword">'+input+'</span><a href=""><span class="glyphicon glyphicon-remove keyword_delete"></span></a></span>')
+                deleted_keyword.find('.keyword_delete').on('click', function (e) {
+                    e.preventDefault()
+                    $('#deleted_keyword_wrapper_'+uuid).remove()
+                })
+                if (!($('#deleted_keyword_wrapper_'+uuid).length)){
+                    $('#deleted_keyword_container').append(deleted_keyword)
+                } else {
+                    return false
+                }
             })
             $('#added_keyword_container').append(added_keyword)
             $('#keyword_input').val('')
@@ -213,24 +200,23 @@
             $('.added_keyword').each(function () {
                 send_array.push($(this).html())
             })
+            var delete_array = []
+            $('.deleted_keyword').each(function () {
+                delete_array.push($(this).html())
+            })
             $.ajax({
-                url:'/re/register/url/', type:'post', dataType:'json', cache:false,
+                url:'/re/update/complete/url/', type:'post', dataType:'json', cache:false,
                 data:{
-                    discrete_loc : $('#discrete_loc').html(),
-                    discrete_scheme: $('#discrete_scheme').html(),
-                    in_not_301: $('#in_not_301').html(),
-                    is_discrete: $('#is_discrete').html(),
-                    loc: $('#loc').html(),
-                    scheme: $('#scheme').html(),
+                    id: $('#id').html(),
+                    refresh: $('#refresh').html(),
+                    status_code: $('#status_code').html(),
                     title: $('#title').html(),
-                    url: $('#url').html(),
-                    keyword_list: send_array
+                    keyword_list: send_array,
+                    delete_list: delete_array
                 },
                 success:function (data) {
                     if (data.res === 1){
-                        var scheme = window.location.protocol == "https:" ? "https://" : "http://";
-                        var update_location = scheme + window.location.host + "/update/url/" + data.id + '/';
-                        location.href=update_location
+                        location.reload()
                     }
                 }
             });
@@ -256,9 +242,7 @@
                 },
                 success:function (data) {
                     if (data.res === 1){
-                        var scheme = window.location.protocol == "https:" ? "https://" : "http://";
-                        var update_location = scheme + window.location.host + "/update/url/" + data.id + '/';
-                        location.href=update_location
+                        alert('성공했음 수정요망')
                     }
                 }
             });

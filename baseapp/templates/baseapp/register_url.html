@@ -58,7 +58,7 @@
                         </div>
                         <div class="url_clue_wrapper"><span class="url_clue" id="url_clue"></span></div>
                         <br>
-                        <a href=""><div align="center"><span class="clickable check_url" id="check">check</span></div></a>
+                        <div align="center"><a href=""><span class="clickable check_url" id="check">check</span></a></div>
                     </div>
                     <div class="url_example_wrapper" id="url_example_wrapper">
 
@@ -126,7 +126,7 @@
                         var append_array = []
 
                         $.each(data.output, function (key, value) {
-                            if (value.in_not_301 === true){
+                            if (value.in_not_301 === 'true'){
                                 append_array.push(value)
                                 // 이러면 뒤로 가야 한다.
                             } else {
@@ -142,6 +142,11 @@
                                 '</a>')
                             appender.on('click', function (e) {
                                 e.preventDefault()
+                                if(value.user_has_it !== 'false'){
+                                    var scheme = window.location.protocol == "https:" ? "https://" : "http://";
+                                    var update_location = scheme + window.location.host + "/update/url/" + data.id + '/';
+                                    location.href=update_location
+                                }
                                 $('#discrete_loc').html(value.loc)
                                 $('#discrete_scheme').html(value.discrete_scheme)
                                 $('#in_not_301').html(value.in_not_301)
@@ -239,7 +244,9 @@
                 },
                 success:function (data) {
                     if (data.res === 1){
-                        alert('성공했으니 수정요망')
+                        var scheme = window.location.protocol == "https:" ? "https://" : "http://";
+                        var update_location = scheme + window.location.host + "/update/url/" + data.id + '/';
+                        location.href=update_location
                     }
                 }
             });
@@ -265,7 +272,9 @@
                 },
                 success:function (data) {
                     if (data.res === 1){
-                        alert('성공했으니 수정요망')
+                        var scheme = window.location.protocol == "https:" ? "https://" : "http://";
+                        var update_location = scheme + window.location.host + "/update/url/" + data.id + '/';
+                        location.href=update_location
                     }
                 }
             });

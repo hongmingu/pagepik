@@ -141,5 +141,5 @@ def update_url(request, uuid):
             sub_url_object = SubUrlObject.objects.get(uuid=uuid, user=request.user)
         except Exception as e:
             return redirect(reverse('baseapp:main_create_log_in'))
-        return render(request, 'baseapp/register_url.html', {'id': uuid})
+        return render(request, 'baseapp/update_url.html', {'id': uuid})
 

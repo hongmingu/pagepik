@@ -430,7 +430,12 @@ transform: translateX(10px) translateY(-10px)
 }
 .added_keyword{
     font-size: 11px; padding: 3px; border-radius: 3px; background-color: #d2d8ff;
-
+}
+.deleted_keyword_wrapper{
+    margin-right: 4px; margin-top: 4px; margin-bottom: 4px;
+}
+.deleted_keyword{
+    font-size: 11px; padding: 3px; border-radius: 3px; background-color: #ffbecc;
 }
 .url_example{
     background-color: #dce5ff;

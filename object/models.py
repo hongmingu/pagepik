@@ -385,7 +385,7 @@ class Keyword(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "pk: %s" % self.pk
+        return "text: %s" % self.text
 
     class Meta:
         unique_together = ('url_object', 'text',)
@@ -420,6 +420,7 @@ class KeywordDown(models.Model):
 class Title(models.Model):
     url_object = models.ForeignKey(UrlObject, on_delete=models.CASCADE, null=True, blank=True)
     text = models.TextField(max_length=1000, null=True, blank=True)
+    status = models.CharField(max_length=20, null=True, default='200', blank=True)
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -447,7 +448,7 @@ class SubKeyword(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "pk: %s" % self.pk
+        return "text: %s" % self.keyword.text
 
     class Meta:
         unique_together = ('user', 'keyword',)

@@ -285,6 +285,7 @@ def deleted_notice_post_chat_rest_like(sender, instance, **kwargs):
 # ----------------------------------------------------------------------------------
 # notice post_chat_rest_like
 
+
 @receiver(post_save, sender=SubKeyword)
 def created_sub_keyword(sender, instance, created, **kwargs):
     if created:
@@ -315,7 +316,7 @@ def deleted_sub_keyword(sender, instance, **kwargs):
 
 # notice post_chat_rest_like
 @receiver(post_save, sender=KeywordUp)
-def created_sub_keyword(sender, instance, created, **kwargs):
+def created_keyword_up(sender, instance, created, **kwargs):
     if created:
         try:
             with transaction.atomic():
@@ -328,7 +329,7 @@ def created_sub_keyword(sender, instance, created, **kwargs):
 
 
 @receiver(post_delete, sender=KeywordUp)
-def deleted_sub_keyword(sender, instance, **kwargs):
+def deleted_keyword_up(sender, instance, **kwargs):
     try:
         with transaction.atomic():
             keyword = instance.keyword
@@ -343,7 +344,7 @@ def deleted_sub_keyword(sender, instance, **kwargs):
 
 # notice post_chat_rest_like
 @receiver(post_save, sender=KeywordDown)
-def created_sub_keyword(sender, instance, created, **kwargs):
+def created_keyword_down(sender, instance, created, **kwargs):
     if created:
         try:
             with transaction.atomic():
@@ -356,7 +357,7 @@ def created_sub_keyword(sender, instance, created, **kwargs):
 
 
 @receiver(post_delete, sender=KeywordDown)
-def deleted_sub_keyword(sender, instance, **kwargs):
+def deleted_keyword_down(sender, instance, **kwargs):
     try:
         with transaction.atomic():
             keyword = instance.keyword
@@ -402,6 +403,13 @@ def deleted_sub_raw_keyword(sender, instance, **kwargs):
             sub_raw_keyword_count = instance.sub_url_object.subrawkeywordcount
             sub_raw_keyword_count.count = F('count') - 1
             sub_raw_keyword_count.save()
+
+            sub_keyword = instance.sub_keyword
+            sub_raw_keywords_exist = SubRawKeyword.objects.filter(sub_keyword=sub_keyword).exists()
+
+            if not sub_raw_keywords_exist:
+                sub_keyword.delete()
+
     except Exception as e:
         print(e)
         pass
