@@ -102,12 +102,21 @@
                         added_keyword.find('.keyword_delete').on('click', function (e) {
                             e.preventDefault()
                             var deleted_keyword = $('<span class="deleted_keyword_wrapper" id="deleted_keyword_wrapper_'+uuid+'"><span class="deleted_keyword">'+value+'</span><a href=""><span class="glyphicon glyphicon-remove keyword_delete"></span></a></span>')
+
                             deleted_keyword.find('.keyword_delete').on('click', function (e) {
                                 e.preventDefault()
                                 $('#deleted_keyword_wrapper_'+uuid).remove()
+                                if($('#added_keyword_wrapper_'+uuid).hasClass('added_keyword_wrapper_deleted')){
+                                    $('#added_keyword_wrapper_'+uuid).removeClass('added_keyword_wrapper_deleted')
+                                }
                             })
                             if (!($('#deleted_keyword_wrapper_'+uuid).length)){
+
                                 $('#deleted_keyword_container').append(deleted_keyword)
+
+                                if(!($('#added_keyword_wrapper_'+uuid).hasClass('added_keyword_wrapper_deleted'))){
+                                    $('#added_keyword_wrapper_'+uuid).addClass('added_keyword_wrapper_deleted')
+                                }
                             } else {
                                 return false
                             }
@@ -178,9 +187,17 @@
                 deleted_keyword.find('.keyword_delete').on('click', function (e) {
                     e.preventDefault()
                     $('#deleted_keyword_wrapper_'+uuid).remove()
+                    if($('#added_keyword_wrapper_'+uuid).hasClass('added_keyword_wrapper_deleted')){
+                        $('#added_keyword_wrapper_'+uuid).removeClass('added_keyword_wrapper_deleted')
+                    }
+
                 })
                 if (!($('#deleted_keyword_wrapper_'+uuid).length)){
                     $('#deleted_keyword_container').append(deleted_keyword)
+
+                    if(!($('#added_keyword_wrapper_'+uuid).hasClass('added_keyword_wrapper_deleted'))){
+                        $('#added_keyword_wrapper_'+uuid).addClass('added_keyword_wrapper_deleted')
+                    }
                 } else {
                     return false
                 }

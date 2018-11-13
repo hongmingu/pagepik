@@ -428,8 +428,14 @@ transform: translateX(10px) translateY(-10px)
 .added_keyword_wrapper{
     margin-right: 4px; margin-top: 4px; margin-bottom: 4px;
 }
+.added_keyword_wrapper_deleted{
+    background-color: red; padding:4px; border-radius: 3px;
+}
 .added_keyword{
     font-size: 11px; padding: 3px; border-radius: 3px; background-color: #d2d8ff;
+}
+.added_keyword_with_delete{
+    font-size: 11px; padding: 3px; border-radius: 3px; background-color: #979797;
 }
 .deleted_keyword_wrapper{
     margin-right: 4px; margin-top: 4px; margin-bottom: 4px;
