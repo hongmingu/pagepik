@@ -2818,7 +2818,8 @@ def re_profile_suobj(request):
                 user = None
                 try:
                     user = User.objects.get(username=chosen_user_id)
-                except User.DoesNotExist:
+                except Exception as e:
+                    print(e)
                     return JsonResponse({'res': 0})
                 suobjs = None
 
@@ -2829,6 +2830,8 @@ def re_profile_suobj(request):
                     try:
                         last_suojs = SubUrlObject.objects.get(uuid=last_id)
                     except Exception as e:
+                        print(e)
+
                         return JsonResponse({'res': 0})
                     if last_suojs is not None:
                         suobjs = SubUrlObject.objects.filter(
@@ -2997,7 +3000,7 @@ def re_bridging_list(request):
 
 
 @ensure_csrf_cookie
-def re_bridging_list(request):
+def re_bridger_list(request):
     if request.method == "POST":
         if request.user.is_authenticated:
             if request.is_ajax():

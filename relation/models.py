@@ -42,7 +42,7 @@ class Bridge(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "user: %s, bridge: %s" % (self.user.userusername.username, self.bridge.userusername.username)
+        return "ok: %s, bridge: %s" % (self.pk, self.pk)
 
     class Meta:
         unique_together = ('user', 'bridge',)
@@ -53,7 +53,7 @@ class BridgingCount(models.Model):
     count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return "bridging Count of: %s" % self.user.userusername.username
+        return "bridging Count of: %s" % self.pk
 
 
 class BridgerCount(models.Model):
@@ -61,7 +61,7 @@ class BridgerCount(models.Model):
     count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return "bridger Count of: %s" % self.user.userusername.username
+        return "bridger Count of: %s" % self.pk
 '''
 
 class Blocking(models.Model):

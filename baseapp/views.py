@@ -130,7 +130,7 @@ def user_profile(request, user_username):
                 return render(request, '404.html')
             if chosen_user is not None:
                 bridging = None
-                if Bridge.objects.filter(user=request.user, follow=chosen_user).exists():
+                if Bridge.objects.filter(user=request.user, bridge=chosen_user).exists():
                     bridging = True
 
                 return render(request, 'baseapp/user_profile.html', {'chosen_user': chosen_user, 'bridging': bridging})
