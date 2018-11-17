@@ -12,6 +12,7 @@ urlpatterns = [
 
     re_path(r'^register/url/$', views.register_url, name='register_url'),
     re_path(r'^update/url/(?P<uuid>([0-9a-f]{32}))/$', views.update_url, name='update_url'),
+    re_path(r'^url/obj/(?P<uuid>([0-9a-f]{32}))/$', views.suobj, name='suobj'),
 
     re_path(r'^explore/feed/$', views.explore_feed, name='explore_feed'),
     re_path(r'^note/all/$', views.note_all, name='note_all'),
@@ -37,6 +38,30 @@ urlpatterns = [
             name='re_update_complete_url'),
     re_path(r'^re/refresh/url/$', base_ajax_views.re_refresh_url,
             name='re_refresh_url'),
+    #
+    re_path(r'^re/profile/suobj/$', base_ajax_views.re_profile_suobj,
+            name='re_profile_suobj'),
+    re_path(r'^re/suobj/populate/$', base_ajax_views.re_suobj_populate,
+            name='re_suobj_populate'),
+
+
+    re_path(r'^re/bridge/add/$', base_ajax_views.re_bridge_add,
+            name='re_bridge_add'),
+    re_path(r'^re/bridging/list/$', base_ajax_views.re_bridging_list,
+            name='re_bridging_list'),
+    re_path(r'^re/bridger/list/$', base_ajax_views.re_bridger_list,
+            name='re_bridger_list'),
+    # re_path(r'^re/follow/add/$', base_ajax_views.re_follow_add,
+    #         name='re_follow_add'),
+    # re_path(r'^re/following/list/$', base_ajax_views.re_following_list,
+    #         name='re_following_list'),
+    # re_path(r'^re/follower/list/$', base_ajax_views.re_follower_list,
+    #         name='re_follower_list'),
+    #
+    # re_path(r'^re/profile/post/$', base_ajax_views.re_profile_post,
+    #         name='re_profile_post'),
+    # re_path(r'^re/post/populate/$', base_ajax_views.re_post_populate,
+    #         name='re_post_populate'),
     # re_path(r'^email/key/send/$', views.email_key_send, name='email_key_send'),
     # re_path(r'^email/key/confirm/(?P<uid>([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?))/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         # views.email_key_confirm, name='email_key_confirm'),

@@ -33,6 +33,35 @@ class FollowerCount(models.Model):
 
     def __str__(self):
         return "Follower Count of: %s" % self.user.userusername.username
+
+
+class Bridge(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='is_bridging')
+    bridge = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='is_bridged')
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "user: %s, bridge: %s" % (self.user.userusername.username, self.bridge.userusername.username)
+
+    class Meta:
+        unique_together = ('user', 'bridge',)
+
+
+class BridgingCount(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return "bridging Count of: %s" % self.user.userusername.username
+
+
+class BridgerCount(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return "bridger Count of: %s" % self.user.userusername.username
 '''
 
 class Blocking(models.Model):

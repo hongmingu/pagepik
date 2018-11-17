@@ -363,7 +363,7 @@ class UrlObject(models.Model):
     loc = models.TextField(max_length=2050, null=True, unique=True, blank=True, default=None)
 
     # 여기서 unique True 면 null값도 두 개 이상 넣을 수 없나?
-    http = models.BooleanField(default=True)
+    http = models.BooleanField(default=False)
     https = models.BooleanField(default=False)
     is_discrete = models.BooleanField(default=False)
     in_not_301 = models.BooleanField(default=False)
@@ -373,6 +373,15 @@ class UrlObject(models.Model):
 
     def __str__(self):
         return "URL: %s" % self.loc
+
+    def get_url(self):
+        scheme = ''
+        if self.https:
+            scheme = 'https://'
+        elif self.http:
+            scheme = 'http://'
+        return scheme + self.loc
+
 
 
 class Keyword(models.Model):
@@ -442,7 +451,6 @@ class SubUrlObject(models.Model):
 class SubKeyword(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     keyword = models.ForeignKey(Keyword, on_delete=models.CASCADE, null=True, blank=True)
-    sub_url_object = models.ForeignKey(SubUrlObject, on_delete=models.CASCADE, null=True, blank=True)
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -452,6 +460,20 @@ class SubKeyword(models.Model):
 
     class Meta:
         unique_together = ('user', 'keyword',)
+
+
+class SubUrlObjectSubKeyword(models.Model):
+    sub_url_object = models.ForeignKey(SubUrlObject, on_delete=models.CASCADE, null=True, blank=True)
+    sub_keyword = models.ForeignKey(SubKeyword, on_delete=models.CASCADE, null=True, blank=True)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "pk: %s" % self.pk
+
+    class Meta:
+        unique_together = ('sub_url_object', 'sub_keyword',)
 
 
 class SubRawKeyword(models.Model):
@@ -464,7 +486,7 @@ class SubRawKeyword(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('user', 'text',)
+        unique_together = ('sub_url_object', 'text',)
 
 
 class SubRawKeywordCount(models.Model):

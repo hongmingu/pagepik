@@ -1524,86 +1524,6 @@ def re_profile_follower(request):
 
 
 @ensure_csrf_cookie
-def re_profile_post(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                chosen_user_id = request.POST.get('chosen_user_id', None)
-                last_id = request.POST.get('last_post_id', None)
-                user = None
-                try:
-                    user = User.objects.get(username=chosen_user_id)
-                except User.DoesNotExist:
-                    pass
-                master = False
-                if user == request.user:
-                    master = True
-                posts = None
-
-                if master:
-                    if last_id == '':
-                        posts = Post.objects.filter((Q(user=user))).order_by('-post_chat_created').distinct()[:21]
-                    else:
-                        last_post = None
-                        try:
-                            last_post = Post.objects.get(uuid=last_id)
-                        except Exception as e:
-                            print(e)
-                            pass
-                        if last_post is not None:
-                            posts = Post.objects.filter(
-                                (Q(user=user)) & Q(post_chat_created__lte=last_post.post_chat_created)).exclude(
-                                pk=last_post.pk).order_by('-post_chat_created').distinct()[:21]
-                        else:
-                            posts = Post.objects.filter(Q(user=user)).order_by('-post_chat_created').distinct()[:21]
-                else:
-                    if last_id == '':
-                        posts = Post.objects.filter((Q(user=user) & Q(is_open=True))).order_by(
-                            '-post_chat_created').distinct()[:21]
-                    else:
-                        last_post = None
-                        try:
-                            last_post = Post.objects.get(uuid=last_id)
-                        except Exception as e:
-                            print(e)
-                            pass
-                        if last_post is not None:
-                            posts = Post.objects.filter((Q(user=user)) & Q(is_open=True) & Q(
-                                post_chat_created__lte=last_post.post_chat_created)).exclude(pk=last_post.pk).order_by(
-                                '-post_chat_created').distinct()[:21]
-                        else:
-                            posts = Post.objects.filter(Q(user=user) & Q(is_open=True)).order_by(
-                                '-post_chat_created').distinct()[:21]
-                # 이제 리스트 만드는 코드가 필요하다. #########
-
-                # filter(Q(post__uuid=post_id) & Q(pk__lt=last_post_chat.pk))
-                ################################
-                output = []
-                count = 0
-                last = None
-                sub_output = None
-                post_follow = None
-                for post in posts:
-                    count = count + 1
-                    if count == 20:
-                        last = post.uuid
-                    post_follow = True
-                    if Follow.objects.filter(user=request.user, follow=post.user).exists():
-                        post_follow = False
-                    sub_output = {
-                        'id': post.uuid,
-                        'created': post.created,
-                        'post_follow': post_follow
-                    }
-
-                    output.append(sub_output)
-
-                return JsonResponse({'res': 1, 'set': output, 'last': last, 'master': master})
-
-        return JsonResponse({'res': 2})
-
-
-@ensure_csrf_cookie
 def re_profile_post_delete(request):
     if request.method == "POST":
         if request.user.is_authenticated:
@@ -2621,8 +2541,9 @@ def re_register_url(request):
                 text = item.replace(" ", "")
                 keyword = Keyword.objects.get_or_create(url_object=url_object, text=text)
                 sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
-                                                               user=request.user,
-                                                               sub_url_object=sub_url_object)
+                                                               user=request.user)
+                sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(sub_url_object=sub_url_object,
+                                                                                          sub_keyword=sub_keyword)
                 sub_raw_keyword_count = SubRawKeywordCount.objects.get_or_create(sub_url_object=sub_url_object)
                 if sub_raw_keyword_count[0].count < 31:
                     sub_raw_keyword = SubRawKeyword.objects.get_or_create(text=item,
@@ -2728,8 +2649,9 @@ def re_update_complete_url(request):
                 text = item.replace(" ", "")
                 keyword = Keyword.objects.get_or_create(url_object=url_object, text=text)
                 sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
-                                                               user=request.user,
-                                                               sub_url_object=sub_url_object)
+                                                               user=request.user)
+                sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(sub_url_object=sub_url_object,
+                                                                                          sub_keyword=sub_keyword)
                 sub_raw_keyword_count = SubRawKeywordCount.objects.get_or_create(sub_url_object=sub_url_object)
                 if sub_raw_keyword_count[0].count < 31:
                     sub_raw_keyword = SubRawKeyword.objects.get_or_create(text=item,
@@ -2885,3 +2807,231 @@ def strip_scheme(url):
 
 
 # localhost, http:///change/new/, 이런거 확인. 그리고 줄임 주소 변경 여부 확인. get_current_url 이용
+
+@ensure_csrf_cookie
+def re_profile_suobj(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                chosen_user_id = request.POST.get('chosen_user_id', None)
+                last_id = request.POST.get('last_suobj_id', None)
+                user = None
+                try:
+                    user = User.objects.get(username=chosen_user_id)
+                except User.DoesNotExist:
+                    return JsonResponse({'res': 0})
+                suobjs = None
+
+                if last_id == '':
+                    suobjs = SubUrlObject.objects.filter(Q(user=user)).order_by('-created').distinct()[:20]
+                else:
+                    last_suojs = None
+                    try:
+                        last_suojs = SubUrlObject.objects.get(uuid=last_id)
+                    except Exception as e:
+                        return JsonResponse({'res': 0})
+                    if last_suojs is not None:
+                        suobjs = SubUrlObject.objects.filter(
+                            Q(user=user) & Q(pk_lt=last_suojs.pk)).order_by('-created').distinct()[:20]
+
+                # 이제 리스트 만드는 코드가 필요하다. #########
+
+                # filter(Q(post__uuid=post_id) & Q(pk__lt=last_post_chat.pk))
+                ################################
+                output = []
+                count = 0
+                last = None
+                sub_output = None
+                for suobj in suobjs:
+                    count = count + 1
+                    if count == 20:
+                        last = suobj.uuid
+
+                    sub_output = {
+                        'id': suobj.uuid,
+                    }
+
+                    output.append(sub_output)
+
+                return JsonResponse({'res': 1, 'output': output, 'last': last})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_suobj_populate(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                suobj_id = request.POST.get('suobj_id', None)
+                suobj = None
+                try:
+                    suobj = SubUrlObject.objects.get(uuid=suobj_id)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+                ################################
+                sub_raw_keywords = SubRawKeyword.objects.filter(sub_url_object=suobj)
+                srk_output = []
+                for sub_raw_keyword in sub_raw_keywords:
+                    srk_output.append(sub_raw_keyword.text)
+
+                output = {
+                    'user_id': suobj.user.username,
+                    'username': suobj.user.userusername.username,
+                    'title': suobj.title.text,
+                    'created': suobj.created,
+                    'url': suobj.url_object.get_url(),
+                    'srk_output': srk_output
+                }
+                # {'user_id', 'username', 'gross(포스트의)', 'date(포스트의)', 'created', 'obj_id',
+                #  ['comment_username', 'comment_text', 'comment_user_id', 'comment_created', 'comment_id']}
+
+                return JsonResponse({'res': 1, 'output': output})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_bridge_add(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                chosen_user_id = request.POST.get('user_id', None)
+                chosen_user = None
+                try:
+                    chosen_user = User.objects.get(username=chosen_user_id)
+                except User.DoesNotExist:
+                    return JsonResponse({'res': 0})
+
+                if chosen_user is not None:
+                    # 어이없는 스스로 팔로우 방지
+                    if chosen_user == request.user:
+                        return JsonResponse({'res': 0})
+                    bridge = None
+                    try:
+                        bridge = Bridge.objects.get(bridge=chosen_user, user=request.user)
+                    except Bridge.DoesNotExist:
+                        pass
+                    result = None
+                    if bridge is not None:
+                        try:
+                            with transaction.atomic():
+                                bridge.delete()
+
+                                from django.db.models import F
+                                bridging_count = request.user.bridgingcount
+                                bridging_count.count = F('count') - 1
+                                bridging_count.save()
+                                bridger_count = chosen_user.bridgercount
+                                bridger_count.count = F('count') - 1
+                                bridger_count.save()
+                                result = False
+
+                                # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
+                        except Exception:
+                            return JsonResponse({'res': 0})
+                    else:
+                        try:
+                            with transaction.atomic():
+                                bridge = Bridge.objects.create(bridge=chosen_user, user=request.user)
+                                from django.db.models import F
+                                bridging_count = request.user.bridgingcount
+                                bridging_count.count = F('count') + 1
+                                bridging_count.save()
+                                bridger_count = chosen_user.bridgercount
+                                bridger_count.count = F('count') + 1
+                                bridger_count.save()
+                                result = True
+
+                                # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
+                        except Exception:
+                            return JsonResponse({'res': 0})
+                    return JsonResponse({'res': 1, 'result': result})
+
+                return JsonResponse({'res': 2})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_bridging_list(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                user_id = request.POST.get('user_id', None)
+                next_id = request.POST.get('next_user_id', None)
+                user = None
+                try:
+                    user = User.objects.get(username=user_id)
+                except User.DoesNotExist:
+                    return JsonResponse({'res': 0})
+
+
+                next = None
+                output = []
+                if user is not None:
+                    if next_id == '':
+                        bridgings = Bridge.objects.filter(user=user).order_by('created')[:31]
+                    else:
+                        try:
+                            last_bridging = Bridge.objects.get(bridge__username=next_id, user=user)
+                        except:
+                            return JsonResponse({'res': 0})
+                        bridgings = Bridge.objects.filter(Q(user=user) & Q(pk__gte=last_bridging.pk)).order_by('created')[:31]
+                    count = 0
+                    for bridge in bridgings:
+                        count = count+1
+                        if count == 31:
+                            next = bridge.bridge.username
+                            break
+                        sub_output = {
+                            'username': bridge.bridge.userusername.username,
+                            'photo': bridge.bridge.userphoto.file_50_url(),
+                        }
+                        output.append(sub_output)
+
+                return JsonResponse({'res': 1, 'output': output, 'next':next})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_bridging_list(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                user_id = request.POST.get('user_id', None)
+                next_id = request.POST.get('next_user_id', None)
+                user = None
+                try:
+                    user = User.objects.get(username=user_id)
+                except User.DoesNotExist:
+                    return JsonResponse({'res': 0})
+
+                next = None
+                output = []
+                if user is not None:
+                    if next_id == '':
+                        bridgers = Bridge.objects.filter(bridge=user).order_by('created')[:31]
+                    else:
+                        try:
+                            last_bridger = Bridge.objects.get(bridge=user, user__username=next_id)
+                        except Exception as e:
+                            return JsonResponse({'res': 0})
+                        bridgers = Bridge.objects.filter(Q(bridge=user) & Q(pk__gte=last_bridger.pk)).order_by('created')[:31]
+                    count = 0
+                    for bridge in bridgers:
+                        count = count+1
+                        if count == 31:
+                            next = bridge.user.username
+                            break
+                        sub_output = {
+                            'username': bridge.user.userusername.username,
+                            'photo': bridge.user.userphoto.file_50_url(),
+                        }
+                        output.append(sub_output)
+
+                return JsonResponse({'res': 1, 'output': output, 'next': next})
+
+        return JsonResponse({'res': 2})

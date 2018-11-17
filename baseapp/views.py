@@ -12,30 +12,6 @@ from django.utils.timezone import now, timedelta
 
 # Create your views here.
 
-def user_profile(request, user_username):
-    if request.method == "GET":
-        if request.user.is_authenticated:
-            user = None
-            try:
-                chosen_user = User.objects.get(userusername__username=user_username)
-            except:
-                return render(request, '404.html')
-            if chosen_user is not None:
-                following = None
-                if Follow.objects.filter(user=request.user, follow=chosen_user).exists():
-                    following = True
-
-                return render(request, 'baseapp/user_profile.html', {'chosen_user': chosen_user, 'following': following})
-        else:
-            user = None
-            try:
-                chosen_user = User.objects.get(userusername__username=user_username)
-            except:
-                return render(request, '404.html')
-            if chosen_user is not None:
-                following = None
-                return render(request, 'baseapp/user_profile.html',
-                              {'chosen_user': chosen_user, 'following': following})
 
 
 def post_update(request, uuid):
@@ -62,19 +38,19 @@ def post_update(request, uuid):
 
             return render(request, 'baseapp/post_update.html', {'post': post, 'just_created': just_created})
 
-def post(request, uuid):
+def suobj(request, uuid):
     if request.method == "GET":
-        post = None
+        suobj = None
         try:
-            post = Post.objects.get(uuid=uuid)
+            suobj = SubUrlObject.objects.get(uuid=uuid)
         except:
             return render(request, '404.html')
-        if post is not None:
+        if suobj is not None:
             id_data = {}
             id_data['id'] = uuid
-            return render(request, 'baseapp/post.html', {'id_data': id_data, 'post': post})
+            return render(request, 'baseapp/suobj.html', {'id_data': id_data, 'suobj': suobj})
 
-        return render(request, 'baseapp/post.html', )
+        return render(request, 'baseapp/suobj.html', )
 
 
 def explore_feed(request):
@@ -143,3 +119,28 @@ def update_url(request, uuid):
             return redirect(reverse('baseapp:main_create_log_in'))
         return render(request, 'baseapp/update_url.html', {'id': uuid})
 
+
+def user_profile(request, user_username):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            user = None
+            try:
+                chosen_user = User.objects.get(userusername__username=user_username)
+            except:
+                return render(request, '404.html')
+            if chosen_user is not None:
+                bridging = None
+                if Bridge.objects.filter(user=request.user, follow=chosen_user).exists():
+                    bridging = True
+
+                return render(request, 'baseapp/user_profile.html', {'chosen_user': chosen_user, 'bridging': bridging})
+        else:
+            user = None
+            try:
+                chosen_user = User.objects.get(userusername__username=user_username)
+            except:
+                return render(request, '404.html')
+            if chosen_user is not None:
+                bridging = None
+                return render(request, 'baseapp/user_profile.html',
+                              {'chosen_user': chosen_user, 'bridging': bridging})
