@@ -2896,7 +2896,8 @@ def re_suobj_populate(request):
                     'loc': suobj.url_object.loc,
                     'url': suobj.url_object.get_url(),
                     'srk_output': srk_output,
-                    'url_id': suobj.uuid,
+                    'url_id': suobj.url_object.uuid,
+                    'suobj_id': suobj.uuid,
                 }
                 # {'user_id', 'username', 'gross(포스트의)', 'date(포스트의)', 'created', 'obj_id',
                 #  ['comment_username', 'comment_text', 'comment_user_id', 'comment_created', 'comment_id']}

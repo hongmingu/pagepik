@@ -19,7 +19,8 @@ var suobj_populate = function suobj_populate(id) {
                         '<div><a href="/'+data.output.username+'/"><span class="pop_username">'+data.output.username+'</span></a></div>' +
                         '<div><a href="'+data.output.url+'"><span class="pop_title">'+data.output.title+'</span></a></div>' +
                         '<div><a href="'+data.output.url+'"><span class="pop_url">'+data.output.url+'</span></a></div>' +
-                        '<a href="/url/'+data.output.url_id+'/"><div class="pop_info"></div></a>' +
+                        '<a href="/object/'+data.output.suobj_id+'/"><div class="pop_private_info">url private</div></a>' +
+                        '<a href="/url/'+data.output.url_id+'/"><div class="pop_public_info">url public</div></a>' +
                         '<div align="right"><span class="pop_created">'+date_differ(data.output.created)+'</span></div>' +
                         '<div class="srk_list">'+srks+'</div>' +
                         '</div>')
@@ -47,7 +48,7 @@ $(function () {
     $("#modal_pop_menu").on("shown.bs.modal", function () {
         var clicked_post = $('#clicked_suobj_id').html()
         var scheme = window.location.protocol == "https:" ? "https" : "http";
-        var path = scheme + '://' + window.location.host + '/url/obj/' + clicked_post;
+        var path = scheme + '://' + window.location.host + '/object/' + clicked_post;
         $('#modal_pop_menu_input').val(path).select();
     }).on("hidden.bs.modal", function () {
         $('#clicked_post_id').html('')
@@ -58,7 +59,7 @@ $(function () {
         e.preventDefault()
         var clicked_post = $('#clicked_suobj_id').html()
         var scheme = window.location.protocol == "https:" ? "https" : "http";
-        var path = scheme + '://' + window.location.host + '/url/obj/' + clicked_post;
+        var path = scheme + '://' + window.location.host + '/object/' + clicked_post;
         $('#modal_pop_menu_input').val(path).select();
         document.execCommand('Copy')
     })
@@ -66,7 +67,7 @@ $(function () {
         e.preventDefault()
         var clicked_post = $('#clicked_suobj_id').html()
         var scheme = window.location.protocol == "https:" ? "https" : "http";
-        var path = scheme + '://' + window.location.host + '/url/obj/' + clicked_post;
+        var path = scheme + '://' + window.location.host + '/object/' + clicked_post;
         location.href=path
     })
 })

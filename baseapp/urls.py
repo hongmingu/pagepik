@@ -12,7 +12,8 @@ urlpatterns = [
 
     re_path(r'^register/url/$', views.register_url, name='register_url'),
     re_path(r'^update/url/(?P<uuid>([0-9a-f]{32}))/$', views.update_url, name='update_url'),
-    re_path(r'^url/obj/(?P<uuid>([0-9a-f]{32}))/$', views.suobj, name='suobj'),
+    re_path(r'^object/(?P<uuid>([0-9a-f]{32}))/$', views.suobj, name='suobj'),
+    re_path(r'^url/(?P<uuid>([0-9a-f]{32}))/$', views.suobj, name='suobj'),
 
     re_path(r'^explore/feed/$', views.explore_feed, name='explore_feed'),
     re_path(r'^note/all/$', views.note_all, name='note_all'),
