@@ -193,9 +193,9 @@ $(function () {
         })
     })
 
-    $('#count_bridger').click(function (e) {
+    $('#count_bridging').click(function (e) {
         e.preventDefault()
-        $('#modal_bridger').modal('show')
+        $('#modal_bridging').modal('show')
     })
     $('#count_bridger').click(function (e) {
         e.preventDefault()

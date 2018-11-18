@@ -2513,19 +2513,28 @@ def re_register_url(request):
                         title = Title.objects.create(text=title_text, url_object=url_object)
                 else:
                     title = Title.objects.create(text=title_text, url_object=url_object)
-                sub_url_object = SubUrlObject.objects.create(user=request.user,
-                                                             title=title,
-                                                             url_object=url_object,
-                                                             uuid=uuid.uuid4().hex)
+
+                sub_url_object = None
+                try:
+                    sub_url_object = SubUrlObject.objects.get(user=request.user, url_object=url_object)
+                except Exception as e:
+                    pass
+                if sub_url_object is None:
+                    sub_url_object = SubUrlObject.objects.create(user=request.user,
+                                                                 title=title,
+                                                                 url_object=url_object,
+                                                                 uuid=uuid.uuid4().hex)
+
 
             else:
                 # url_object가 없다. 키워드고 뭐고 없음.
+                id = uuid.uuid4().hex
                 if scheme == 'http':
                     url_object = UrlObject.objects.create(loc=loc, http=True, https=False, is_discrete=is_discrete,
-                                                          in_not_301=in_not_301, discrete_loc=discrete_loc)
+                                                          in_not_301=in_not_301, discrete_loc=discrete_loc, uuid=id)
                 elif scheme == 'https':
                     url_object = UrlObject.objects.create(loc=loc, http=False, https=True, is_discrete=is_discrete,
-                                                          in_not_301=in_not_301, discrete_loc=discrete_loc)
+                                                          in_not_301=in_not_301, discrete_loc=discrete_loc, uuid=id)
                 title = Title.objects.create(text=title_text, url_object=url_object)
                 sub_url_object = SubUrlObject.objects.create(user=request.user,
                                                              title=title,
@@ -2543,7 +2552,7 @@ def re_register_url(request):
                 sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
                                                                user=request.user)
                 sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(sub_url_object=sub_url_object,
-                                                                                          sub_keyword=sub_keyword)
+                                                                                          sub_keyword=sub_keyword[0])
                 sub_raw_keyword_count = SubRawKeywordCount.objects.get_or_create(sub_url_object=sub_url_object)
                 if sub_raw_keyword_count[0].count < 31:
                     sub_raw_keyword = SubRawKeyword.objects.get_or_create(text=item,
@@ -2651,7 +2660,7 @@ def re_update_complete_url(request):
                 sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
                                                                user=request.user)
                 sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(sub_url_object=sub_url_object,
-                                                                                          sub_keyword=sub_keyword)
+                                                                                          sub_keyword=sub_keyword[0])
                 sub_raw_keyword_count = SubRawKeywordCount.objects.get_or_create(sub_url_object=sub_url_object)
                 if sub_raw_keyword_count[0].count < 31:
                     sub_raw_keyword = SubRawKeyword.objects.get_or_create(text=item,
@@ -2884,8 +2893,10 @@ def re_suobj_populate(request):
                     'username': suobj.user.userusername.username,
                     'title': suobj.title.text,
                     'created': suobj.created,
+                    'loc': suobj.url_object.loc,
                     'url': suobj.url_object.get_url(),
-                    'srk_output': srk_output
+                    'srk_output': srk_output,
+                    'url_id': suobj.uuid,
                 }
                 # {'user_id', 'username', 'gross(포스트의)', 'date(포스트의)', 'created', 'obj_id',
                 #  ['comment_username', 'comment_text', 'comment_user_id', 'comment_created', 'comment_id']}

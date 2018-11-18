@@ -37,8 +37,8 @@
 {% else %}
     <div class="hidden" id="user_id"></div>
 {% endif %}
-<div class="hidden" id="last_post_id"></div>
-<div class="hidden" id="delete_post_id"></div>
+<div class="hidden" id="suobj_to_delete"></div>
+<div class="hidden" id="last_suobj_id"></div>
 
 <!--page info end -->
 
@@ -46,10 +46,9 @@
     <div class="row">
         <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
             <div class="row" id="content">
-                <div class="row div_base" id="chat_base">
+                <div class="row div_base">
                     <div align="center">
-                        <img class="img_300_300" id="img_300"
-                             src="{{ chosen_user.userphoto.file_300_url }}">
+                        <img class="img_300_300" src="{{ chosen_user.userphoto.file_300_url }}">
                     </div>
 
                     <div align="center"><span>{{ chosen_user.usertextname.name }}</span></div>

@@ -365,6 +365,8 @@ class UrlObject(models.Model):
     # 여기서 unique True 면 null값도 두 개 이상 넣을 수 없나?
     http = models.BooleanField(default=False)
     https = models.BooleanField(default=False)
+    uuid = models.CharField(max_length=34, unique=True, null=True, default=None, blank=True)
+
     is_discrete = models.BooleanField(default=False)
     in_not_301 = models.BooleanField(default=False)
     discrete_loc = models.TextField(max_length=2050, null=True, unique=True, blank=True, default=None)
@@ -381,7 +383,6 @@ class UrlObject(models.Model):
         elif self.http:
             scheme = 'http://'
         return scheme + self.loc
-
 
 
 class Keyword(models.Model):
@@ -446,6 +447,9 @@ class SubUrlObject(models.Model):
 
     def __str__(self):
         return "pk: %s" % self.pk
+
+    class Meta:
+        unique_together = ('user', 'url_object',)
 
 
 class SubKeyword(models.Model):
