@@ -13,7 +13,7 @@ urlpatterns = [
     re_path(r'^register/url/$', views.register_url, name='register_url'),
     re_path(r'^update/url/(?P<uuid>([0-9a-f]{32}))/$', views.update_url, name='update_url'),
     re_path(r'^object/(?P<uuid>([0-9a-f]{32}))/$', views.suobj, name='suobj'),
-    re_path(r'^url/(?P<uuid>([0-9a-f]{32}))/$', views.suobj, name='suobj'),
+    re_path(r'^url/(?P<uuid>([0-9a-f]{32}))/$', views.url, name='url'),
 
     re_path(r'^explore/feed/$', views.explore_feed, name='explore_feed'),
     re_path(r'^note/all/$', views.note_all, name='note_all'),
@@ -38,7 +38,7 @@ urlpatterns = [
             name='re_update_complete_url'),
     re_path(r'^re/refresh/url/$', base_ajax_views.re_refresh_url,
             name='re_refresh_url'),
-    #
+
     re_path(r'^re/profile/suobj/$', base_ajax_views.re_profile_suobj,
             name='re_profile_suobj'),
     re_path(r'^re/suobj/populate/$', base_ajax_views.re_suobj_populate,
@@ -51,6 +51,10 @@ urlpatterns = [
             name='re_bridging_list'),
     re_path(r'^re/bridger/list/$', base_ajax_views.re_bridger_list,
             name='re_bridger_list'),
+
+    re_path(r'^re/url/$', base_ajax_views.re_url,
+            name='re_url'),
+
     # re_path(r'^re/follow/add/$', base_ajax_views.re_follow_add,
     #         name='re_follow_add'),
     # re_path(r'^re/following/list/$', base_ajax_views.re_following_list,

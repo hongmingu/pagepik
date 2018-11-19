@@ -386,8 +386,18 @@ class UrlObject(models.Model):
 
 
 class Keyword(models.Model):
+    text = models.TextField(max_length=2048, null=True, blank=True, unique=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "text: %s" % self.text
+
+
+class UrlKeyword(models.Model):
     url_object = models.ForeignKey(UrlObject, on_delete=models.CASCADE, null=True, blank=True)
-    text = models.TextField(max_length=2048, null=True, blank=True)
+    keyword = models.ForeignKey(Keyword, on_delete=models.CASCADE, null=True, blank=True)
+    uuid = models.CharField(max_length=34, unique=True, null=True, default=None, blank=True)
     up_count = models.PositiveIntegerField(default=0)
     down_count = models.PositiveIntegerField(default=0)
     register_count = models.PositiveIntegerField(default=0)
@@ -395,15 +405,15 @@ class Keyword(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "text: %s" % self.text
+        return "text: %s" % self.pk
 
     class Meta:
-        unique_together = ('url_object', 'text',)
+        unique_together = ('url_object', 'keyword',)
 
 
-class KeywordUp(models.Model):
+class UrlKeywordUp(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    keyword = models.ForeignKey(Keyword, on_delete=models.CASCADE, null=True, blank=True)
+    url_keyword = models.ForeignKey(UrlKeyword, on_delete=models.CASCADE, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -411,12 +421,12 @@ class KeywordUp(models.Model):
         return "pk: %s" % self.pk
 
     class Meta:
-        unique_together = ('user', 'keyword',)
+        unique_together = ('user', 'url_keyword',)
 
 
-class KeywordDown(models.Model):
+class UrlKeywordDown(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    keyword = models.ForeignKey(Keyword, on_delete=models.CASCADE, null=True, blank=True)
+    url_keyword = models.ForeignKey(UrlKeyword, on_delete=models.CASCADE, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -424,7 +434,7 @@ class KeywordDown(models.Model):
         return "pk: %s" % self.pk
 
     class Meta:
-        unique_together = ('user', 'keyword',)
+        unique_together = ('user', 'url_keyword',)
 
 
 class Title(models.Model):

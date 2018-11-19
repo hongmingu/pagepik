@@ -19,8 +19,7 @@ var suobj_populate = function suobj_populate(id) {
                         '<div><a href="/'+data.output.username+'/"><span class="pop_username">'+data.output.username+'</span></a></div>' +
                         '<div><a href="'+data.output.url+'"><span class="pop_title">'+data.output.title+'</span></a></div>' +
                         '<div><a href="'+data.output.url+'"><span class="pop_url">'+data.output.url+'</span></a></div>' +
-                        '<a href="/object/'+data.output.suobj_id+'/"><div class="pop_private_info">url private</div></a>' +
-                        '<a href="/url/'+data.output.url_id+'/"><div class="pop_public_info">url public</div></a>' +
+                        '<a href="/url/'+data.output.url_id+'/"><div class="pop_public_info">url info</div></a>' +
                         '<div align="right"><span class="pop_created">'+date_differ(data.output.created)+'</span></div>' +
                         '<div class="srk_list">'+srks+'</div>' +
                         '</div>')

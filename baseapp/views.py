@@ -38,20 +38,6 @@ def post_update(request, uuid):
 
             return render(request, 'baseapp/post_update.html', {'post': post, 'just_created': just_created})
 
-def suobj(request, uuid):
-    if request.method == "GET":
-        suobj = None
-        try:
-            suobj = SubUrlObject.objects.get(uuid=uuid)
-        except:
-            return render(request, '404.html')
-        if suobj is not None:
-            id_data = {}
-            id_data['id'] = uuid
-            return render(request, 'baseapp/suobj.html', {'id_data': id_data, 'suobj': suobj})
-
-        return render(request, 'baseapp/suobj.html', )
-
 
 def explore_feed(request):
     if request.method == "GET":
@@ -144,3 +130,30 @@ def user_profile(request, user_username):
                 bridging = None
                 return render(request, 'baseapp/user_profile.html',
                               {'chosen_user': chosen_user, 'bridging': bridging})
+
+
+def suobj(request, uuid):
+    if request.method == "GET":
+        suobj = None
+        try:
+            suobj = SubUrlObject.objects.get(uuid=uuid)
+        except:
+            return render(request, '404.html')
+        if suobj is not None:
+            return render(request, 'baseapp/suobj.html', {'id': uuid})
+
+        return render(request, '404.html')
+
+
+def url(request, uuid):
+    if request.method == "GET":
+        url_object = None
+        try:
+            url_object = UrlObject.objects.get(uuid=uuid)
+        except:
+            return render(request, '404.html')
+        if url_object is not None:
+            return render(request, 'baseapp/url.html', {'url_object':url_object, 'id': uuid})
+
+        return render(request, '404.html')
+

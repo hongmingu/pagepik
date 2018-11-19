@@ -2548,7 +2548,16 @@ def re_register_url(request):
 
             for item in new_keyword_list:
                 text = item.replace(" ", "")
-                keyword = Keyword.objects.get_or_create(url_object=url_object, text=text)
+                keyword = Keyword.objects.get_or_create(text=text)
+
+                url_keyword = None
+                if UrlKeyword.objects.filter(url_object=url_object, keyword=keyword[0]).exists():
+                    url_keyword = UrlKeyword.objects.get(url_object=url_object, keyword=keyword[0])
+                else:
+                    url_keyword = UrlKeyword.objects.create(url_object=url_object,
+                                                            keyword=keyword[0],
+                                                            uuid=uuid.uuid4().hex)
+
                 sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
                                                                user=request.user)
                 sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(sub_url_object=sub_url_object,
@@ -2656,7 +2665,16 @@ def re_update_complete_url(request):
 
             for item in new_keyword_list:
                 text = item.replace(" ", "")
-                keyword = Keyword.objects.get_or_create(url_object=url_object, text=text)
+                keyword = Keyword.objects.get_or_create(text=text)
+
+                url_keyword = None
+                if UrlKeyword.objects.filter(url_object=url_object, keyword=keyword[0]).exists():
+                    url_keyword = UrlKeyword.objects.get(url_object=url_object, keyword=keyword[0])
+                else:
+                    url_keyword = UrlKeyword.objects.create(url_object=url_object,
+                                                            keyword=keyword[0],
+                                                            uuid=uuid.uuid4().hex)
+
                 sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
                                                                user=request.user)
                 sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(sub_url_object=sub_url_object,
@@ -3048,5 +3066,71 @@ def re_bridger_list(request):
                         output.append(sub_output)
 
                 return JsonResponse({'res': 1, 'output': output, 'next': next})
+
+        return JsonResponse({'res': 2})
+
+
+
+@ensure_csrf_cookie
+def re_url(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                url_id = request.POST.get('url_id', None)
+                last_id = request.POST.get('last_id', None)
+                url_object = None
+                try:
+                    url_object = UrlObject.objects.get(uuid=url_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                url_keywords = None
+                if last_id == '':
+                    url_keywords = UrlKeyword.objects.filter(url_object=url_object).order_by('up_count')[:30]
+                else:
+                    last_url_keyword = None
+                    try:
+                        last_url_keyword = UrlKeyword.objects.get(uuid=last_id)
+                    except Exception as e:
+                        return JsonResponse({'res': 0})
+                    url_keywords = UrlKeyword.objects.filter(
+                        Q(url_object=url_object) & Q(up_count__lte=last_url_keyword.up_count)
+                    ).exclude(uuid=last_id).order_by('up_count')[:30]
+
+                output = []
+                count = 0
+                last = None
+
+                for url_keyword in url_keywords:
+                    count = count+1
+                    if count == 30:
+                        last = url_keyword.uuid
+                    # 로그인된 상태
+                    register = 'false'
+                    if SubUrlObjectSubKeyword.objects.filter(sub_keyword__keyword=url_keyword.keyword,
+                                                             sub_url_object__url_object=url_keyword.url_object,
+                                                             sub_url_object__user=request.user,
+                                                             sub_keyword__user=request.user).exists():
+                        register = 'true'
+
+                    up = 'false'
+                    if UrlKeywordUp.objects.filter(user=request.user, url_keyword=url_keyword).exists():
+                        up = 'true'
+
+                    down = 'false'
+                    if UrlKeywordDown.objects.filter(user=request.user, url_keyword=url_keyword).exists():
+                        down = 'true'
+                    sub_output = {
+                        'keyword': url_keyword.keyword.text,
+                        'reg_count': url_keyword.register_count,
+                        'up_count': url_keyword.up_count,
+                        'down_count': url_keyword.down_count,
+                        'register': register,
+                        'up': up,
+                        'down': down
+                    }
+                    output.append(sub_output)
+
+                return JsonResponse({'res': 1, 'output': output, 'last': last})
 
         return JsonResponse({'res': 2})

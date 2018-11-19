@@ -286,28 +286,38 @@ def deleted_notice_post_chat_rest_like(sender, instance, **kwargs):
 # notice post_chat_rest_like
 
 
-@receiver(post_save, sender=SubKeyword)
+@receiver(post_save, sender=SubUrlObjectSubKeyword)
 def created_sub_keyword(sender, instance, created, **kwargs):
     if created:
         try:
             with transaction.atomic():
-                keyword = instance.keyword
-                keyword.register_count = F('register_count') + 1
-                keyword.save()
+                url_keyword = None
+                try:
+                    url_keyword = UrlKeyword.objects.get(url_object=instance.sub_url_object.url_object,
+                                                         keyword=instance.sub_keyword.keyword)
+                except Exception as e:
+                    return
+                url_keyword.register_count = F('register_count') + 1
+                url_keyword.save()
         except Exception as e:
             print(e)
             pass
 
 
-@receiver(post_delete, sender=SubKeyword)
+@receiver(post_delete, sender=SubUrlObjectSubKeyword)
 def deleted_sub_keyword(sender, instance, **kwargs):
     try:
         with transaction.atomic():
-            keyword = instance.keyword
-            keyword.register_count = F('register_count') - 1
-            keyword.save()
-            if keyword.register_count == 0 and keyword.up_count == 0 and keyword.down_count == 0:
-                keyword.delete()
+            url_keyword = None
+            try:
+                url_keyword = UrlKeyword.objects.get(url_object=instance.sub_url_object.url_object,
+                                                     keyword=instance.sub_keyword.keyword)
+            except Exception as e:
+                return
+            url_keyword.register_count = F('register_count') - 1
+            url_keyword.save()
+            if url_keyword.register_count == 0 and url_keyword.up_count == 0 and url_keyword.down_count == 0:
+                url_keyword.delete()
                 # 이거 놓치지말고 down_count 랑 up_count 도 0 될 때 다 지운다.
     except Exception as e:
         print(e)
@@ -315,56 +325,56 @@ def deleted_sub_keyword(sender, instance, **kwargs):
 
 
 # notice post_chat_rest_like
-@receiver(post_save, sender=KeywordUp)
+@receiver(post_save, sender=UrlKeywordUp)
 def created_keyword_up(sender, instance, created, **kwargs):
     if created:
         try:
             with transaction.atomic():
-                keyword = instance.keyword
-                keyword.up_count = F('up_count') + 1
-                keyword.save()
+                url_keyword = instance.url_keyword
+                url_keyword.up_count = F('up_count') + 1
+                url_keyword.save()
         except Exception as e:
             print(e)
             pass
 
 
-@receiver(post_delete, sender=KeywordUp)
+@receiver(post_delete, sender=UrlKeywordUp)
 def deleted_keyword_up(sender, instance, **kwargs):
     try:
         with transaction.atomic():
-            keyword = instance.keyword
-            keyword.up_count = F('up_count') - 1
-            keyword.save()
-            if keyword.register_count == 0 and keyword.up_count == 0 and keyword.down_count == 0:
-                keyword.delete()
+            url_keyword = instance.url_keyword
+            url_keyword.up_count = F('up_count') - 1
+            url_keyword.save()
+            if url_keyword.register_count == 0 and url_keyword.up_count == 0 and url_keyword.down_count == 0:
+                url_keyword.delete()
     except Exception as e:
         print(e)
         pass
 
 
 # notice post_chat_rest_like
-@receiver(post_save, sender=KeywordDown)
+@receiver(post_save, sender=UrlKeywordDown)
 def created_keyword_down(sender, instance, created, **kwargs):
     if created:
         try:
             with transaction.atomic():
-                keyword = instance.keyword
-                keyword.down_count = F('down_count') + 1
-                keyword.save()
+                url_keyword = instance.url_keyword
+                url_keyword.down_count = F('down_count') + 1
+                url_keyword.save()
         except Exception as e:
             print(e)
             pass
 
 
-@receiver(post_delete, sender=KeywordDown)
+@receiver(post_delete, sender=UrlKeywordDown)
 def deleted_keyword_down(sender, instance, **kwargs):
     try:
         with transaction.atomic():
-            keyword = instance.keyword
-            keyword.down_count = F('down_count') - 1
-            keyword.save()
-            if keyword.register_count == 0 and keyword.up_count == 0 and keyword.down_count == 0:
-                keyword.delete()
+            url_keyword = instance.url_keyword
+            url_keyword.down_count = F('down_count') - 1
+            url_keyword.save()
+            if url_keyword.register_count == 0 and url_keyword.up_count == 0 and url_keyword.down_count == 0:
+                url_keyword.delete()
     except Exception as e:
         print(e)
         pass
