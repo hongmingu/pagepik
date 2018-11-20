@@ -297,8 +297,9 @@ def created_sub_keyword(sender, instance, created, **kwargs):
                                                          keyword=instance.sub_keyword.keyword)
                 except Exception as e:
                     return
-                url_keyword.register_count = F('register_count') + 1
-                url_keyword.save()
+                url_keyword_register = UrlKeywordRegister.objects.get_or_create(url_keyword=url_keyword,
+                                                                                user=instance.sub_keyword.user)
+
         except Exception as e:
             print(e)
             pass
@@ -314,11 +315,42 @@ def deleted_sub_keyword(sender, instance, **kwargs):
                                                      keyword=instance.sub_keyword.keyword)
             except Exception as e:
                 return
+            try:
+                url_keyword_register = UrlKeywordRegister.objects.get(url_keyword=url_keyword,
+                                                                      user=instance.sub_keyword.user)
+            except Exception as e:
+                return
+            url_keyword_register.delete()
+
+                # 이거 놓치지말고 down_count 랑 up_count 도 0 될 때 다 지운다.
+    except Exception as e:
+        print(e)
+        pass
+
+
+# notice post_chat_rest_like
+@receiver(post_save, sender=UrlKeywordRegister)
+def created_keyword_register(sender, instance, created, **kwargs):
+    if created:
+        try:
+            with transaction.atomic():
+                url_keyword = instance.url_keyword
+                url_keyword.register_count = F('register_count') + 1
+                url_keyword.save()
+        except Exception as e:
+            print(e)
+            pass
+
+
+@receiver(post_delete, sender=UrlKeywordRegister)
+def deleted_keyword_register(sender, instance, **kwargs):
+    try:
+        with transaction.atomic():
+            url_keyword = instance.url_keyword
             url_keyword.register_count = F('register_count') - 1
             url_keyword.save()
             if url_keyword.register_count == 0 and url_keyword.up_count == 0 and url_keyword.down_count == 0:
                 url_keyword.delete()
-                # 이거 놓치지말고 down_count 랑 up_count 도 0 될 때 다 지운다.
     except Exception as e:
         print(e)
         pass
@@ -333,6 +365,15 @@ def created_keyword_up(sender, instance, created, **kwargs):
                 url_keyword = instance.url_keyword
                 url_keyword.up_count = F('up_count') + 1
                 url_keyword.save()
+
+                url_keyword_down = None
+                try:
+                    url_keyword_down = UrlKeywordDown.objects.get(user=instance.user, url_keyword=url_keyword)
+                except Exception as e:
+                    pass
+                if url_keyword_down is not None:
+                    url_keyword_down.delete()
+
         except Exception as e:
             print(e)
             pass
@@ -361,6 +402,14 @@ def created_keyword_down(sender, instance, created, **kwargs):
                 url_keyword = instance.url_keyword
                 url_keyword.down_count = F('down_count') + 1
                 url_keyword.save()
+
+                url_keyword_up = None
+                try:
+                    url_keyword_up = UrlKeywordUp.objects.get(user=instance.user, url_keyword=url_keyword)
+                except Exception as e:
+                    pass
+                if url_keyword_up is not None:
+                    url_keyword_up.delete()
         except Exception as e:
             print(e)
             pass

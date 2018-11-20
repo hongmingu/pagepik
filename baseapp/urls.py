@@ -55,6 +55,10 @@ urlpatterns = [
     re_path(r'^re/url/$', base_ajax_views.re_url,
             name='re_url'),
 
+    re_path(r'^re/url/keyword/up/$', base_ajax_views.re_url_keyword_up,
+            name='re_url_keyword_up'),
+    re_path(r'^re/url/keyword/down/$', base_ajax_views.re_url_keyword_down,
+            name='re_url_keyword_down'),
     # re_path(r'^re/follow/add/$', base_ajax_views.re_follow_add,
     #         name='re_follow_add'),
     # re_path(r'^re/following/list/$', base_ajax_views.re_following_list,

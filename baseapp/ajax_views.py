@@ -2575,10 +2575,10 @@ def re_register_url(request):
 def re_update_url(request):
     if request.method == "POST":
         if request.is_ajax():
-            uuid = request.POST.get('id', None)
+            id = request.POST.get('id', None)
             sub_url_object = None
             try:
-                sub_url_object = SubUrlObject.objects.get(uuid=uuid, user=request.user)
+                sub_url_object = SubUrlObject.objects.get(uuid=id, user=request.user)
             except Exception as e:
                 return JsonResponse({'res': 0})
             sub_raw_keywords = SubRawKeyword.objects.filter(sub_url_object=sub_url_object).order_by('created')
@@ -2631,11 +2631,11 @@ def re_refresh_url(request):
 def re_update_complete_url(request):
     if request.method == "POST":
         if request.is_ajax():
-            uuid = request.POST.get('id', None)
+            id = request.POST.get('id', None)
             refresh = request.POST.get('refresh', None)
             sub_url_object = None
             try:
-                sub_url_object = SubUrlObject.objects.get(uuid=uuid)
+                sub_url_object = SubUrlObject.objects.get(uuid=id)
             except Exception as e:
                 return JsonResponse({'res': 0})
 
@@ -3107,10 +3107,7 @@ def re_url(request):
                         last = url_keyword.uuid
                     # 로그인된 상태
                     register = 'false'
-                    if SubUrlObjectSubKeyword.objects.filter(sub_keyword__keyword=url_keyword.keyword,
-                                                             sub_url_object__url_object=url_keyword.url_object,
-                                                             sub_url_object__user=request.user,
-                                                             sub_keyword__user=request.user).exists():
+                    if UrlKeywordRegister.objects.filter(user=request.user, url_keyword=url_keyword).exists():
                         register = 'true'
 
                     up = 'false'
@@ -3122,6 +3119,7 @@ def re_url(request):
                         down = 'true'
                     sub_output = {
                         'keyword': url_keyword.keyword.text,
+                        'keyword_id': url_keyword.uuid,
                         'reg_count': url_keyword.register_count,
                         'up_count': url_keyword.up_count,
                         'down_count': url_keyword.down_count,
@@ -3132,5 +3130,57 @@ def re_url(request):
                     output.append(sub_output)
 
                 return JsonResponse({'res': 1, 'output': output, 'last': last})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_url_keyword_up(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                url_keyword_id = request.POST.get('url_keyword_id', None)
+                url_keyword = None
+                try:
+                    url_keyword = UrlKeyword.objects.get(uuid=url_keyword_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                url_keyword_up = None
+                try:
+                    url_keyword_up = UrlKeywordUp.objects.get(user=request.user, url_keyword=url_keyword)
+                except Exception as e:
+                    pass
+                if url_keyword_up is not None:
+                    url_keyword_up.delete()
+                    return JsonResponse({'res': 1, 'result': 'cancel'})
+                else:
+                    url_keyword_up = UrlKeywordUp.objects.create(user=request.user, url_keyword=url_keyword)
+                    return JsonResponse({'res': 1, 'result': 'up'})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_url_keyword_down(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                url_keyword_id = request.POST.get('url_keyword_id', None)
+                url_keyword = None
+                try:
+                    url_keyword = UrlKeyword.objects.get(uuid=url_keyword_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                url_keyword_down = None
+                try:
+                    url_keyword_down = UrlKeywordDown.objects.get(user=request.user, url_keyword=url_keyword)
+                except Exception as e:
+                    pass
+                if url_keyword_down is not None:
+                    url_keyword_down.delete()
+                    return JsonResponse({'res': 1, 'result': 'cancel'})
+                else:
+                    url_keyword_down = UrlKeywordDown.objects.create(user=request.user, url_keyword=url_keyword)
+                    return JsonResponse({'res': 1, 'result': 'down'})
 
         return JsonResponse({'res': 2})
