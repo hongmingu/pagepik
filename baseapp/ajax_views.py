@@ -1523,25 +1523,6 @@ def re_profile_follower(request):
         return JsonResponse({'res': 2})
 
 
-@ensure_csrf_cookie
-def re_profile_post_delete(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                post_id = request.POST.get('post_id', None)
-                post = None
-                try:
-                    post = Post.objects.get(uuid=post_id, user=request.user)
-                except Exception as e:
-                    print(e)
-                    return JsonResponse({'res': 0})
-                if post is not None:
-                    post.delete()
-
-                return JsonResponse({'res': 1})
-
-        return JsonResponse({'res': 2})
-
 
 @ensure_csrf_cookie
 def re_profile_populate(request):
@@ -2422,286 +2403,293 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list, user):
 @ensure_csrf_cookie
 def re_check_url(request):
     if request.method == "POST":
-        if request.is_ajax():
-            url = request.POST.get('url', None)
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                url = request.POST.get('url', None)
 
-            if is_unable_url(url):
-                return JsonResponse({'res': 0, 'message': 'unable'})
-            has_scheme = True
-            if not (url.startswith('https://') or url.startswith('http://')):
-                has_scheme = False
+                if is_unable_url(url):
+                    return JsonResponse({'res': 0, 'message': 'unable'})
+                has_scheme = True
+                if not (url.startswith('https://') or url.startswith('http://')):
+                    has_scheme = False
 
-            success_list = []
-            not_301_redirect_list = []
-            if has_scheme is False:
-                check_success_url('http://' + url, 0, success_list, not_301_redirect_list, request.user)
-                check_success_url('https://' + url, 0, success_list, not_301_redirect_list, request.user)
-            else:
-                check_success_url(url, 0, success_list, not_301_redirect_list, request.user)
-            return JsonResponse({'res': 1, 'output': success_list})
+                success_list = []
+                not_301_redirect_list = []
+                if has_scheme is False:
+                    check_success_url('http://' + url, 0, success_list, not_301_redirect_list, request.user)
+                    check_success_url('https://' + url, 0, success_list, not_301_redirect_list, request.user)
+                else:
+                    check_success_url(url, 0, success_list, not_301_redirect_list, request.user)
+                return JsonResponse({'res': 1, 'output': success_list})
         return JsonResponse({'res': 2})
 
 
 @ensure_csrf_cookie
 def re_register_url(request):
     if request.method == "POST":
-        if request.is_ajax():
-            discrete_loc = request.POST.get('discrete_loc', None)
-            discrete_scheme = request.POST.get('discrete_scheme', None)
-            in_not_301 = request.POST.get('in_not_301', None)
-            is_discrete = request.POST.get('is_discrete', None)
-            loc = request.POST.get('loc', None)
-            scheme = request.POST.get('scheme', None)
-            title_text = request.POST.get('title', None)
-            url = request.POST.get('url', None)
-            if discrete_loc is None \
-                    or discrete_scheme is None \
-                    or in_not_301 is None \
-                    or is_discrete is None \
-                    or loc is None \
-                    or scheme is None \
-                    or title_text is None \
-                    or url is None:
-                return JsonResponse({'res': 0})
-            if discrete_loc == '' \
-                    or discrete_scheme == '' \
-                    or in_not_301 == '' \
-                    or is_discrete == '' \
-                    or loc == '' \
-                    or scheme == '' \
-                    or title_text == '' \
-                    or url == '':
-                return JsonResponse({'res': 0})
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                discrete_loc = request.POST.get('discrete_loc', None)
+                discrete_scheme = request.POST.get('discrete_scheme', None)
+                in_not_301 = request.POST.get('in_not_301', None)
+                is_discrete = request.POST.get('is_discrete', None)
+                loc = request.POST.get('loc', None)
+                scheme = request.POST.get('scheme', None)
+                title_text = request.POST.get('title', None)
+                url = request.POST.get('url', None)
+                if discrete_loc is None \
+                        or discrete_scheme is None \
+                        or in_not_301 is None \
+                        or is_discrete is None \
+                        or loc is None \
+                        or scheme is None \
+                        or title_text is None \
+                        or url is None:
+                    return JsonResponse({'res': 0})
+                if discrete_loc == '' \
+                        or discrete_scheme == '' \
+                        or in_not_301 == '' \
+                        or is_discrete == '' \
+                        or loc == '' \
+                        or scheme == '' \
+                        or title_text == '' \
+                        or url == '':
+                    return JsonResponse({'res': 0})
 
-            if in_not_301 == 'true':
-                in_not_301 = True
-            else:
-                in_not_301 = False
-            if is_discrete == 'true':
-                is_discrete = True
-            else:
-                is_discrete = False
-
-            keyword_list = request.POST.getlist('keyword_list[]')
-
-            url_object = None
-            try:
-                url_object = UrlObject.objects.get(loc=loc)
-            except Exception as e:
-                pass
-
-            if url_object is not None:
-                if scheme == 'http':
-                    url_object.http = True
-                    url_object.is_discrete = is_discrete
-                    url_object.in_not_301 = in_not_301
-                    url_object.discrete_loc = discrete_loc
-                    url_object.save()
-                elif scheme == 'https':
-                    url_object.https = True
-                    url_object.is_discrete = is_discrete
-                    url_object.in_not_301 = in_not_301
-                    url_object.discrete_loc = discrete_loc
-                    url_object.save()
-                title = None
-                try:
-                    title = Title.objects.last()
-                except Exception as e:
-                    pass
-                if title is not None:
-                    if title.text != title_text:
-                        title = Title.objects.create(text=title_text, url_object=url_object)
+                if in_not_301 == 'true':
+                    in_not_301 = True
                 else:
-                    title = Title.objects.create(text=title_text, url_object=url_object)
+                    in_not_301 = False
+                if is_discrete == 'true':
+                    is_discrete = True
+                else:
+                    is_discrete = False
 
-                sub_url_object = None
+                keyword_list = request.POST.getlist('keyword_list[]')
+
+                url_object = None
                 try:
-                    sub_url_object = SubUrlObject.objects.get(user=request.user, url_object=url_object)
+                    url_object = UrlObject.objects.get(loc=loc)
                 except Exception as e:
                     pass
-                if sub_url_object is None:
+
+                if url_object is not None:
+                    if scheme == 'http':
+                        url_object.http = True
+                        url_object.is_discrete = is_discrete
+                        url_object.in_not_301 = in_not_301
+                        url_object.discrete_loc = discrete_loc
+                        url_object.save()
+                    elif scheme == 'https':
+                        url_object.https = True
+                        url_object.is_discrete = is_discrete
+                        url_object.in_not_301 = in_not_301
+                        url_object.discrete_loc = discrete_loc
+                        url_object.save()
+                    title = None
+                    try:
+                        title = Title.objects.last()
+                    except Exception as e:
+                        pass
+                    if title is not None:
+                        if title.text != title_text:
+                            title = Title.objects.create(text=title_text, url_object=url_object)
+                    else:
+                        title = Title.objects.create(text=title_text, url_object=url_object)
+
+                    sub_url_object = None
+                    try:
+                        sub_url_object = SubUrlObject.objects.get(user=request.user, url_object=url_object)
+                    except Exception as e:
+                        pass
+                    if sub_url_object is None:
+                        sub_url_object = SubUrlObject.objects.create(user=request.user,
+                                                                     title=title,
+                                                                     url_object=url_object,
+                                                                     uuid=uuid.uuid4().hex)
+
+
+                else:
+                    # url_object가 없다. 키워드고 뭐고 없음.
+                    id = uuid.uuid4().hex
+                    if scheme == 'http':
+                        url_object = UrlObject.objects.create(loc=loc, http=True, https=False, is_discrete=is_discrete,
+                                                              in_not_301=in_not_301, discrete_loc=discrete_loc, uuid=id)
+                    elif scheme == 'https':
+                        url_object = UrlObject.objects.create(loc=loc, http=False, https=True, is_discrete=is_discrete,
+                                                              in_not_301=in_not_301, discrete_loc=discrete_loc, uuid=id)
+                    title = Title.objects.create(text=title_text, url_object=url_object)
                     sub_url_object = SubUrlObject.objects.create(user=request.user,
                                                                  title=title,
                                                                  url_object=url_object,
                                                                  uuid=uuid.uuid4().hex)
 
 
-            else:
-                # url_object가 없다. 키워드고 뭐고 없음.
-                id = uuid.uuid4().hex
-                if scheme == 'http':
-                    url_object = UrlObject.objects.create(loc=loc, http=True, https=False, is_discrete=is_discrete,
-                                                          in_not_301=in_not_301, discrete_loc=discrete_loc, uuid=id)
-                elif scheme == 'https':
-                    url_object = UrlObject.objects.create(loc=loc, http=False, https=True, is_discrete=is_discrete,
-                                                          in_not_301=in_not_301, discrete_loc=discrete_loc, uuid=id)
-                title = Title.objects.create(text=title_text, url_object=url_object)
-                sub_url_object = SubUrlObject.objects.create(user=request.user,
-                                                             title=title,
-                                                             url_object=url_object,
-                                                             uuid=uuid.uuid4().hex)
+                new_keyword_list = []
+                for item in keyword_list:
+                    new_keyword_list.append(item.strip())
 
+                for item in new_keyword_list:
+                    text = item.replace(" ", "")
+                    keyword = Keyword.objects.get_or_create(text=text)
 
-            new_keyword_list = []
-            for item in keyword_list:
-                new_keyword_list.append(item.strip())
+                    url_keyword = None
+                    if UrlKeyword.objects.filter(url_object=url_object, keyword=keyword[0]).exists():
+                        url_keyword = UrlKeyword.objects.get(url_object=url_object, keyword=keyword[0])
+                    else:
+                        url_keyword = UrlKeyword.objects.create(url_object=url_object,
+                                                                keyword=keyword[0],
+                                                                uuid=uuid.uuid4().hex)
 
-            for item in new_keyword_list:
-                text = item.replace(" ", "")
-                keyword = Keyword.objects.get_or_create(text=text)
-
-                url_keyword = None
-                if UrlKeyword.objects.filter(url_object=url_object, keyword=keyword[0]).exists():
-                    url_keyword = UrlKeyword.objects.get(url_object=url_object, keyword=keyword[0])
-                else:
-                    url_keyword = UrlKeyword.objects.create(url_object=url_object,
-                                                            keyword=keyword[0],
-                                                            uuid=uuid.uuid4().hex)
-
-                sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
-                                                               user=request.user)
-                sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(sub_url_object=sub_url_object,
-                                                                                          sub_keyword=sub_keyword[0])
-                sub_raw_keyword_count = SubRawKeywordCount.objects.get_or_create(sub_url_object=sub_url_object)
-                if sub_raw_keyword_count[0].count < 31:
-                    sub_raw_keyword = SubRawKeyword.objects.get_or_create(text=item,
-                                                                          sub_keyword=sub_keyword[0],
-                                                                          sub_url_object=sub_url_object,
-                                                                          user=request.user)
-            return JsonResponse({'res': 1, 'id': sub_url_object.uuid})
+                    sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
+                                                                   user=request.user)
+                    sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(sub_url_object=sub_url_object,
+                                                                                              sub_keyword=sub_keyword[0])
+                    sub_raw_keyword_count = SubRawKeywordCount.objects.get_or_create(sub_url_object=sub_url_object)
+                    if sub_raw_keyword_count[0].count < 31:
+                        sub_raw_keyword = SubRawKeyword.objects.get_or_create(text=item,
+                                                                              sub_keyword=sub_keyword[0],
+                                                                              sub_url_object=sub_url_object,
+                                                                              user=request.user)
+                return JsonResponse({'res': 1, 'id': sub_url_object.uuid})
         return JsonResponse({'res': 2})
 
 @ensure_csrf_cookie
 def re_update_url(request):
     if request.method == "POST":
-        if request.is_ajax():
-            id = request.POST.get('id', None)
-            sub_url_object = None
-            try:
-                sub_url_object = SubUrlObject.objects.get(uuid=id, user=request.user)
-            except Exception as e:
-                return JsonResponse({'res': 0})
-            sub_raw_keywords = SubRawKeyword.objects.filter(sub_url_object=sub_url_object).order_by('created')
+        if request.user.is_authenticated:
 
-            keyword_output = []
-            for item in sub_raw_keywords:
-                keyword_output.append(item.text)
+            if request.is_ajax():
+                id = request.POST.get('id', None)
+                sub_url_object = None
+                try:
+                    sub_url_object = SubUrlObject.objects.get(uuid=id, user=request.user)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                sub_raw_keywords = SubRawKeyword.objects.filter(sub_url_object=sub_url_object).order_by('created')
 
-            url_object = sub_url_object.url_object
-            title = sub_url_object.title.text
+                keyword_output = []
+                for item in sub_raw_keywords:
+                    keyword_output.append(item.text)
 
-            url = None
-            scheme = None
-            if url_object.https is True:
-                scheme = 'https://'
-            elif url_object.http is True:
-                scheme = 'http://'
-            url = scheme + url_object.loc
-            return JsonResponse({'res': 1, 'keyword_output': keyword_output, 'title': title, 'url': url})
+                url_object = sub_url_object.url_object
+                title = sub_url_object.title.text
+
+                url = None
+                scheme = None
+                if url_object.https is True:
+                    scheme = 'https://'
+                elif url_object.http is True:
+                    scheme = 'http://'
+                url = scheme + url_object.loc
+                return JsonResponse({'res': 1, 'keyword_output': keyword_output, 'title': title, 'url': url})
         return JsonResponse({'res': 2})
 
 @ensure_csrf_cookie
 def re_refresh_url(request):
     if request.method == "POST":
-        if request.is_ajax():
-            url = request.POST.get('url', None)
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
-            }
-            try:
-                req = requests.get(url, allow_redirects=False, headers=headers)
-            except Exception as e:
-                print('requests error: ' + str(e) + ' at: ' + url)
-                return JsonResponse({'res': 0})
-            import metadata_parser
-            try:
-                page = metadata_parser.MetadataParser(url=url, search_head_only=False, url_headers=headers)
-            except Exception as e:
-                print(e)
-                return JsonResponse({'res': 0})
-            status_code = req.status_code
-            title = page.get_metadatas('title', strategy=['page'])
-            title = title[0]
+        if request.user.is_authenticated:
 
-            return JsonResponse({'res': 1, 'status_code': status_code, 'title': title})
+            if request.is_ajax():
+                url = request.POST.get('url', None)
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
+                }
+                try:
+                    req = requests.get(url, allow_redirects=False, headers=headers)
+                except Exception as e:
+                    print('requests error: ' + str(e) + ' at: ' + url)
+                    return JsonResponse({'res': 0})
+                import metadata_parser
+                try:
+                    page = metadata_parser.MetadataParser(url=url, search_head_only=False, url_headers=headers)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+                status_code = req.status_code
+                title = page.get_metadatas('title', strategy=['page'])
+                title = title[0]
+
+                return JsonResponse({'res': 1, 'status_code': status_code, 'title': title})
         return JsonResponse({'res': 2})
 
 
 @ensure_csrf_cookie
 def re_update_complete_url(request):
     if request.method == "POST":
-        if request.is_ajax():
-            id = request.POST.get('id', None)
-            refresh = request.POST.get('refresh', None)
-            sub_url_object = None
-            try:
-                sub_url_object = SubUrlObject.objects.get(uuid=id)
-            except Exception as e:
-                return JsonResponse({'res': 0})
-
-            url_object = sub_url_object.url_object
-
-            if refresh == 'true':
-                status_code = request.POST.get('status_code', None)
-                title_text = request.POST.get('title', None)
-                title = None
-                if title_text != url_object.title_set.last().text:
-                    title = Title.objects.create(text=title_text,
-                                                 url_object=url_object,
-                                                 status_code=status_code)
-                else:
-                    title = url_object.title_set.last()
-
-                if title is not None:
-                    sub_url_object.title = title
-                    sub_url_object.save()
-
-            keyword_list = request.POST.getlist('keyword_list[]')
-
-            new_keyword_list = []
-
-            for item in keyword_list:
-                new_keyword_list.append(item.strip())
-
-            for item in new_keyword_list:
-                text = item.replace(" ", "")
-                keyword = Keyword.objects.get_or_create(text=text)
-
-                url_keyword = None
-                if UrlKeyword.objects.filter(url_object=url_object, keyword=keyword[0]).exists():
-                    url_keyword = UrlKeyword.objects.get(url_object=url_object, keyword=keyword[0])
-                else:
-                    url_keyword = UrlKeyword.objects.create(url_object=url_object,
-                                                            keyword=keyword[0],
-                                                            uuid=uuid.uuid4().hex)
-
-                sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
-                                                               user=request.user)
-                sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(sub_url_object=sub_url_object,
-                                                                                          sub_keyword=sub_keyword[0])
-                sub_raw_keyword_count = SubRawKeywordCount.objects.get_or_create(sub_url_object=sub_url_object)
-                if sub_raw_keyword_count[0].count < 31:
-                    sub_raw_keyword = SubRawKeyword.objects.get_or_create(text=item,
-                                                                          sub_keyword=sub_keyword[0],
-                                                                          sub_url_object=sub_url_object,
-                                                                          user=request.user)
-            delete_list = request.POST.getlist('delete_list[]')
-            new_delete_list = []
-            for item in delete_list:
-                new_delete_list.append(item.strip())
-
-            for item in new_delete_list:
-                text = item.replace(" ", "")
-                sub_raw_keyword = None
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                id = request.POST.get('id', None)
+                refresh = request.POST.get('refresh', None)
+                sub_url_object = None
                 try:
-                    sub_raw_keyword = SubRawKeyword.objects.get(text=item,
-                                                                sub_url_object=sub_url_object,
-                                                                user=request.user)
+                    sub_url_object = SubUrlObject.objects.get(uuid=id)
                 except Exception as e:
-                    pass
-                if sub_raw_keyword is not None:
-                    sub_raw_keyword.delete()
-            return JsonResponse({'res': 1})
+                    return JsonResponse({'res': 0})
+
+                url_object = sub_url_object.url_object
+
+                if refresh == 'true':
+                    status_code = request.POST.get('status_code', None)
+                    title_text = request.POST.get('title', None)
+                    title = None
+                    if title_text != url_object.title_set.last().text:
+                        title = Title.objects.create(text=title_text,
+                                                     url_object=url_object,
+                                                     status_code=status_code)
+                    else:
+                        title = url_object.title_set.last()
+
+                    if title is not None:
+                        sub_url_object.title = title
+                        sub_url_object.save()
+
+                keyword_list = request.POST.getlist('keyword_list[]')
+
+                new_keyword_list = []
+
+                for item in keyword_list:
+                    new_keyword_list.append(item.strip())
+
+                for item in new_keyword_list:
+                    text = item.replace(" ", "")
+                    keyword = Keyword.objects.get_or_create(text=text)
+
+                    url_keyword = None
+                    if UrlKeyword.objects.filter(url_object=url_object, keyword=keyword[0]).exists():
+                        url_keyword = UrlKeyword.objects.get(url_object=url_object, keyword=keyword[0])
+                    else:
+                        url_keyword = UrlKeyword.objects.create(url_object=url_object,
+                                                                keyword=keyword[0],
+                                                                uuid=uuid.uuid4().hex)
+
+                    sub_keyword = SubKeyword.objects.get_or_create(keyword=keyword[0],
+                                                                   user=request.user)
+                    sub_url_object_sub_keyword = SubUrlObjectSubKeyword.objects.get_or_create(sub_url_object=sub_url_object,
+                                                                                              sub_keyword=sub_keyword[0])
+                    sub_raw_keyword_count = SubRawKeywordCount.objects.get_or_create(sub_url_object=sub_url_object)
+                    if sub_raw_keyword_count[0].count < 31:
+                        sub_raw_keyword = SubRawKeyword.objects.get_or_create(text=item,
+                                                                              sub_keyword=sub_keyword[0],
+                                                                              sub_url_object=sub_url_object,
+                                                                              user=request.user)
+                delete_list = request.POST.getlist('delete_list[]')
+                new_delete_list = []
+                for item in delete_list:
+                    new_delete_list.append(item.strip())
+
+                for item in new_delete_list:
+                    text = item.replace(" ", "")
+                    sub_raw_keyword = None
+                    try:
+                        sub_raw_keyword = SubRawKeyword.objects.get(text=item,
+                                                                    sub_url_object=sub_url_object,
+                                                                    user=request.user)
+                    except Exception as e:
+                        pass
+                    if sub_raw_keyword is not None:
+                        sub_raw_keyword.delete()
+                return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
 
 '''
@@ -3070,66 +3058,64 @@ def re_bridger_list(request):
         return JsonResponse({'res': 2})
 
 
-
 @ensure_csrf_cookie
-def re_url(request):
+def re_url_keyword(request):
     if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                url_id = request.POST.get('url_id', None)
-                last_id = request.POST.get('last_id', None)
-                url_object = None
+        if request.is_ajax():
+            url_id = request.POST.get('url_id', None)
+            last_id = request.POST.get('last_id', None)
+            url_object = None
+            try:
+                url_object = UrlObject.objects.get(uuid=url_id)
+            except Exception as e:
+                return JsonResponse({'res': 0})
+
+            url_keywords = None
+            if last_id == '':
+                url_keywords = UrlKeyword.objects.filter(url_object=url_object).order_by('up_count')[:30]
+            else:
+                last_url_keyword = None
                 try:
-                    url_object = UrlObject.objects.get(uuid=url_id)
+                    last_url_keyword = UrlKeyword.objects.get(uuid=last_id)
                 except Exception as e:
                     return JsonResponse({'res': 0})
+                url_keywords = UrlKeyword.objects.filter(
+                    Q(url_object=url_object) & Q(up_count__lte=last_url_keyword.up_count)
+                ).exclude(uuid=last_id).order_by('up_count')[:30]
 
-                url_keywords = None
-                if last_id == '':
-                    url_keywords = UrlKeyword.objects.filter(url_object=url_object).order_by('up_count')[:30]
-                else:
-                    last_url_keyword = None
-                    try:
-                        last_url_keyword = UrlKeyword.objects.get(uuid=last_id)
-                    except Exception as e:
-                        return JsonResponse({'res': 0})
-                    url_keywords = UrlKeyword.objects.filter(
-                        Q(url_object=url_object) & Q(up_count__lte=last_url_keyword.up_count)
-                    ).exclude(uuid=last_id).order_by('up_count')[:30]
+            output = []
+            count = 0
+            last = None
 
-                output = []
-                count = 0
-                last = None
+            for url_keyword in url_keywords:
+                count = count+1
+                if count == 30:
+                    last = url_keyword.uuid
+                # 로그인된 상태
+                register = 'false'
+                if UrlKeywordRegister.objects.filter(user=request.user, url_keyword=url_keyword).exists():
+                    register = 'true'
 
-                for url_keyword in url_keywords:
-                    count = count+1
-                    if count == 30:
-                        last = url_keyword.uuid
-                    # 로그인된 상태
-                    register = 'false'
-                    if UrlKeywordRegister.objects.filter(user=request.user, url_keyword=url_keyword).exists():
-                        register = 'true'
+                up = 'false'
+                if UrlKeywordUp.objects.filter(user=request.user, url_keyword=url_keyword).exists():
+                    up = 'true'
 
-                    up = 'false'
-                    if UrlKeywordUp.objects.filter(user=request.user, url_keyword=url_keyword).exists():
-                        up = 'true'
+                down = 'false'
+                if UrlKeywordDown.objects.filter(user=request.user, url_keyword=url_keyword).exists():
+                    down = 'true'
+                sub_output = {
+                    'keyword': url_keyword.keyword.text,
+                    'keyword_id': url_keyword.uuid,
+                    'reg_count': url_keyword.register_count,
+                    'up_count': url_keyword.up_count,
+                    'down_count': url_keyword.down_count,
+                    'register': register,
+                    'up': up,
+                    'down': down
+                }
+                output.append(sub_output)
 
-                    down = 'false'
-                    if UrlKeywordDown.objects.filter(user=request.user, url_keyword=url_keyword).exists():
-                        down = 'true'
-                    sub_output = {
-                        'keyword': url_keyword.keyword.text,
-                        'keyword_id': url_keyword.uuid,
-                        'reg_count': url_keyword.register_count,
-                        'up_count': url_keyword.up_count,
-                        'down_count': url_keyword.down_count,
-                        'register': register,
-                        'up': up,
-                        'down': down
-                    }
-                    output.append(sub_output)
-
-                return JsonResponse({'res': 1, 'output': output, 'last': last})
+            return JsonResponse({'res': 1, 'output': output, 'last': last})
 
         return JsonResponse({'res': 2})
 
@@ -3182,5 +3168,24 @@ def re_url_keyword_down(request):
                 else:
                     url_keyword_down = UrlKeywordDown.objects.create(user=request.user, url_keyword=url_keyword)
                     return JsonResponse({'res': 1, 'result': 'down'})
+
+        return JsonResponse({'res': 2})
+
+@ensure_csrf_cookie
+def re_profile_suobj_delete(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                suobj_id = request.POST.get('suobj_id', None)
+                suobj = None
+                try:
+                    suobj = SubUrlObject.objects.get(uuid=suobj_id, user=request.user)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+                if suobj is not None:
+                    suobj.delete()
+
+                return JsonResponse({'res': 1})
 
         return JsonResponse({'res': 2})

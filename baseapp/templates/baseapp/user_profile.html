@@ -78,14 +78,14 @@
                 {% endif %}
 
                 </div>
-                <div id="user_profile_post_list"></div>
-                <a href=""><div class="user_profile_more_load hidden" id="user_profile_more_load" align="center">more load</div></a>
+                <div id="user_profile_suobj_list"></div>
+                <a href=""><div class="profile_more_load hidden" id="profile_more_load" align="center">more load</div></a>
             </div>
         </div>
     </div>
 </div>
 
-{% include 'baseapp/_modal_post_delete.html' %}
+{% include 'baseapp/_modal_suobj_delete.html' %}
 {% include 'baseapp/_modal_populate.html' %}
 {% include 'baseapp/_modal_bridge.html' %}
 
@@ -106,7 +106,7 @@
                   },
                   success: function (data) {
                     if(data.res === 1){
-                        $('#suobj_wrapper_'+$('#suobj_to_delete').html()).replaceWith('<div>post removed</div>')
+                        $('#suobj_wrapper_with_modi_'+$('#suobj_to_delete').html()).replaceWith('<div>removed</div>')
                         $('#modal_suobj_delete').modal('hide')
                     }
                   }
@@ -135,9 +135,9 @@
                 $.each(data.output, function (key, value) {
 
                     if (chosen_user_id === user_id){
-                        _modifier = '<div align="right"><a href="/update/url/'+value.id+'/"><span class="user_profile_post_update">update</span></a><span>  </span><a href=""><span class="user_profile_post_delete">delete</span></a></div>'
+                        _modifier = '<div align="right"><a href="/update/url/'+value.id+'/"><span class="user_profile_post_update">update</span></a><span>  </span><a href=""><span class="profile_suobj_delete">delete</span></a></div>'
                     }
-                    var appender = '<div>' +
+                    var appender = '<div id="suobj_wrapper_with_modi_'+value.id+'">' +
                         '<div class="row div_base" id="suobj_wrapper_'+value.id+'">' +
                         '<script defer>' +
                         '    suobj_populate("'+value.id+'")' +
@@ -145,17 +145,17 @@
                         '</div>' + _modifier +
                         '</div>'
                     var jq_appender = $(appender)
-                    jq_appender.find('.user_profile_post_delete').on('click', function (e) {
+                    jq_appender.find('.profile_suobj_delete').on('click', function (e) {
                         e.preventDefault()
-                        $('#delete_suobj_id').html(value.id)
+                        $('#suobj_to_delete').html(value.id)
                         $('#modal_suobj_delete').modal('show')
                     })
-                    $('#user_profile_post_list').append(jq_appender)
+                    $('#user_profile_suobj_list').append(jq_appender)
                 })
                     if (data.last === null){
-                        $('#profile_post_more_load').addClass('hidden')
+                        $('#profile_more_load').addClass('hidden')
                     } else {
-                        $('#profile_post_more_load').removeClass('hidden')
+                        $('#profile_more_load').removeClass('hidden')
                     }
 
             }

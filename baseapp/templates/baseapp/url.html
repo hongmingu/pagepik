@@ -37,7 +37,6 @@
     <div class="hidden" id="user_id"></div>
 {% endif %}
 <div class="hidden" id="id">{{ id }}</div>
-<div class="hidden" id="last_id"></div>
 <div class="hidden" id="link_source">/url/{{ id }}/</div>
 
 <!--page info end -->
@@ -48,8 +47,12 @@
             <div class="row" id="content">
                 <div class="row div_base">
                     <div align="right"><a href=""><span class="glyphicon glyphicon-option-horizontal" id="pop_menu"></span></a></div>
-                    <div>{{ url_object.get_url }}</div>
-                    <div>{{ url_object.title_set.last.text }}</div>
+                    <a href="{{ url_object.get_url }}" target="_blank" rel="noopener noreferrer">
+                        <div>
+                            <div>{{ url_object.get_url }}</div>
+                            <div>{{ url_object.title_set.last.text }}</div>
+                        </div>
+                    </a>
                     <div id="keyword_list"></div>
                     <a href=""><div class="hidden" id="keyword_more">more load</div></a>
                 </div>

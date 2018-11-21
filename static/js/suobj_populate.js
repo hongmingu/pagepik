@@ -17,8 +17,8 @@ var suobj_populate = function suobj_populate(id) {
                     var appender = $('<div id="pop_'+id+'">' +
                         '<div align="right"><a href=""><span class="glyphicon glyphicon-option-horizontal pop_menu"></span></a></div>' +
                         '<div><a href="/'+data.output.username+'/"><span class="pop_username">'+data.output.username+'</span></a></div>' +
-                        '<div><a href="'+data.output.url+'"><span class="pop_title">'+data.output.title+'</span></a></div>' +
-                        '<div><a href="'+data.output.url+'"><span class="pop_url">'+data.output.url+'</span></a></div>' +
+                        '<div><a href="'+data.output.url+'" target="_blank" rel="noopener noreferrer"><span class="pop_title">'+data.output.title+'</span></a></div>' +
+                        '<div><a href="'+data.output.url+'" target="_blank" rel="noopener noreferrer"><span class="pop_url">'+data.output.url+'</span></a></div>' +
                         '<a href="/url/'+data.output.url_id+'/"><div class="pop_public_info">url info</div></a>' +
                         '<div align="right"><span class="pop_created">'+date_differ(data.output.created)+'</span></div>' +
                         '<div class="srk_list">'+srks+'</div>' +
@@ -27,10 +27,6 @@ var suobj_populate = function suobj_populate(id) {
 
                     appender.find('.pop_menu').on('click', function (e) {
                         e.preventDefault()
-                        if ($('#user_id').html() === '') {
-                            $('#modal_need_login_pop').modal('show')
-                            return false;
-                        }
                         $('#clicked_suobj_id').html(id)
                         $('#modal_pop_menu').modal('show')
                     })
