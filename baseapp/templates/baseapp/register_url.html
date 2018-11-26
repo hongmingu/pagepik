@@ -43,6 +43,7 @@
     <div class="hidden" id="scheme"></div>
     <div class="hidden" id="title"></div>
     <div class="hidden" id="url"></div>
+    <div class="hidden" id="init_url"></div>
 
 <div class="container-fluid margin_top_50">
     <div class="row">
@@ -110,6 +111,7 @@
                 return false
             }
             $('#url_clue').html('')
+            $('#first_url').html('')
             $('#check').html('waiting...')
             $.ajax({
                 url:'/re/check/url/', type:'post', dataType:'json', cache:false,
@@ -159,6 +161,8 @@
                                 $('#add_keyword_url').html(value.url)
                                 $('#url_check_wrapper').remove()
                                 $('#url_example_wrapper').remove()
+                                $('#init_url').html(data.init_url)
+
                                 if ($('#add_keyword_wrapper').hasClass('hidden')){
                                     $('#add_keyword_wrapper').removeClass('hidden')
                                 }
@@ -240,6 +244,7 @@
                     scheme: $('#scheme').html(),
                     title: $('#title').html(),
                     url: $('#url').html(),
+                    init_url: $('#init_url').html(),
                     keyword_list: send_array
                 },
                 success:function (data) {
@@ -268,6 +273,7 @@
                     scheme: $('#scheme').html(),
                     title: $('#title').html(),
                     url: $('#url').html(),
+                    init_url: $('#init_url').html(),
                     keyword_list: send_array
                 },
                 success:function (data) {

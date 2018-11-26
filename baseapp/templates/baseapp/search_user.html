@@ -11,12 +11,6 @@
     <script src="{% static 'js/nav_badge.js' %}"></script>
 
     <script src="{% static 'js/date_differ.js' %}"></script>
-    <script src="{% static 'js/profile_populate.js' %}"></script>
-    <script src="{% static 'js/modal_resize.js' %}"></script>
-    <script src="{% static 'js/modal_feed_menu.js' %}"></script>
-    <script src="{% static 'js/modal_opens.js' %}"></script>
-    <script src="{% static 'js/modal_profile_reading.js' %}"></script>
-
 
     <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
     {% if user.is_authenticated %}
@@ -35,7 +29,7 @@
 <!--navbar end-->
 <!--page info-->
 {% include 'others/bootstrap_tester.html' %}
-    <div class="hidden" id="search_word">{{ word.q}}</div>
+    <div class="hidden" id="search_word">{{ word }}</div>
     <div class="hidden" id="next_id"></div>
 {% if user.is_authenticated %}
     <div class="hidden" id="user_id">{{ user.username }}</div>

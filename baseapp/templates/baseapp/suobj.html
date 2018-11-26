@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Demo</title>
+    {% include 'others/header_static.html' %}
+    {% include 'others/favicon.html' %}
+
+    {% load static from staticfiles %}
+    <script src="{% static 'js/navbar.js' %}"></script>
+    <script src="{% static 'js/a_selected.js' %}"></script>
+    <script src="{% static 'js/nav_badge.js' %}"></script>
+    <script src="{% static 'js/date_differ.js' %}"></script>
+    <script src="{% static 'js/suobj_populate.js' %}"></script>
+    <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
+    {% if user.is_authenticated %}
+    {% else %}
+    {% endif %}
+
+    <style>
+    </style>
+
+
+</head>
+<body class="light_background_color height_100">
+<!--navbar start-->
+{% include 'baseapp/_navbar.html' %}
+
+<!--navbar end-->
+<!--page info-->
+{% include 'others/bootstrap_tester.html' %}
+<div class="hidden" id="page_kind">user</div>
+
+{% if user.is_authenticated %}
+    <div class="hidden" id="user_id">{{ user.username }}</div>
+{% else %}
+    <div class="hidden" id="user_id"></div>
+{% endif %}
+
+<!--page info end -->
+
+<div class="container-fluid margin_top_50">
+    <div class="row">
+        <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
+            <div class="row" id="content">
+                    <div class="row div_base" id="suobj_wrapper_{{ id }}">
+                        <script defer>
+                            suobj_populate("{{ id }}")
+                        </script>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'baseapp/_modal_populate.html' %}
+  <!-- Hidden 으로 데이터 저장해놓고 modal on show 랑 hide 에서 그 데이터 불러와서 모달 채우게 하자. 그리고 임플린은 친구 중심이고
+  피드가 존재하게 되었기 때문에 팔로우가 부가적으로 존재하는 것 뿐이다. -->
+
+
+</body>
+<script>
+    $(function () {
+
+            $('#suobj_delete').click(function (e) {
+                e.preventDefault()
+              $.ajax({
+                  url: '/re/profile/suobj/delete/', type: 'post', dataType: 'json', cache: false,
+                  data: {
+                      suobj_id: $('#suobj_to_delete').html(),
+                  },
+                  success: function (data) {
+                    if(data.res === 1){
+                        $('#suobj_wrapper_with_modi_'+$('#suobj_to_delete').html()).replaceWith('<div>removed</div>')
+                        $('#modal_suobj_delete').modal('hide')
+                    }
+                  }
+              })
+
+            })
+
+            $("#modal_suobj_delete").on("shown.bs.modal", function () {
+
+            }).on("hidden.bs.modal", function () {
+                    $('#suobj_to_delete').html('')
+            })
+    });
+    $(function () {
+
+        $.ajax({url:'/re/profile/suobj/', type:'post', dataType:'json', cache:false,
+            data:{
+                chosen_user_id: $('#chosen_user_id').html(),
+                last_suobj_id: $('#last_suobj_id').html()
+            },
+            success:function (data) {
+                console.log(data)
+                var _modifier = ''
+                var chosen_user_id = $('#chosen_user_id').html()
+                var user_id = $('#user_id').html()
+                $.each(data.output, function (key, value) {
+
+                    if (chosen_user_id === user_id){
+                        _modifier = '<div align="right"><a href="/update/url/'+value.id+'/"><span class="user_profile_post_update">update</span></a><span>  </span><a href=""><span class="profile_suobj_delete">delete</span></a></div>'
+                    }
+                    var appender = '<div id="suobj_wrapper_with_modi_'+value.id+'">' +
+                        '<div class="row div_base" id="suobj_wrapper_'+value.id+'">' +
+                        '<script defer>' +
+                        '    suobj_populate("'+value.id+'")' +
+                        '<'+'/script>' +
+                        '</div>' + _modifier +
+                        '</div>'
+                    var jq_appender = $(appender)
+                    jq_appender.find('.profile_suobj_delete').on('click', function (e) {
+                        e.preventDefault()
+                        $('#suobj_to_delete').html(value.id)
+                        $('#modal_suobj_delete').modal('show')
+                    })
+                    $('#user_profile_suobj_list').append(jq_appender)
+                })
+                    if (data.last === null){
+                        $('#profile_more_load').addClass('hidden')
+                    } else {
+                        $('#profile_more_load').removeClass('hidden')
+                    }
+
+            }
+        })
+    })
+
+</script>
+
+</html>

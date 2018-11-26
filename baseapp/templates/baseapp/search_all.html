@@ -11,11 +11,6 @@
     <script src="{% static 'js/nav_badge.js' %}"></script>
 
     <script src="{% static 'js/date_differ.js' %}"></script>
-    <script src="{% static 'js/profile_populate.js' %}"></script>
-    <script src="{% static 'js/modal_resize.js' %}"></script>
-    <script src="{% static 'js/modal_feed_menu.js' %}"></script>
-    <script src="{% static 'js/modal_opens.js' %}"></script>
-    <script src="{% static 'js/modal_profile_reading.js' %}"></script>
 
 
     <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
@@ -35,7 +30,7 @@
 <!--navbar end-->
 <!--page info-->
 {% include 'others/bootstrap_tester.html' %}
-    <div class="hidden" id="search_word">{{ word.q}}</div>
+    <div class="hidden" id="search_word">{{ word }}</div>
 
 {% if user.is_authenticated %}
     <div class="hidden" id="user_id">{{ user.username }}</div>
@@ -43,31 +38,22 @@
     <div class="hidden" id="user_id"></div>
 {% endif %}
 <!--page info end -->
-<div class="hidden" id="clicked_post_id"></div>
-
-<div class="hidden" id="reading_post_id"></div>
-<div class="hidden" id="reading_post_profile_photo"></div>
-<div class="hidden" id="reading_post_user_id"></div>
-<div class="hidden" id="reading_post_profile_name"></div>
-<div class="hidden" id="reading_post_chat_last_id"></div>
-<div class="hidden" id="reading_post_chat_before_id"></div>
-<div class="hidden" id="reading_post_chat_next_id"></div>
-<div class="hidden" id="post_liking_next_id"></div>
-<div class="hidden" id="post_follow_next_id"></div>
-<div class="hidden" id="post_chat_liking_next_id"></div>
-<div class="hidden" id="post_chat_rest_liking_next_id"></div>
-<div class="hidden" id="clicked_post_chat_id"></div>
-<div class="hidden" id="clicked_post_chat_rest_id"></div>
 <div class="container-fluid margin_top_50">
     <div class="row">
         <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
             <div class="row">
-                <div class="h2">Users result</div>
+                <div class="h3">user result</div>
                 <div id="content_user"></div>
-                <div class="hidden" align="center" id="more_user"><a href="/search/user/?q={{ word.q }}"><div class="clickable padding_5 main_background_color write_new_post">more user</div></a></div>
-                <div class="h2">Posts result</div>
-                <div id="content_post"></div>
-                <div class="hidden" align="center" id="more_post"><a href="/search/post/?q={{ word.q }}"><div class="clickable padding_5 main_background_color write_new_post">more post</div></a></div>
+                <div class="hidden" align="center" id="more_user"><a href="/search/user/?q={{ word }}"><div class="clickable padding_5 main_background_color write_new_post">more user</div></a></div>
+                <div class="h3">bridged result</div>
+                <div id="content_bridge"></div>
+                <div class="hidden" align="center" id="more_post"><a href="/search/bridge/?q={{ word }}"><div class="clickable padding_5 main_background_color write_new_post">more post</div></a></div>
+                <div class="h3">keyword result</div>
+                <div id="content_keyword"></div>
+                <div class="hidden" align="center" id="more_post"><a href="/search/keyword/?q={{ word }}"><div class="clickable padding_5 main_background_color write_new_post">more post</div></a></div>
+                <div class="h3">general result</div>
+                <div id="content_general"></div>
+                <div class="hidden" align="center" id="more_post"><a href="/search/general/?q={{ word }}"><div class="clickable padding_5 main_background_color write_new_post">more post</div></a></div>
             </div>
         </div>
     </div>

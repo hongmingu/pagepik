@@ -14,37 +14,6 @@ from django.utils.timezone import now, timedelta
 
 
 
-def post_update(request, uuid):
-    if request.method == "GET":
-        if request.user.is_authenticated:
-            post = None
-            try:
-                post = Post.objects.get(uuid=uuid, user=request.user)
-
-            except Post.DoesNotExist:
-                return render(request, '404.html')
-            just_created = {}
-            if not post.postfirstcheck.first_checked:
-                just_created['ok'] = 'on'
-                post_first_check = post.postfirstcheck
-                post_first_check.first_checked = True
-                post_first_check.save()
-            else:
-                just_created['ok'] = 'off'
-                if post.is_open:
-                    just_created['current'] = 'open'
-                else:
-                    just_created['current'] = 'close'
-
-            return render(request, 'baseapp/post_update.html', {'post': post, 'just_created': just_created})
-
-
-def explore_feed(request):
-    if request.method == "GET":
-        if request.user.is_authenticated:
-            return render(request, 'baseapp/user_feed.html')
-        else:
-            return redirect(reverse('baseapp:main_create_log_in'))
 
 
 def note_all(request):
@@ -65,26 +34,7 @@ def note_all(request):
             return redirect(reverse('baseapp:main_create_log_in'))
 
 
-def search_all(request):
-    if request.method == "GET":
-        q = request.GET.get('q', None)
-        word = {}
-        word['q'] = q
-        return render(request, 'baseapp/user_search_all.html', {'word': word})
 
-def search_user(request):
-    if request.method == "GET":
-        q = request.GET.get('q', None)
-        word = {}
-        word['q'] = q
-        return render(request, 'baseapp/user_search_user.html', {'word': word})
-
-def search_post(request):
-    if request.method == "GET":
-        q = request.GET.get('q', None)
-        word = {}
-        word['q'] = q
-        return render(request, 'baseapp/user_search_post.html', {'word': word})
 
 
 def register_url(request):
@@ -157,3 +107,49 @@ def url(request, uuid):
 
         return render(request, '404.html')
 
+
+
+
+def explore_feed(request):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            return render(request, 'baseapp/user_feed.html')
+        else:
+            return redirect(reverse('baseapp:main_create_log_in'))
+
+
+def search_all(request):
+    if request.method == "GET":
+        q = request.GET.get('q', None)
+        word = q
+        return render(request, 'baseapp/search_all.html', {'word': word})
+
+# 브릿지 검색아래 제네럴 검색
+
+
+def search_user(request):
+    if request.method == "GET":
+        q = request.GET.get('q', None)
+        word = q
+        return render(request, 'baseapp/search_user.html', {'word': word})
+
+
+def search_bridge(request):
+    if request.method == "GET":
+        q = request.GET.get('q', None)
+        word = q
+        return render(request, 'baseapp/search_user.html', {'word': word})
+
+
+def search_keyword(request):
+    if request.method == "GET":
+        q = request.GET.get('q', None)
+        word = q
+        return render(request, 'baseapp/search_user.html', {'word': word})
+
+
+def search_general(request):
+    if request.method == "GET":
+        q = request.GET.get('q', None)
+        word = q
+        return render(request, 'baseapp/search_keyword.html', {'word': word})

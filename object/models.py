@@ -475,6 +475,21 @@ class SubUrlObject(models.Model):
         unique_together = ('user', 'url_object',)
 
 
+class SubUrlObjectInitialUrl(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    sub_url_object = models.ForeignKey(SubUrlObject, on_delete=models.CASCADE, null=True, blank=True)
+    url = models.TextField(max_length=2060, null=True, blank=True, default=None)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "pk: %s" % self.pk
+
+    class Meta:
+        unique_together = ('url', 'sub_url_object',)
+
+
 class SubKeyword(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     keyword = models.ForeignKey(Keyword, on_delete=models.CASCADE, null=True, blank=True)
