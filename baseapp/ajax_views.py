@@ -2907,6 +2907,22 @@ def re_bridger_list(request):
 
         return JsonResponse({'res': 2})
 
+@ensure_csrf_cookie
+def re_url_populate(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            url_object_id = request.POST.get('url_id', None)
+            url_object = None
+            try:
+                url_object = UrlObject.objects.get(uuid=url_object_id)
+            except Exception as e:
+                print(e)
+                return JsonResponse({'res': 0})
+
+            return JsonResponse({'res': 1, 'full_url': url_object.get_url(), 'title': url_object.title_set.last().text})
+
+        return JsonResponse({'res': 2})
+
 
 @ensure_csrf_cookie
 def re_url_keyword(request):
@@ -3047,28 +3063,33 @@ def re_search_all(request):
     if request.method == "POST":
         if request.is_ajax():
             search_word = request.POST.get('search_word', None)
+
+            user_output = []
             users = User.objects.filter(Q(userusername__username__icontains=search_word)
                                         | Q(usertextname__name__icontains=search_word)).order_by(
                 '-userusername__created').distinct()[:10]
-            user_output = []
-            user_next = None
+
             for user in users:
                 sub_output = {
                     'username': user.userusername.username,
-                    'user_photo': user.userphoto.file_50_url(),
                     'user_text_name': user.usertextname.name,
                 }
 
                 user_output.append(sub_output)
 
-            suobjs = SubUrlObject.objects.filter(Q(user__userusername__username__icontains=search_word)
-                                                 | Q(title__text__icontains=search_word)
-                                                 | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=
-                                                     search_word)
-                                                 | Q(user__usertextname__name__icontains=search_word)).order_by(
-                '-created').distinct()[:11]
-
             suobj_output = []
+            if request.user.is_authenticated:
+
+                suobjs = SubUrlObject.objects.filter((Q(user__is_bridged__user=request.user) | Q(user=request.user)) &
+                                                     (Q(user__userusername__username__icontains=search_word)
+                                                     | Q(title__text__icontains=search_word)
+                                                     | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=
+                                                         search_word)
+                                                     | Q(user__usertextname__name__icontains=search_word))).order_by(
+                    '-created').distinct()[:11]
+            else:
+                suobjs = SubUrlObject.objects.none()
+
             for suobj in suobjs:
                 sub_raw_keywords = SubRawKeyword.objects.filter(sub_url_object=suobj).order_by('created')[:5]
                 sub_raw_keywords_output = []
@@ -3076,14 +3097,33 @@ def re_search_all(request):
                     sub_raw_keywords_output.append(sub_raw_keyword.text)
                 sub_output = {
                     'username': suobj.user.userusername.username,
+                    'id': suobj.uuid,
                     'url': suobj.url_object.get_url(),
                     'keyword_output': sub_raw_keywords_output
                 }
 
                 suobj_output.append(sub_output)
+
+            keyword_output = []
+            from django.db.models.functions import Length
+
+            keywords = Keyword.objects.filter(text__icontains=search_word).order_by(Length('text').asc())[:10]
+            for keyword in keywords:
+                keyword_output.append(keyword.text)
+
+            url_output = []
+            url_keyword = UrlKeyword.objects.filter(Q(keyword__text__icontains=search_word)).order_by('up_count')[:10]
+            url_objects = UrlObject.objects.filter(Q(urlkeyword__keyword__text__icontains=search_word)).order_by(
+                'urlkeyword__up_count')[:10]
+            print(url_objects)
+            for url_object in url_objects:
+                url_output.append(url_object.uuid)
+
             return JsonResponse({'res': 1,
                                  'user_output': user_output,
-                                 'suobj_output': suobj_output})
+                                 'bridge_output': suobj_output,
+                                 'keyword_output': keyword_output,
+                                 'url_output': url_output})
 
         return JsonResponse({'res': 2})
 

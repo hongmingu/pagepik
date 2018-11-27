@@ -27,7 +27,7 @@ urlpatterns = [
     re_path(r'^search/user/$', views.search_user, name='search_user'),
     re_path(r'^search/bridge/$', views.search_bridge, name='search_bridge'),
     re_path(r'^search/keyword/$', views.search_keyword, name='search_keyword'),
-    re_path(r'^search/general/$', views.search_general, name='search_general'),
+    re_path(r'^search/url/$', views.search_url, name='search_url'),
 
     re_path(r'^re_settings/ajax/$', auth_ajax_views.re_settings, name='re_settings'),
     re_path(r'^re_settings/ajax/upload_user_photo/$', auth_ajax_views.upload_user_photo, name='re_upload_user_photo'),
@@ -56,6 +56,8 @@ urlpatterns = [
             name='re_bridging_list'),
     re_path(r'^re/bridger/list/$', base_ajax_views.re_bridger_list,
             name='re_bridger_list'),
+    re_path(r'^re/url/populate/$', base_ajax_views.re_url_populate,
+            name='re_url_populate'),
 
     re_path(r'^re/url/keyword/$', base_ajax_views.re_url_keyword,
             name='re_url_keyword'),
@@ -68,6 +70,8 @@ urlpatterns = [
     re_path(r'^re/profile/suobj/delete/$', base_ajax_views.re_profile_suobj_delete,
             name='re_profile_suobj_delete'),
 
+    re_path(r'^re/search/all/$', base_ajax_views.re_search_all,
+            name='re_search_all'),
     # re_path(r'^re/follow/add/$', base_ajax_views.re_follow_add,
     #         name='re_follow_add'),
     # re_path(r'^re/following/list/$', base_ajax_views.re_following_list,

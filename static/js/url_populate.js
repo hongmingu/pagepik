@@ -279,7 +279,6 @@ $(function () {
         var path = scheme + '://' + window.location.host + source;
         $('#modal_pop_menu_input').val(path).select();
     }).on("hidden.bs.modal", function () {
-        $('#clicked_post_id').html('')
         $('#modal_pop_menu_input').val('')
     });
 

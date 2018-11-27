@@ -121,6 +121,8 @@ def explore_feed(request):
 def search_all(request):
     if request.method == "GET":
         q = request.GET.get('q', None)
+        if q is None:
+            q = ''
         word = q
         return render(request, 'baseapp/search_all.html', {'word': word})
 
@@ -130,6 +132,8 @@ def search_all(request):
 def search_user(request):
     if request.method == "GET":
         q = request.GET.get('q', None)
+        if q is None:
+            q = ''
         word = q
         return render(request, 'baseapp/search_user.html', {'word': word})
 
@@ -137,6 +141,8 @@ def search_user(request):
 def search_bridge(request):
     if request.method == "GET":
         q = request.GET.get('q', None)
+        if q is None:
+            q = ''
         word = q
         return render(request, 'baseapp/search_user.html', {'word': word})
 
@@ -144,12 +150,16 @@ def search_bridge(request):
 def search_keyword(request):
     if request.method == "GET":
         q = request.GET.get('q', None)
+        if q is None:
+            q = ''
         word = q
         return render(request, 'baseapp/search_user.html', {'word': word})
 
 
-def search_general(request):
+def search_url(request):
     if request.method == "GET":
         q = request.GET.get('q', None)
+        if q is None:
+            q = ''
         word = q
         return render(request, 'baseapp/search_keyword.html', {'word': word})
