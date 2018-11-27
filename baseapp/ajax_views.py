@@ -3049,15 +3049,10 @@ def re_search_all(request):
             search_word = request.POST.get('search_word', None)
             users = User.objects.filter(Q(userusername__username__icontains=search_word)
                                         | Q(usertextname__name__icontains=search_word)).order_by(
-                '-noticecount__created').distinct()[:11]
+                '-userusername__created').distinct()[:10]
             user_output = []
-            users_count = 0
             user_next = None
             for user in users:
-                users_count = users_count + 1
-                if users_count == 11:
-                    user_next = True
-                    break
                 sub_output = {
                     'username': user.userusername.username,
                     'user_photo': user.userphoto.file_50_url(),
@@ -3066,39 +3061,29 @@ def re_search_all(request):
 
                 user_output.append(sub_output)
 
-            posts = Post.objects.filter(Q(user__userusername__username__icontains=search_word)
-                                        | Q(title__icontains=search_word)
-                                        | Q(description__icontains=search_word)
-                                        | Q(user__usertextname__name__icontains=search_word)).order_by(
-                '-post_chat_created').distinct()[:11]
+            suobjs = SubUrlObject.objects.filter(Q(user__userusername__username__icontains=search_word)
+                                                 | Q(title__text__icontains=search_word)
+                                                 | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=
+                                                     search_word)
+                                                 | Q(user__usertextname__name__icontains=search_word)).order_by(
+                '-created').distinct()[:11]
 
-            post_output = []
-            posts_count = 0
-            post_next = None
-            for post in posts:
-                posts_count = posts_count + 1
-                if posts_count == 11:
-                    post_next = True
-                    break
-
-                if request.user.is_authenticated:
-                    post_follow = True
-                    if Follow.objects.filter(user=request.user, follow=post.user).exists():
-                        post_follow = False
-                else:
-                    post_follow = False
+            suobj_output = []
+            for suobj in suobjs:
+                sub_raw_keywords = SubRawKeyword.objects.filter(sub_url_object=suobj).order_by('created')[:5]
+                sub_raw_keywords_output = []
+                for sub_raw_keyword in sub_raw_keywords:
+                    sub_raw_keywords_output.append(sub_raw_keyword.text)
                 sub_output = {
-                    'id': post.uuid,
-                    'created': post.created,
-                    'post_follow': post_follow
+                    'username': suobj.user.userusername.username,
+                    'url': suobj.url_object.get_url(),
+                    'keyword_output': sub_raw_keywords_output
                 }
 
-                post_output.append(sub_output)
+                suobj_output.append(sub_output)
             return JsonResponse({'res': 1,
-                                 'user_set': user_output,
-                                 'user_next': user_next,
-                                 'post_set': post_output,
-                                 'post_next': post_next})
+                                 'user_output': user_output,
+                                 'suobj_output': suobj_output})
 
         return JsonResponse({'res': 2})
 
