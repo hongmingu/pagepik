@@ -3112,10 +3112,8 @@ def re_search_all(request):
                 keyword_output.append(keyword.text)
 
             url_output = []
-            url_keyword = UrlKeyword.objects.filter(Q(keyword__text__icontains=search_word)).order_by('up_count')[:10]
             url_objects = UrlObject.objects.filter(Q(urlkeyword__keyword__text__icontains=search_word)).order_by(
                 'urlkeyword__up_count')[:10]
-            print(url_objects)
             for url_object in url_objects:
                 url_output.append(url_object.uuid)
 
@@ -3133,90 +3131,164 @@ def re_search_user(request):
     if request.method == "POST":
         if request.is_ajax():
             search_word = request.POST.get('search_word', None)
-            next_id = request.POST.get('next_id', None)
-            if next_id == '':
+            end_id = request.POST.get('end_id', None)
+            step = 20
+            if end_id == '':
                 users = User.objects.filter(Q(userusername__username__icontains=search_word)
                                             | Q(usertextname__name__icontains=search_word)).order_by(
-                    '-noticecount__created').distinct()[:31]
+                    '-userusername__created').distinct()[:step]
             else:
-                next_user = None
+                end_user = None
                 try:
-                    next_user = User.objects.get(username=next_id)
+                    end_user = User.objects.get(username=end_id)
                 except Exception as e:
                     print(e)
                     return JsonResponse({'res': 0})
 
                 users = User.objects.filter((Q(userusername__username__icontains=search_word)
-                                             | Q(usertextname__name__icontains=search_word)) & Q(
-                    noticecount__created__lte=next_user.noticecount.created)).exclude(pk=next_user.pk).order_by(
-                    '-noticecount__created').distinct()[:31]
-            user_output = []
-            users_count = 0
-            user_next = None
+                                            | Q(usertextname__name__icontains=search_word))
+                                            & Q(pk__lt=end_user.pk)).order_by(
+                    '-userusername__created').distinct()[:step]
+            output = []
+            count = 0
+            end = None
             for user in users:
-                users_count = users_count + 1
-                if users_count == 31:
-                    user_next = user.username
-                    break
+                count = count + 1
+                if count == step:
+                    end = user.username
                 sub_output = {
                     'username': user.userusername.username,
                     'user_photo': user.userphoto.file_50_url(),
-                    'user_text_name': user.usertextname.name,
+                    'user_text_name': escape(user.usertextname.name),
                 }
 
-                user_output.append(sub_output)
+                output.append(sub_output)
 
             return JsonResponse({'res': 1,
-                                 'user_set': user_output,
-                                 'user_next': user_next})
+                                 'output': output,
+                                 'end': end})
 
         return JsonResponse({'res': 2})
 
 
 @ensure_csrf_cookie
-def re_search_post(request):
+def re_search_bridge(request):
     if request.method == "POST":
         if request.is_ajax():
             search_word = request.POST.get('search_word', None)
-            next_id = request.POST.get('next_id', None)
-            if next_id == '':
-                posts = Post.objects.filter(Q(user__userusername__username__icontains=search_word)
-                                            | Q(title__icontains=search_word)
-                                            | Q(description__icontains=search_word)
-                                            | Q(user__usertextname__name__icontains=search_word)).order_by(
-                    '-post_chat_created').distinct()[:2]
+            end_id = request.POST.get('end_id', None)
+            step = 10
+            sub_raw_keyword_step = 5
+
+            if request.user.is_authenticated:
+                if end_id == '':
+
+                    suobjs = SubUrlObject.objects.filter(
+                        (Q(user__is_bridged__user=request.user) | Q(user=request.user)) &
+                        (Q(user__userusername__username__icontains=search_word)
+                         | Q(title__text__icontains=search_word)
+                         | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=search_word)
+                         | Q(user__usertextname__name__icontains=search_word))).order_by(
+                        '-created').distinct()[:step]
+                else:
+                    try:
+                        end_suobjs = SubUrlObject.objects.get(uuid=end_id)
+                    except Exception as e:
+                        print(e)
+                        return JsonResponse({'res': 0})
+                    suobjs = SubUrlObject.objects.filter(
+                        ((Q(user__is_bridged__user=request.user) | Q(user=request.user)) &
+                         (Q(user__userusername__username__icontains=search_word)
+                         | Q(title__text__icontains=search_word)
+                         | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=
+                             search_word)
+                         | Q(user__usertextname__name__icontains=search_word)))
+                        & Q(pk__lt=end_suobjs.pk)).order_by(
+                        '-created').distinct()[:step]
             else:
-                next_post = None
-                try:
-                    next_post = Post.objects.get(uuid=next_id)
-                except Exception as e:
-                    print(e)
-                    return JsonResponse({'res': 0})
+                suobjs = SubUrlObject.objects.none()
 
-                posts = Post.objects.filter((Q(user__userusername__username__icontains=search_word)
-                                             | Q(title__icontains=search_word)
-                                             | Q(description__icontains=search_word)
-                                             | Q(user__usertextname__name__icontains=search_word))
-                                            & Q(post_chat_created__lte=next_post.post_chat_created)).order_by(
-                    '-post_chat_created').distinct()[:2]
-
-            post_output = []
-            posts_count = 0
-            post_next = None
-            for post in posts:
-                posts_count = posts_count + 1
-                if posts_count == 2:
-                    post_next = post.uuid
-                    break
-
+            output = []
+            count = 0
+            end = None
+            for suobj in suobjs:
+                count = count + 1
+                if count == step:
+                    end = suobj.uuid
+                sub_raw_keywords = SubRawKeyword.objects.filter(
+                    sub_url_object=suobj).order_by('created')[:sub_raw_keyword_step]
+                sub_raw_keywords_output = []
+                for sub_raw_keyword in sub_raw_keywords:
+                    sub_raw_keywords_output.append(sub_raw_keyword.text)
                 sub_output = {
-                    'id': post.uuid,
+                    'username': suobj.user.userusername.username,
+                    'id': suobj.uuid,
+                    'url': suobj.url_object.get_url(),
+                    'keyword_output': sub_raw_keywords_output
                 }
 
-                post_output.append(sub_output)
+                output.append(sub_output)
+
             return JsonResponse({'res': 1,
-                                 'post_set': post_output,
-                                 'post_next': post_next})
+                                 'output': output,
+                                 'end': end})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_search_keyword(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            search_word = request.POST.get('search_word', None)
+            order = request.POST.get('order', None)
+            order = int(order)
+            step = 10
+
+            from django.db.models.functions import Length
+
+            keywords = Keyword.objects.filter(
+                text__icontains=search_word).order_by(Length('text').asc())[order:order + step]
+
+            end = 'false'
+            if keywords.count() < step:
+                end = 'true'
+
+            output = []
+
+            for keyword in keywords:
+                output.append(keyword.text)
+
+            return JsonResponse({'res': 1,
+                                 'output': output,
+                                 'order': order + step,
+                                 'end': end})
+
+        return JsonResponse({'res': 2})
+
+@ensure_csrf_cookie
+def re_search_url(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            search_word = request.POST.get('search_word', None)
+            order = request.POST.get('order', None)
+            order = int(order)
+            step = 10
+            url_objects = UrlObject.objects.filter(Q(urlkeyword__keyword__text__icontains=search_word)).order_by(
+                'urlkeyword__up_count')[order:order + step]
+
+            end = 'false'
+            if url_objects.count() < step:
+                end = 'true'
+
+            output = []
+            for url_object in url_objects:
+                output.append(url_object.uuid)
+
+            return JsonResponse({'res': 1,
+                                 'output': output,
+                                 'order': order + step,
+                                 'end': end})
 
         return JsonResponse({'res': 2})
 
