@@ -1902,67 +1902,10 @@ def re_post_follow_list(request):
         return JsonResponse({'res': 2})
 
 
-@ensure_csrf_cookie
-def re_explore_feed(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                last_id = request.POST.get('last_id', None)
-                posts = None
-                if last_id == '':
-                    posts = Post.objects.filter(
-                        ~Q(user__is_followed__user=request.user) & Q(is_open=True) & ~Q(user=request.user)).exclude(
-                        Q(post_follow__user=request.user)).order_by('-post_chat_created').distinct()[:20]
-                else:
-                    last_post = None
-                    try:
-                        last_post = Post.objects.get(uuid=last_id)
-                    except Exception as e:
-                        print(e)
-                        return JsonResponse({'res': 0})
-                    posts = Post.objects.filter(~Q(user__is_followed__user=request.user) & Q(is_open=True) & Q(
-                        post_chat_created__lte=last_post.post_chat_created) & ~Q(user=request.user)).exclude(
-                        Q(post_follow__user=request.user) | Q(uuid=last_id)).order_by('-post_chat_created').distinct()[
-                            :20]
-
-                # 여기서 posts 옵션 준다. 20개씩 줄 것이므로 21로 잡는다. #########
-                # 여기서 포스트 팔로우 된 건 피드에 뜨지 않게 Q 설정해야한다 .
-                ################################
-                output = []
-                count = 0
-                last = None
-                post_follow = None
-                for post in posts:
-                    count = count + 1
-                    if count == 20:
-                        last = post.uuid
-                    sub_output = {
-                        'id': post.uuid,
-                    }
-
-                    output.append(sub_output)
-
-                return JsonResponse({'res': 1, 'set': output, 'last': last})
-
-        return JsonResponse({'res': 2})
 
 
 
 
-@ensure_csrf_cookie
-def re_nav_badge_populate(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                try:
-                    notice_count = request.user.noticecount.count
-                except Exception as e:
-                    print(e)
-                    return JsonResponse({'res': 0})
-
-                return JsonResponse({'res': 1, 'notice_count': notice_count})
-
-        return JsonResponse({'res': 2})
 
 
 # ---------------------------------------------------------------------------------------------------------------------------
@@ -3289,3 +3232,61 @@ def re_note_all(request):
                 return JsonResponse({'res': 1, 'output': output, 'end': end})
 
         return JsonResponse({'res': 2})
+
+
+
+@ensure_csrf_cookie
+def re_nav_badge_populate(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                try:
+                    notice_count = request.user.noticecount.count
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+
+                return JsonResponse({'res': 1, 'notice_count': notice_count})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_bridge_feed(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                end_id = request.POST.get('end_id', None)
+                step = 20
+                suobjs = None
+                if end_id == '':
+                    suobjs = SubUrlObject.objects.filter(Q(user__is_bridged__user=request.user)
+                                                         ).order_by('-created').distinct()[:step]
+                else:
+                    end_post = None
+                    try:
+                        end_suobj = SubUrlObject.objects.get(uuid=end_id)
+                    except Exception as e:
+                        print(e)
+                        return JsonResponse({'res': 0})
+                    suobjs = SubUrlObject.objects.filter((Q(user__is_bridged__user=request.user))
+                                                         & Q(pk__lt=end_suobj.pk)).order_by('-created').distinct()[:step]
+
+                output = []
+                count = 0
+                end = None
+                for item in suobjs:
+                    count = count + 1
+                    if count == step:
+                        end = item.uuid
+                    sub_output = {
+                        'id': item.uuid,
+                    }
+
+                    output.append(sub_output)
+
+                return JsonResponse({'res': 1, 'output': output, 'end': end})
+
+        return JsonResponse({'res': 2})
+
+

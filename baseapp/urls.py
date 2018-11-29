@@ -24,8 +24,8 @@ urlpatterns = [
     re_path(r'^search/keyword/$', views.search_keyword, name='search_keyword'),
     re_path(r'^search/url/$', views.search_url, name='search_url'),
 
-    re_path(r'^explore/feed/$', views.explore_feed, name='explore_feed'),
-
+    re_path(r'^bridge/feed/$', views.bridge_feed, name='bridge_feed'),
+    re_path(r'^note/all/$', views.note_all, name='note_all'),
 
     # re_path(r'^note/all/$', views.note_all, name='note_all'),
 
@@ -82,6 +82,16 @@ urlpatterns = [
             name='re_search_user'),
     re_path(r'^re/search/url/$', base_ajax_views.re_search_url,
             name='re_search_user'),
+
+    re_path(r'^re/nav/badge/populate/$', base_ajax_views.re_nav_badge_populate,
+            name='re_nav_badge_populate'),
+
+    re_path(r'^re/note/all/$', base_ajax_views.re_note_all,
+            name='re_note_all'),
+
+    re_path(r'^re/bridge/feed/$', base_ajax_views.re_bridge_feed,
+            name='re_bridge_feed'),
+
     # re_path(r'^re/follow/add/$', base_ajax_views.re_follow_add,
     #         name='re_follow_add'),
     # re_path(r'^re/following/list/$', base_ajax_views.re_following_list,

@@ -16,23 +16,6 @@ from django.utils.timezone import now, timedelta
 
 
 
-def note_all(request):
-    if request.method == "GET":
-        if request.user.is_authenticated:
-            try:
-                with transaction.atomic():
-                    notices_update = Notice.objects.filter(Q(user=request.user) & Q(checked=False)).update(
-                        checked=True)
-                    notice_count = request.user.noticecount
-                    notice_count.count = 0
-                    notice_count.save()
-            except Exception as e:
-                print(e)
-                pass
-            return render(request, 'baseapp/note_all.html')
-        else:
-            return redirect(reverse('baseapp:main_create_log_in'))
-
 
 
 
@@ -109,15 +92,6 @@ def url(request, uuid):
 
 
 
-
-def explore_feed(request):
-    if request.method == "GET":
-        if request.user.is_authenticated:
-            return render(request, 'baseapp/user_feed.html')
-        else:
-            return redirect(reverse('baseapp:main_create_log_in'))
-
-
 def search_all(request):
     if request.method == "GET":
         q = request.GET.get('q', None)
@@ -164,3 +138,29 @@ def search_url(request):
             q = ''
         word = q
         return render(request, 'baseapp/search_url.html', {'word': word})
+
+
+def note_all(request):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            try:
+                with transaction.atomic():
+                    notices_update = Notice.objects.filter(Q(user=request.user) & Q(checked=False)).update(
+                        checked=True)
+                    notice_count = request.user.noticecount
+                    notice_count.count = 0
+                    notice_count.save()
+            except Exception as e:
+                print(e)
+                pass
+            return render(request, 'baseapp/note_all.html')
+        else:
+            return redirect(reverse('baseapp:main_create_log_in'))
+
+
+def bridge_feed(request):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            return render(request, 'baseapp/bridge_feed.html')
+        else:
+            return redirect(reverse('baseapp:main_create_log_in'))

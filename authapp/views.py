@@ -240,8 +240,6 @@ def main_create_log_in(request):
                             gender=form.cleaned_data['gender']
                         )
                         # 여기 기본적인 릴레이션 모델
-                        new_following_count = FollowingCount.objects.create(user=new_user_create)
-                        new_follower_count = FollowerCount.objects.create(user=new_user_create)
 # ----------------------------------------------------------------------------------------------------------------------
                         new_notice_count = NoticeCount.objects.create(user=new_user_create)
                         new_bridging_count = BridgingCount.objects.create(user=new_user_create)
