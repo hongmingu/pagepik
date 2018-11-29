@@ -18,16 +18,18 @@ urlpatterns = [
     re_path(r'^(?P<user_username>([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?))/$',
             views.user_profile, name='user_profile'),
 
-    re_path(r'^explore/feed/$', views.explore_feed, name='explore_feed'),
-
-
-    # re_path(r'^note/all/$', views.note_all, name='note_all'),
-
     re_path(r'^search/all/$', views.search_all, name='search_all'),
     re_path(r'^search/user/$', views.search_user, name='search_user'),
     re_path(r'^search/bridge/$', views.search_bridge, name='search_bridge'),
     re_path(r'^search/keyword/$', views.search_keyword, name='search_keyword'),
     re_path(r'^search/url/$', views.search_url, name='search_url'),
+
+    re_path(r'^explore/feed/$', views.explore_feed, name='explore_feed'),
+
+
+    # re_path(r'^note/all/$', views.note_all, name='note_all'),
+
+
 
     re_path(r'^re_settings/ajax/$', auth_ajax_views.re_settings, name='re_settings'),
     re_path(r'^re_settings/ajax/upload_user_photo/$', auth_ajax_views.upload_user_photo, name='re_upload_user_photo'),
@@ -72,6 +74,14 @@ urlpatterns = [
 
     re_path(r'^re/search/all/$', base_ajax_views.re_search_all,
             name='re_search_all'),
+    re_path(r'^re/search/user/$', base_ajax_views.re_search_user,
+            name='re_search_user'),
+    re_path(r'^re/search/bridge/$', base_ajax_views.re_search_bridge,
+            name='re_search_user'),
+    re_path(r'^re/search/keyword/$', base_ajax_views.re_search_keyword,
+            name='re_search_user'),
+    re_path(r'^re/search/url/$', base_ajax_views.re_search_url,
+            name='re_search_user'),
     # re_path(r'^re/follow/add/$', base_ajax_views.re_follow_add,
     #         name='re_follow_add'),
     # re_path(r'^re/following/list/$', base_ajax_views.re_following_list,

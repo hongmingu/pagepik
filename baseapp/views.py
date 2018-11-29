@@ -29,7 +29,7 @@ def note_all(request):
             except Exception as e:
                 print(e)
                 pass
-            return render(request, 'baseapp/user_note.html')
+            return render(request, 'baseapp/note_all.html')
         else:
             return redirect(reverse('baseapp:main_create_log_in'))
 
@@ -141,10 +141,11 @@ def search_user(request):
 def search_bridge(request):
     if request.method == "GET":
         q = request.GET.get('q', None)
+        print(q)
         if q is None:
             q = ''
         word = q
-        return render(request, 'baseapp/search_user.html', {'word': word})
+        return render(request, 'baseapp/search_bridge.html', {'word': word})
 
 
 def search_keyword(request):
@@ -153,7 +154,7 @@ def search_keyword(request):
         if q is None:
             q = ''
         word = q
-        return render(request, 'baseapp/search_user.html', {'word': word})
+        return render(request, 'baseapp/search_keyword.html', {'word': word})
 
 
 def search_url(request):
@@ -162,4 +163,4 @@ def search_url(request):
         if q is None:
             q = ''
         word = q
-        return render(request, 'baseapp/search_keyword.html', {'word': word})
+        return render(request, 'baseapp/search_url.html', {'word': word})

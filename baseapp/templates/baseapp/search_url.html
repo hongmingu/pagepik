@@ -41,7 +41,7 @@
     <div class="row">
         <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
             <div class="row">
-                <div class="h3">keyword result</div>
+                <div class="h3">url result</div>
                 <div id="content_result"></div>
                 <a href="">
                     <div class="hidden clickable" align="center" id="more_load">more load</div>
@@ -57,7 +57,7 @@
             $('#content_result').append('<div class="h4">no results</div>')
         } else {
             $.ajax({
-                url: '/re/search/keyword/', type: 'post', dataType: 'json', cache: false,
+                url: '/re/search/url/', type: 'post', dataType: 'json', cache: false,
                 data: {
                     search_word: $('#search_word').html(),
                     order: $('#order').html()
@@ -93,7 +93,7 @@
         $('#more_load').on('click', function (e) {
             e.preventDefault()
             $.ajax({
-                url: '/re/search/keyword/', type: 'post', dataType: 'json', cache: false,
+                url: '/re/search/url/', type: 'post', dataType: 'json', cache: false,
                 data: {
                     search_word: $('#search_word').html(),
                     order: $('#order').html()

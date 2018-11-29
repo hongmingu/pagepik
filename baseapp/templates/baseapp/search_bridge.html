@@ -41,7 +41,7 @@
     <div class="row">
         <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
             <div class="row">
-                <div class="h3">user result</div>
+                <div class="h3">bridged result</div>
                 <div id="content_result"></div>
                 <div class="hidden clickable" align="center" id="more_load"><a href=""><span>more load</span></a></div>
             </div>
@@ -54,7 +54,7 @@
         if($('#search_word').html()===''){
             $('#content_result').append('<div class="h4">no results</div>')
         } else {
-            $.ajax({url:'/re/search/user/', type:'post', dataType:'json', cache:false,
+            $.ajax({url:'/re/search/bridge/', type:'post', dataType:'json', cache:false,
                 data:{
                     search_word: $('#search_word').html(),
                     end_id: $('#end_id').html()
@@ -67,10 +67,7 @@
 
                     }else {
                         $.each(data.output, function (key, value) {
-                            var appender = '<div class="search_user_wrapper">\n' +
-                            '<div class="search_user_img_wrapper"><a href="/'+value.username+'/"><img class="search_user_img_small clickable" src="'+value.user_photo+'"></a></div>\n' +
-                            '<div class="search_user_detail_wrapper"><a href="/'+value.username+'/"><span class="search_user_detail_username clickable">'+value.username+'</span></a><span> <span><a href="/'+value.username+'/"><span class="search_user_detail_name clickable">'+value.user_text_name+'</span></a></div>\n' +
-                            '</div>'
+                            var appender = ''
                             $('#content_result').append(appender)
 
                         })
@@ -93,7 +90,7 @@
 
         $('#more_load').on('click', function (e) {
             e.preventDefault()
-            $.ajax({url:'/re/search/user/', type:'post', dataType:'json', cache:false,
+            $.ajax({url:'/re/search/bridge/', type:'post', dataType:'json', cache:false,
                 data:{
                     search_word: $('#search_word').html(),
                     end_id: $('#end_id').html()
@@ -106,10 +103,7 @@
 
                     }else {
                         $.each(data.output, function (key, value) {
-                            var appender = '<div class="search_user_wrapper">\n' +
-                            '<div class="search_user_img_wrapper"><a href="/'+value.username+'/"><img class="search_user_img_small clickable" src="'+value.user_photo+'"></a></div>\n' +
-                            '<div class="search_user_detail_wrapper"><a href="/'+value.username+'/"><span class="search_user_detail_username clickable">'+value.username+'</span></a><span> <span><a href="/'+value.username+'/"><span class="search_user_detail_name clickable">'+value.user_text_name+'</span></a></div>\n' +
-                            '</div>'
+                            var appender = ''
                             $('#content_result').append(appender)
 
                         })

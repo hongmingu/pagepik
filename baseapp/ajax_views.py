@@ -1947,48 +1947,6 @@ def re_explore_feed(request):
         return JsonResponse({'res': 2})
 
 
-@ensure_csrf_cookie
-def re_note_all(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                next_id = request.POST.get('next_id', None)
-                notices = None
-                if next_id == '':
-                    notices = Notice.objects.filter(Q(user=request.user)).order_by('-created').distinct()[:31]
-                else:
-                    next_notice = None
-                    try:
-                        next_notice = Notice.objects.get(uuid=next_id)
-                    except Exception as e:
-                        print(e)
-                        return JsonResponse({'res': 0})
-                    notices = Notice.objects.filter(Q(user=request.user) & Q(pk__lte=next_notice.pk)).order_by(
-                        '-created').distinct()[:31]
-
-                # 여기서 posts 옵션 준다. 20개씩 줄 것이므로 21로 잡는다. #########
-                # 여기서 포스트 팔로우 된 건 피드에 뜨지 않게 Q 설정해야한다 .
-                ################################
-                output = []
-                count = 0
-                next = None
-                for notice in notices:
-                    count = count + 1
-                    if count == 31:
-                        next = notice.uuid
-                        break
-                    sub_output = {
-                        'id': notice.uuid,
-                        'created': notice.created,
-                        'notice_kind': notice.kind,
-                        'notice_value': notice.get_value(),
-                    }
-
-                    output.append(sub_output)
-
-                return JsonResponse({'res': 1, 'set': output, 'next': next})
-
-        return JsonResponse({'res': 2})
 
 
 @ensure_csrf_cookie
@@ -3292,3 +3250,42 @@ def re_search_url(request):
 
         return JsonResponse({'res': 2})
 
+@ensure_csrf_cookie
+def re_note_all(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                end_id = request.POST.get('end_id', None)
+                step = 30
+                notices = None
+                if end_id == '':
+                    notices = Notice.objects.filter(Q(user=request.user)).order_by('-created').distinct()[:step]
+                else:
+                    end_notice = None
+                    try:
+                        end_notice = Notice.objects.get(uuid=end_id)
+                    except Exception as e:
+                        print(e)
+                        return JsonResponse({'res': 0})
+                    notices = Notice.objects.filter(Q(user=request.user) & Q(pk__lt=end_notice.pk)).order_by(
+                        '-created').distinct()[:step]
+
+                output = []
+                count = 0
+                end = None
+                for notice in notices:
+                    count = count + 1
+                    if count == step:
+                        end = notice.uuid
+                    sub_output = {
+                        'id': notice.uuid,
+                        'created': notice.created,
+                        'notice_kind': notice.kind,
+                        'notice_value': notice.get_value(),
+                    }
+
+                    output.append(sub_output)
+
+                return JsonResponse({'res': 1, 'output': output, 'end': end})
+
+        return JsonResponse({'res': 2})
