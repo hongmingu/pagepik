@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, reverse
-from .forms import PostCreateForm
 from relation.models import *
 from object.models import *
 from object.numbers import *
@@ -45,7 +44,7 @@ def user_profile(request, user_username):
             user = None
             try:
                 chosen_user = User.objects.get(userusername__username=user_username)
-            except:
+            except Exception as e:
                 return render(request, '404.html')
             if chosen_user is not None:
                 bridging = None
@@ -57,7 +56,7 @@ def user_profile(request, user_username):
             user = None
             try:
                 chosen_user = User.objects.get(userusername__username=user_username)
-            except:
+            except Exception as e:
                 return render(request, '404.html')
             if chosen_user is not None:
                 bridging = None
@@ -86,7 +85,7 @@ def url(request, uuid):
         except:
             return render(request, '404.html')
         if url_object is not None:
-            return render(request, 'baseapp/url.html', {'url_object':url_object, 'id': uuid})
+            return render(request, 'baseapp/url.html', {'url_object': url_object, 'id': uuid})
 
         return render(request, '404.html')
 
@@ -115,7 +114,6 @@ def search_user(request):
 def search_bridge(request):
     if request.method == "GET":
         q = request.GET.get('q', None)
-        print(q)
         if q is None:
             q = ''
         word = q
@@ -164,3 +162,16 @@ def bridge_feed(request):
             return render(request, 'baseapp/bridge_feed.html')
         else:
             return redirect(reverse('baseapp:main_create_log_in'))
+
+
+def user_search(request, user_username):
+    if request.method == "GET":
+        q = request.GET.get('q', None)
+        if q is None:
+            q = ''
+        word = q
+        try:
+            chosen_user = User.objects.get(userusername__username=user_username)
+        except Exception as e:
+            return render(request, '404.html')
+        return render(request, 'baseapp/user_search.html', {'word': word, 'chosen_user': chosen_user})

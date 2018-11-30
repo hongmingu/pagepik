@@ -368,7 +368,7 @@ def main_create_log_in(request):
 
     else:
         if request.user.is_authenticated:
-            return render(request, 'baseapp/user_home.html')
+            return render(request, 'baseapp/home.html')
         return render_with_clue_loginform_createform(request, 'authapp/main_first.html', None, LoginForm(), UserCreateForm())
 
 

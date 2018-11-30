@@ -25,7 +25,6 @@ from django.http import JsonResponse
 from authapp import options
 from authapp import texts
 from object.models import *
-from .forms import PostProfilePhotoForm, PostChatPhotoForm
 from relation.models import *
 from notice.models import *
 from .models import *
@@ -1445,14 +1444,15 @@ def re_bridge_feed(request):
                     suobjs = SubUrlObject.objects.filter(Q(user__is_bridged__user=request.user)
                                                          ).order_by('-created').distinct()[:step]
                 else:
-                    end_post = None
+                    end_suobj = None
                     try:
                         end_suobj = SubUrlObject.objects.get(uuid=end_id)
                     except Exception as e:
                         print(e)
                         return JsonResponse({'res': 0})
                     suobjs = SubUrlObject.objects.filter((Q(user__is_bridged__user=request.user))
-                                                         & Q(pk__lt=end_suobj.pk)).order_by('-created').distinct()[:step]
+                                                         & Q(pk__lt=end_suobj.pk)).order_by(
+                        '-created').distinct()[:step]
 
                 output = []
                 count = 0
@@ -1472,3 +1472,134 @@ def re_bridge_feed(request):
         return JsonResponse({'res': 2})
 
 
+
+@ensure_csrf_cookie
+def re_user_search_suobj(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            search_word = request.POST.get('search_word', None)
+            end_id = request.POST.get('end_id', None)
+
+            user_id = request.POST.get('user_id', None)
+
+            try:
+                user = User.objects.get(username=user_id)
+            except Exception as e:
+                return JsonResponse({'res': 0})
+
+            loc = None
+            if not is_unable_url(search_word):
+                loc = url_without_scheme(search_word)
+
+            step = 10
+            sub_raw_keyword_step = 5
+
+            if request.user.is_authenticated:
+                if end_id == '':
+                    if loc is None:
+
+                        suobjs = SubUrlObject.objects.filter(
+                            (Q(user=user)) &
+                            (Q(title__text__icontains=search_word)
+                             | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=search_word))).order_by(
+                            '-created').distinct()[:step]
+                    else:
+                        suobjs = SubUrlObject.objects.filter(
+                            (Q(user=user)) &
+                            (Q(title__text__icontains=search_word)
+                             | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=search_word)
+                             | Q(url_object__loc__icontains=loc))).order_by(
+                            '-created').distinct()[:step]
+                else:
+                    try:
+                        end_suobjs = SubUrlObject.objects.get(uuid=end_id)
+                    except Exception as e:
+                        print(e)
+                        return JsonResponse({'res': 0})
+                    if loc is None:
+                        suobjs = SubUrlObject.objects.filter(
+                            ((Q(user=user)) &
+                             (Q(title__text__icontains=search_word)
+                             | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=
+                                 search_word)))
+                            & Q(pk__lt=end_suobjs.pk)).order_by(
+                            '-created').distinct()[:step]
+                    else:
+                        suobjs = SubUrlObject.objects.filter(
+                            ((Q(user=user)) &
+                             (Q(title__text__icontains=search_word)
+                              | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=
+                                  search_word)
+                              | Q(url_object__loc__icontains=loc)))
+                            & Q(pk__lt=end_suobjs.pk)).order_by(
+                            '-created').distinct()[:step]
+            else:
+                suobjs = SubUrlObject.objects.none()
+
+            output = []
+            count = 0
+            end = None
+            for suobj in suobjs:
+                count = count + 1
+                if count == step:
+                    end = suobj.uuid
+                sub_raw_keywords = SubRawKeyword.objects.filter(
+                    sub_url_object=suobj).order_by('created')[:sub_raw_keyword_step]
+                sub_raw_keywords_output = []
+                for sub_raw_keyword in sub_raw_keywords:
+                    sub_raw_keywords_output.append(sub_raw_keyword.text)
+                sub_output = {
+                    'username': suobj.user.userusername.username,
+                    'id': suobj.uuid,
+                    'url': suobj.url_object.get_url(),
+                    'keyword_output': sub_raw_keywords_output
+                }
+
+                output.append(sub_output)
+
+            return JsonResponse({'res': 1,
+                                 'output': output,
+                                 'end': end})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_user_search_keyword(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            search_word = request.POST.get('search_word', None)
+            order = request.POST.get('order', None)
+
+            user_id = request.POST.get('user_id', None)
+
+            try:
+                user = User.objects.get(username=user_id)
+            except Exception as e:
+                return JsonResponse({'res': 0})
+
+            order = int(order)
+            step = 10
+
+
+            from django.db.models.functions import Length
+
+            keywords = Keyword.objects.filter(Q(subkeyword__user=user)
+                                              & Q(text__icontains=search_word)).order_by(
+                Length('text').asc())[order:order + step]
+
+            end = 'false'
+            if keywords.count() < step:
+                end = 'true'
+
+            output = []
+
+            for keyword in keywords:
+                output.append(keyword.text)
+
+            return JsonResponse({'res': 1,
+                                 'output': output,
+                                 'order': order + step,
+                                 'end': end})
+
+        return JsonResponse({'res': 2})

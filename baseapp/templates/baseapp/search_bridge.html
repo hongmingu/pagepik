@@ -29,8 +29,8 @@
 <!--navbar end-->
 <!--page info-->
 {% include 'others/bootstrap_tester.html' %}
-    <div class="hidden" id="search_word">{{ word }}</div>
-    <div class="hidden" id="end_id"></div>
+<div class="hidden" id="search_word">{{ word }}</div>
+<div class="hidden" id="end_id"></div>
 {% if user.is_authenticated %}
     <div class="hidden" id="user_id">{{ user.username }}</div>
 {% else %}
@@ -43,7 +43,9 @@
             <div class="row">
                 <div class="h3">bridged result</div>
                 <div id="content_result"></div>
-                <div class="hidden clickable" align="center" id="more_load"><a href=""><span>more load</span></a></div>
+                <a href="">
+                    <div class="hidden clickable" align="center" id="more_load"><span>more load</span></div>
+                </a>
             </div>
         </div>
     </div>
@@ -51,37 +53,37 @@
 </body>
 <script>
     $(function () {
-        if($('#search_word').html()===''){
+        if ($('#search_word').html() === '') {
             $('#content_result').append('<div class="h4">no results</div>')
         } else {
-            $.ajax({url:'/re/search/bridge/', type:'post', dataType:'json', cache:false,
-                data:{
+            $.ajax({
+                url: '/re/search/bridge/', type: 'post', dataType: 'json', cache: false,
+                data: {
                     search_word: $('#search_word').html(),
                     end_id: $('#end_id').html()
                 },
-                success:function (data) {
-                if (data.res === 1){
-                    //user set
-                    if(data.output.length === 0){
-                        $('#content_result').append('<div class="h4">end result</div>')
+                success: function (data) {
+                    if (data.res === 1) {
+                        //user set
+                        if (data.output.length === 0) {
+                            $('#content_result').append('<div class="h4">end result</div>')
 
-                    }else {
-                        $.each(data.output, function (key, value) {
-                            var appender = ''
-                            $('#content_result').append(appender)
+                        } else {
+                            $.each(data.output, function (key, value) {
+                                var appender = ''
+                                $('#content_result').append(appender)
 
-                        })
+                            })
+                        }
+
+                        if (data.end === null) {
+                            $('#more_load').addClass('hidden')
+                            $('#end_id').html('')
+                        } else {
+                            $('#more_load').removeClass('hidden')
+                            $('#end_id').html(data.end)
+                        }
                     }
-
-                    if (data.end === null){
-                        $('#more_load').addClass('hidden')
-                        $('#end_id').html('')
-                    } else {
-                        $('#more_load').removeClass('hidden')
-                        $('#end_id').html(data.end)
-                    }
-                }
-
 
 
                 }
@@ -90,34 +92,34 @@
 
         $('#more_load').on('click', function (e) {
             e.preventDefault()
-            $.ajax({url:'/re/search/bridge/', type:'post', dataType:'json', cache:false,
-                data:{
+            $.ajax({
+                url: '/re/search/bridge/', type: 'post', dataType: 'json', cache: false,
+                data: {
                     search_word: $('#search_word').html(),
                     end_id: $('#end_id').html()
                 },
-                success:function (data) {
-                if (data.res === 1){
-                    //user set
-                    if(data.output.length === 0){
-                        $('#content_result').append('<div class="h4">end result</div>')
+                success: function (data) {
+                    if (data.res === 1) {
+                        //user set
+                        if (data.output.length === 0) {
+                            $('#content_result').append('<div class="h4">end result</div>')
 
-                    }else {
-                        $.each(data.output, function (key, value) {
-                            var appender = ''
-                            $('#content_result').append(appender)
+                        } else {
+                            $.each(data.output, function (key, value) {
+                                var appender = ''
+                                $('#content_result').append(appender)
 
-                        })
+                            })
+                        }
+
+                        if (data.end === null) {
+                            $('#more_load').addClass('hidden')
+                            $('#end_id').html('')
+                        } else {
+                            $('#more_load').removeClass('hidden')
+                            $('#end_id').html(data.end)
+                        }
                     }
-
-                    if (data.end === null){
-                        $('#more_load').addClass('hidden')
-                        $('#end_id').html('')
-                    } else {
-                        $('#more_load').removeClass('hidden')
-                        $('#end_id').html(data.end)
-                    }
-                }
-
 
 
                 }

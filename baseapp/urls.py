@@ -27,6 +27,8 @@ urlpatterns = [
     re_path(r'^bridge/feed/$', views.bridge_feed, name='bridge_feed'),
     re_path(r'^note/all/$', views.note_all, name='note_all'),
 
+    re_path(r'^(?P<user_username>([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?))/search/$',
+            views.user_search, name='user_search'),
     # re_path(r'^note/all/$', views.note_all, name='note_all'),
 
 
@@ -92,6 +94,11 @@ urlpatterns = [
     re_path(r'^re/bridge/feed/$', base_ajax_views.re_bridge_feed,
             name='re_bridge_feed'),
 
+
+    re_path(r'^re/user/search/suobj/$', base_ajax_views.re_user_search_suobj,
+            name='re_user_search_suobj'),
+    re_path(r'^re/user/search/keyword/$', base_ajax_views.re_user_search_keyword,
+            name='re_user_search_keyword'),
     # re_path(r'^re/follow/add/$', base_ajax_views.re_follow_add,
     #         name='re_follow_add'),
     # re_path(r'^re/following/list/$', base_ajax_views.re_following_list,

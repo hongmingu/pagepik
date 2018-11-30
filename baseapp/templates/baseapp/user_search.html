@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Demo</title>
+    {% include 'others/header_static.html' %}
+    {% include 'others/favicon.html' %}
+
+    {% load static from staticfiles %}
+    <script src="{% static 'js/navbar.js' %}"></script>
+    <script src="{% static 'js/a_selected.js' %}"></script>
+    <script src="{% static 'js/nav_badge.js' %}"></script>
+
+    <script src="{% static 'js/date_differ.js' %}"></script>
+
+    <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
+    {% if user.is_authenticated %}
+    {% else %}
+    {% endif %}
+
+    <style>
+    </style>
+
+
+</head>
+<body class="light_background_color height_100">
+<!--navbar start-->
+{% include 'baseapp/_navbar.html' %}
+
+<!--navbar end-->
+<!--page info-->
+{% include 'others/bootstrap_tester.html' %}
+<div class="hidden" id="search_word">{{ word }}</div>
+<div class="hidden" id="end_id"></div>
+<div class="hidden" id="order">0</div>
+{% if user.is_authenticated %}
+    <div class="hidden" id="user_id">{{ user.username }}</div>
+{% else %}
+    <div class="hidden" id="user_id"></div>
+{% endif %}
+<div class="hidden" id="chosen_user_id">{{ chosen_user.username }}</div>
+
+<!--page info end -->
+<div class="container-fluid margin_top_50">
+    <div class="row">
+        <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
+            <div class="row">
+                <div class="h3">keyword result</div>
+                <div id="content_result_keyword"></div>
+                <a href="">
+                    <div class="hidden clickable" align="center" id="more_load_keyword">more load</div>
+                </a>
+
+                <div class="h3">registered result</div>
+                <div id="content_result_suobj"></div>
+                <a href="">
+                    <div class="hidden clickable" align="center" id="more_load_suobj">more load</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    $(function () {
+        if ($('#search_word').html() === '') {
+            $('#content_result_keyword').append('<div class="h4">no results</div>')
+        } else {
+            $.ajax({
+                url: '/re/user/search/keyword/', type: 'post', dataType: 'json', cache: false,
+                data: {
+                    search_word: $('#search_word').html(),
+                    user_id: $('#chosen_user_id').html(),
+                    order: $('#order').html()
+                },
+                success: function (data) {
+                    console.log(data)
+                    if (data.res === 1) {
+                        //user set
+                        if (data.output.length === 0) {
+                            $('#content_result_keyword').append('<div class="h4">end results</div>')
+
+                        } else {
+                            $.each(data.output, function (key, value) {
+                                var appender = ''
+                                $('#content_result_keyword').append(appender)
+
+                            })
+                        }
+
+                        if (data.end === "true") {
+                            $('#more_load_keyword').addClass('hidden')
+                        } else if (data.end === "false") {
+                            $('#more_load_keyword').removeClass('hidden')
+                        }
+                        $('#order').html(data.order)
+                    }
+
+
+                }
+            })
+        }
+
+        $('#more_load_keyword').on('click', function (e) {
+            e.preventDefault()
+            $.ajax({
+                url: '/re/user/search/keyword/', type: 'post', dataType: 'json', cache: false,
+                data: {
+                    search_word: $('#search_word').html(),
+                    user_id: $('#chosen_user_id').html(),
+                    order: $('#order').html()
+                },
+                success: function (data) {
+                    console.log(data)
+                    if (data.res === 1) {
+                        //user set
+                        if (data.output.length === 0) {
+                            $('#content_result_keyword').append('<div class="h4">end results</div>')
+
+                        } else {
+                            $.each(data.output, function (key, value) {
+                                var appender = ''
+                                $('#content_result_keyword').append(appender)
+
+                            })
+                        }
+
+                        if (data.end === "true") {
+                            $('#more_load_keyword').addClass('hidden')
+                        } else if (data.end === "false") {
+                            $('#more_load_keyword').removeClass('hidden')
+                        }
+                        $('#order').html(data.order)
+                    }
+
+
+                }
+            })
+        })
+
+        if ($('#search_word').html() === '') {
+            $('#content_result_suobj').append('<div class="h4">no results</div>')
+        } else {
+            $.ajax({
+                url: '/re/user/search/suobj/', type: 'post', dataType: 'json', cache: false,
+                data: {
+                    search_word: $('#search_word').html(),
+                    user_id: $('#chosen_user_id').html(),
+                    end_id: $('#end_id').html()
+                },
+                success: function (data) {
+                    if (data.res === 1) {
+                        //user set
+                        if (data.output.length === 0) {
+                            $('#content_result_suobj').append('<div class="h4">end result</div>')
+
+                        } else {
+                            $.each(data.output, function (key, value) {
+                                var appender = ''
+                                $('#content_result_suobj').append(appender)
+
+                            })
+                        }
+
+                        if (data.end === null) {
+                            $('#more_load_suobj').addClass('hidden')
+                            $('#end_id').html('')
+                        } else {
+                            $('#more_load_suobj').removeClass('hidden')
+                            $('#end_id').html(data.end)
+                        }
+                    }
+
+
+                }
+            })
+        }
+
+        $('#more_load_suobj').on('click', function (e) {
+            e.preventDefault()
+            $.ajax({
+                url: '/re/user/search/suobj/', type: 'post', dataType: 'json', cache: false,
+                data: {
+                    search_word: $('#search_word').html(),
+                    user_id: $('#chosen_user_id').html(),
+                    end_id: $('#end_id').html()
+                },
+                success: function (data) {
+                    if (data.res === 1) {
+                        //user set
+                        if (data.output.length === 0) {
+                            $('#content_result_suobj').append('<div class="h4">end result</div>')
+
+                        } else {
+                            $.each(data.output, function (key, value) {
+                                var appender = ''
+                                $('#content_result_suobj').append(appender)
+
+                            })
+                        }
+
+                        if (data.end === null) {
+                            $('#more_load_suobj').addClass('hidden')
+                            $('#end_id').html('')
+                        } else {
+                            $('#more_load_suobj').removeClass('hidden')
+                            $('#end_id').html(data.end)
+                        }
+                    }
+
+
+                }
+            })
+        })
+    })
+</script>
+</html>

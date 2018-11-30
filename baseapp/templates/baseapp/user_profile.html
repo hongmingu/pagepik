@@ -63,23 +63,37 @@
                         </div>
                     </div>
 
-                {% if bridging == None %}
-                    <a href="">
-                        <div class="hidden" align="center" id="bridge">
-                            <span class="clickable" id="bridge_text">bridge</span>
-                        </div>
-                    </a>
-                {% else %}
-                    <a href="">
-                        <div class="hidden" align="center" id="bridge">
-                            <span class="clickable" id="bridge_text">now bridging <span class="glyphicon glyphicon-ok"></span></span>
-                        </div>
-                    </a>
-                {% endif %}
-
+                    {% if bridging == None %}
+                        <a href="">
+                            <div class="hidden" align="center" id="bridge">
+                                <span class="clickable" id="bridge_text">bridge</span>
+                            </div>
+                        </a>
+                    {% else %}
+                        <a href="">
+                            <div class="hidden" align="center" id="bridge">
+                                <span class="clickable" id="bridge_text">now bridging <span
+                                        class="glyphicon glyphicon-ok"></span></span>
+                            </div>
+                        </a>
+                    {% endif %}
+                    <div align="center">
+                        <form>
+                            <div class="input-group input-group-sm">
+                                <textarea class="form-control"></textarea>
+                                <div class="input-group-btn">
+                                    <button class="btn btn-default">
+                                        <i class="glyphicon glyphicon-send"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
                 <div id="user_profile_suobj_list"></div>
-                <a href=""><div class="profile_more_load hidden" id="profile_more_load" align="center">more load</div></a>
+                <a href="">
+                    <div class="profile_more_load hidden" id="profile_more_load" align="center">more load</div>
+                </a>
             </div>
         </div>
     </div>
@@ -89,59 +103,60 @@
 {% include 'baseapp/_modal_populate.html' %}
 {% include 'baseapp/_modal_bridge.html' %}
 
-  <!-- Hidden 으로 데이터 저장해놓고 modal on show 랑 hide 에서 그 데이터 불러와서 모달 채우게 하자. 그리고 임플린은 친구 중심이고
-  피드가 존재하게 되었기 때문에 팔로우가 부가적으로 존재하는 것 뿐이다. -->
+<!-- Hidden 으로 데이터 저장해놓고 modal on show 랑 hide 에서 그 데이터 불러와서 모달 채우게 하자. 그리고 임플린은 친구 중심이고
+피드가 존재하게 되었기 때문에 팔로우가 부가적으로 존재하는 것 뿐이다. -->
 
 
 </body>
 <script>
     $(function () {
 
-            $('#suobj_delete').click(function (e) {
-                e.preventDefault()
-              $.ajax({
-                  url: '/re/profile/suobj/delete/', type: 'post', dataType: 'json', cache: false,
-                  data: {
-                      suobj_id: $('#suobj_to_delete').html(),
-                  },
-                  success: function (data) {
-                    if(data.res === 1){
-                        $('#suobj_wrapper_with_modi_'+$('#suobj_to_delete').html()).replaceWith('<div>removed</div>')
+        $('#suobj_delete').click(function (e) {
+            e.preventDefault()
+            $.ajax({
+                url: '/re/profile/suobj/delete/', type: 'post', dataType: 'json', cache: false,
+                data: {
+                    suobj_id: $('#suobj_to_delete').html(),
+                },
+                success: function (data) {
+                    if (data.res === 1) {
+                        $('#suobj_wrapper_with_modi_' + $('#suobj_to_delete').html()).replaceWith('<div>removed</div>')
                         $('#modal_suobj_delete').modal('hide')
                     }
-                  }
-              })
-
+                }
             })
 
-            $("#modal_suobj_delete").on("shown.bs.modal", function () {
+        })
 
-            }).on("hidden.bs.modal", function () {
-                    $('#suobj_to_delete').html('')
-            })
+        $("#modal_suobj_delete").on("shown.bs.modal", function () {
+
+        }).on("hidden.bs.modal", function () {
+            $('#suobj_to_delete').html('')
+        })
     });
     $(function () {
 
-        $.ajax({url:'/re/profile/suobj/', type:'post', dataType:'json', cache:false,
-            data:{
+        $.ajax({
+            url: '/re/profile/suobj/', type: 'post', dataType: 'json', cache: false,
+            data: {
                 chosen_user_id: $('#chosen_user_id').html(),
                 last_suobj_id: $('#last_suobj_id').html()
             },
-            success:function (data) {
+            success: function (data) {
                 console.log(data)
                 var _modifier = ''
                 var chosen_user_id = $('#chosen_user_id').html()
                 var user_id = $('#user_id').html()
                 $.each(data.output, function (key, value) {
 
-                    if (chosen_user_id === user_id){
-                        _modifier = '<div align="right"><a href="/update/url/'+value.id+'/"><span class="user_profile_post_update">update</span></a><span>  </span><a href=""><span class="profile_suobj_delete">delete</span></a></div>'
+                    if (chosen_user_id === user_id) {
+                        _modifier = '<div align="right"><a href="/update/url/' + value.id + '/"><span class="user_profile_post_update">update</span></a><span>  </span><a href=""><span class="profile_suobj_delete">delete</span></a></div>'
                     }
-                    var appender = '<div id="suobj_wrapper_with_modi_'+value.id+'">' +
-                        '<div class="row div_base" id="suobj_wrapper_'+value.id+'">' +
+                    var appender = '<div id="suobj_wrapper_with_modi_' + value.id + '">' +
+                        '<div class="row div_base" id="suobj_wrapper_' + value.id + '">' +
                         '<script defer>' +
-                        '    suobj_populate("'+value.id+'")' +
-                        '<'+'/script>' +
+                        '    suobj_populate("' + value.id + '")' +
+                        '<' + '/script>' +
                         '</div>' + _modifier +
                         '</div>'
                     var jq_appender = $(appender)
@@ -152,16 +167,81 @@
                     })
                     $('#user_profile_suobj_list').append(jq_appender)
                 })
-                    if (data.last === null){
-                        $('#profile_more_load').addClass('hidden')
-                    } else {
-                        $('#profile_more_load').removeClass('hidden')
-                    }
+                if (data.last === null) {
+                    $('#profile_more_load').addClass('hidden')
+                } else {
+                    $('#profile_more_load').removeClass('hidden')
+                }
 
             }
         })
     })
 
+    $(function () {
+        append_to.find('#textarea_' + id).on('keypress', function (e) {
+            if ($('#user_id').html() === '') {
+                $('#modal_need_login').modal('show')
+                return false;
+            }
+
+            if (e.keyCode == 13 && !e.shiftKey) {
+                var text = $('#textarea_' + id).val()
+                if (text === '') {
+                    return false;
+                } else if (1 <= text.length && text.length <= 1000) {
+                    $.ajax({
+                        url: '/re/comment/add/', type: 'post', dataType: 'json', cache: false,
+                        data: {
+                            post_id: id,
+                            comment: text,
+                        },
+                        success: function (data) {
+                            console.log(data)
+                            if (data.res === 1) {
+                                var _comment = '';
+                                if (data.set !== null) {
+                                    $.each(data.set, function (key, value) {
+                                        var _remove = '';
+                                        if (value.comment_user_id === user_id || user_id === post_user_id) {
+                                            _remove = '<a href=""><span class="glyphicon glyphicon-remove home_feed_comment_delete clickable" data-u="' + value.comment_uuid + '"></span></a>'
+                                        } else {
+                                            _remove = '';
+                                        }
+                                        _comment = '<div class="home_feed_new_comment" id="comment_div_' + value.comment_uuid + '"><div><a href="#"><span class="comments_name">' + value.comment_username + '</span></a></div><div><span class="comments">' + value.comment_text + '</span>   <span class="home_feed_comment_time">' + date_differ(value.comment_created) + '</span> ' + _remove + '</div></div>'
+                                    })
+                                }
+                                var _comment_prepender = $(_comment)
+                                _comment_prepender.find('.home_feed_comment_delete').on('click', function (e) {
+                                    e.preventDefault()
+                                    var deleted_id = $(this).attr('data-u')
+                                    $.ajax({
+                                        url: '/re/comment/delete/',
+                                        type: 'post',
+                                        dataType: 'json',
+                                        cache: false,
+                                        data: {
+                                            post_id: id,
+                                            comment_id: deleted_id,
+                                        },
+                                        success: function (data) {
+                                            if (data.res === 1) {
+                                                $('#comment_div_' + deleted_id).replaceWith('<div>removed</div>')
+                                            }
+                                        }
+                                    })
+                                })
+                                $('#comment_list_' + id).prepend(_comment_prepender)
+                                $('#textarea_' + id).val('')
+                            }
+                        }
+                    })
+                }
+                else if (1000 < text.length) {
+                    alert('too long')
+                }
+            }
+        })
+    })
 </script>
 
 </html>
