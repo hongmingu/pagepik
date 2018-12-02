@@ -17,11 +17,9 @@ def created_bridge(sender, instance, created, **kwargs):
             return
         try:
             with transaction.atomic():
-                notice = Notice.objects.create(user=instance.follow, kind=BRIDGE)
+                notice = Notice.objects.create(user=instance.follow, kind=BRIDGE, uuid=uuid.uuid4().hex)
                 notice_bridge = NoticeBridge.objects.create(notice=notice, bridge=instance)
-                notice_count = instance.bridge.noticecount
-                notice_count.count = F('count') + 1
-                notice_count.save()
+
 
                 bridging_count = instance.user.bridgingcount
                 bridging_count.count = F('count') + 1
@@ -40,20 +38,14 @@ def created_bridge(sender, instance, created, **kwargs):
 def deleted_bridge(sender, instance, **kwargs):
     try:
         with transaction.atomic():
-            if instance.notice.checked is False:
-                notice_count = instance.notice.user.noticecount
-                notice_count.count = F('count') - 1
-                notice_count.save()
+            bridging_count = instance.user.bridgingcount
+            bridging_count.count = F('count') - 1
+            bridging_count.save()
 
-                bridging_count = instance.user.bridgingcount
-                bridging_count.count = F('count') - 1
-                bridging_count.save()
+            bridger_count = instance.bridge.bridgercount
+            bridger_count.count = F('count') - 1
+            bridger_count.save()
 
-                bridger_count = instance.bridge.bridgercount
-                bridger_count.count = F('count') - 1
-                bridger_count.save()
-
-            instance.notice.delete()
     except Exception as e:
         print(e)
         pass
@@ -64,10 +56,6 @@ def deleted_notice_bridge(sender, instance, **kwargs):
     if instance.notice:
         try:
             with transaction.atomic():
-                if instance.notice.checked is False:
-                    notice_count = instance.notice.user.noticecount
-                    notice_count.count = F('count') - 1
-                    notice_count.save()
                 instance.notice.delete()
         except Exception as e:
             print(e)
@@ -272,11 +260,8 @@ def created_sub_url_object_help(sender, instance, created, **kwargs):
         try:
             with transaction.atomic():
 
-                notice = Notice.objects.create(user=instance.sub_url_object.user, kind=SUB_URL_OBJECT_HELP)
+                notice = Notice.objects.create(user=instance.sub_url_object.user, kind=SUB_URL_OBJECT_HELP, uuid=uuid.uuid4().hex)
                 notice_suobj = NoticeSubUrlObjectHelp.objects.create(notice=notice, sub_url_object_help=instance)
-                notice_count = instance.sub_url_object.user.noticecount
-                notice_count.count = F('count') + 1
-                notice_count.save()
 
                 sub_url_object = instance.sub_url_object
                 sub_url_object.help_count = F('help_count') + 1
@@ -303,11 +288,34 @@ def deleted_notice_sub_url_object_help(sender, instance, **kwargs):
     if instance.notice:
         try:
             with transaction.atomic():
-                if instance.notice.checked is False:
-                    notice_count = instance.notice.user.noticecount
-                    notice_count.count = F('count') - 1
-                    notice_count.save()
                 instance.notice.delete()
         except Exception as e:
             print(e)
             pass
+
+
+
+@receiver(post_save, sender=Notice)
+def created_notice(sender, instance, created, **kwargs):
+    if created:
+        try:
+            with transaction.atomic():
+                notice_count = instance.user.noticecount
+                notice_count.count = F('count') + 1
+                notice_count.save()
+        except Exception as e:
+            print(e)
+            pass
+
+
+@receiver(post_delete, sender=Notice)
+def deleted_notice(sender, instance, **kwargs):
+    try:
+        with transaction.atomic():
+            if instance.checked is False:
+                notice_count = instance.user.noticecount
+                notice_count.count = F('count') - 1
+                notice_count.save()
+    except Exception as e:
+        print(e)
+        pass
