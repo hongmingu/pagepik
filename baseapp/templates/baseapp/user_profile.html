@@ -32,6 +32,7 @@
 <div class="hidden" id="page_kind">user</div>
 
 <div class="hidden" id="chosen_user_id">{{ chosen_user.username }}</div>
+<div class="hidden" id="chosen_user_username">{{ chosen_user.userusername.username }}</div>
 {% if user.is_authenticated %}
     <div class="hidden" id="user_id">{{ user.username }}</div>
 {% else %}
@@ -80,9 +81,9 @@
                     <div align="center">
                         <form>
                             <div class="input-group input-group-sm">
-                                <textarea class="form-control"></textarea>
+                                <textarea class="form-control" id="profile_search_textarea"></textarea>
                                 <div class="input-group-btn">
-                                    <button class="btn btn-default">
+                                    <button class="btn btn-default" id="profile_search_btn">
                                         <i class="glyphicon glyphicon-send"></i>
                                     </button>
                                 </div>
@@ -178,69 +179,29 @@
     })
 
     $(function () {
-        append_to.find('#textarea_' + id).on('keypress', function (e) {
-            if ($('#user_id').html() === '') {
-                $('#modal_need_login').modal('show')
-                return false;
-            }
-
+        $('#profile_search_textarea').on('keypress', function (e) {
             if (e.keyCode == 13 && !e.shiftKey) {
-                var text = $('#textarea_' + id).val()
+                var text = $('#profile_search_textarea').val()
                 if (text === '') {
                     return false;
-                } else if (1 <= text.length && text.length <= 1000) {
-                    $.ajax({
-                        url: '/re/comment/add/', type: 'post', dataType: 'json', cache: false,
-                        data: {
-                            post_id: id,
-                            comment: text,
-                        },
-                        success: function (data) {
-                            console.log(data)
-                            if (data.res === 1) {
-                                var _comment = '';
-                                if (data.set !== null) {
-                                    $.each(data.set, function (key, value) {
-                                        var _remove = '';
-                                        if (value.comment_user_id === user_id || user_id === post_user_id) {
-                                            _remove = '<a href=""><span class="glyphicon glyphicon-remove home_feed_comment_delete clickable" data-u="' + value.comment_uuid + '"></span></a>'
-                                        } else {
-                                            _remove = '';
-                                        }
-                                        _comment = '<div class="home_feed_new_comment" id="comment_div_' + value.comment_uuid + '"><div><a href="#"><span class="comments_name">' + value.comment_username + '</span></a></div><div><span class="comments">' + value.comment_text + '</span>   <span class="home_feed_comment_time">' + date_differ(value.comment_created) + '</span> ' + _remove + '</div></div>'
-                                    })
-                                }
-                                var _comment_prepender = $(_comment)
-                                _comment_prepender.find('.home_feed_comment_delete').on('click', function (e) {
-                                    e.preventDefault()
-                                    var deleted_id = $(this).attr('data-u')
-                                    $.ajax({
-                                        url: '/re/comment/delete/',
-                                        type: 'post',
-                                        dataType: 'json',
-                                        cache: false,
-                                        data: {
-                                            post_id: id,
-                                            comment_id: deleted_id,
-                                        },
-                                        success: function (data) {
-                                            if (data.res === 1) {
-                                                $('#comment_div_' + deleted_id).replaceWith('<div>removed</div>')
-                                            }
-                                        }
-                                    })
-                                })
-                                $('#comment_list_' + id).prepend(_comment_prepender)
-                                $('#textarea_' + id).val('')
-                            }
-                        }
-                    })
                 }
-                else if (1000 < text.length) {
-                    alert('too long')
-                }
+                var scheme = window.location.protocol == "https:" ? "https://" : "http://";
+                var path = scheme + window.location.host + "/" + $('#chosen_user_username').html() + "/search/?q=" + text;
+                location.href = path
             }
+
         })
+        $('#profile_search_btn').click(function (e) {
+            e.preventDefault()
+            var text = $('#profile_search_textarea').val()
+            if (text === '') {
+                return false;
+            }
+            var scheme = window.location.protocol == "https:" ? "https://" : "http://";
+            var path = scheme + window.location.host + "/" + $('#chosen_user_username').html() + "/search/?q=" + text;
+            location.href = path
+        })
+
     })
 </script>
 

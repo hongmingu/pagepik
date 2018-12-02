@@ -6,35 +6,6 @@ from django.conf import settings
 from authapp.models import *
 
 
-class Follow(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='is_following')
-    follow = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='is_followed')
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return "user: %s, follow: %s" % (self.user.userusername.username, self.follow.userusername.username)
-
-    class Meta:
-        unique_together = ('user', 'follow',)
-
-
-class FollowingCount(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    count = models.PositiveIntegerField(default=0)
-
-    def __str__(self):
-        return "Following Count of: %s" % self.user.userusername.username
-
-
-class FollowerCount(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    count = models.PositiveIntegerField(default=0)
-
-    def __str__(self):
-        return "Follower Count of: %s" % self.user.userusername.username
-
-
 class Bridge(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='is_bridging')
     bridge = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='is_bridged')

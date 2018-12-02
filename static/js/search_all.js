@@ -20,10 +20,10 @@ $(function () {
                     } else {
                         $('#more_user').removeClass('hidden')
                         $.each(data.user_output, function (key, value) {
-                            var appender = '<div class="search_user_wrapper">' +
+                            var appender = '<a href="/' + value.username + '/"><div class="search_user_wrapper">' +
                                 '<span class="search_user_username">' + value.username + '</span>' +
-                                '<span class="search_user_textname">' + value.user_text_name + '</span>' +
-                                '</div>'
+                                '<span class="search_user_textname">(' + value.user_text_name + ')</span>' +
+                                '</div></a>'
                             $('#content_user').append(appender)
                         })
                     }
@@ -31,7 +31,7 @@ $(function () {
                     //user set
 
                     if (data.bridge_output.length === 0) {
-                        if($('#user_id')===''){
+                        if ($('#user_id') === '') {
                             $('#content_bridge').append('<a href="/"><div class="h4">need to login</div></a>')
                         }
                         $('#content_bridge').append('<div class="h4">no results</div>')
@@ -47,10 +47,13 @@ $(function () {
                             })
                             var appender = '<div class="search_bridge_wrapper">' +
                                 '<div>' +
-                                '<span class="search_bridge_username">' + value.username + '</span>' +
+                                '<a href="/' + value.username + '/"><span class="search_bridge_username">' + value.username + '</span></a>' +
                                 '<a href="/object/' + value.id + '/"><span class="search_bridge_more">more</span></a>' +
                                 '</div>' +
-                                '<div><span class="search_bridge_url"></span></div>' +
+                                '<a href="'+value.url+'">' +
+                                '<div><span class="search_bridge_title">'+value.title+'</span></div>' +
+                                '<div><span class="search_bridge_url">'+value.url+'</span></div>' +
+                                '</a>' +
                                 '<div class="search_bridge_keyword_wrapper">' + keyword + '</div>' +
                                 '</div>'
 

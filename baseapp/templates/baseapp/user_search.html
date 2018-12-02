@@ -75,10 +75,8 @@
                 success: function (data) {
                     console.log(data)
                     if (data.res === 1) {
-                        //user set
                         if (data.output.length === 0) {
                             $('#content_result_keyword').append('<div class="h4">end results</div>')
-
                         } else {
                             $.each(data.output, function (key, value) {
                                 var appender = ''

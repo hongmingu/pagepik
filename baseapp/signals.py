@@ -18,13 +18,49 @@ def created_bridge(sender, instance, created, **kwargs):
         try:
             with transaction.atomic():
                 notice = Notice.objects.create(user=instance.follow, kind=BRIDGE)
-                notice_follow = NoticeBridge.objects.create(notice=notice, follow=instance)
-                notice_count = instance.follow.noticecount
+                notice_bridge = NoticeBridge.objects.create(notice=notice, bridge=instance)
+                notice_count = instance.bridge.noticecount
                 notice_count.count = F('count') + 1
                 notice_count.save()
+
+                bridging_count = instance.user.bridgingcount
+                bridging_count.count = F('count') + 1
+                bridging_count.save()
+
+                bridger_count = instance.bridge.bridgercount
+                bridger_count.count = F('count') + 1
+                bridger_count.save()
+
         except Exception as e:
             print(e)
             pass
+
+
+@receiver(post_delete, sender=Bridge)
+def deleted_bridge(sender, instance, **kwargs):
+    try:
+        if instance.notice:
+            try:
+                with transaction.atomic():
+                    if instance.notice.checked is False:
+                        notice_count = instance.notice.user.noticecount
+                        notice_count.count = F('count') - 1
+                        notice_count.save()
+
+                        bridging_count = instance.user.bridgingcount
+                        bridging_count.count = F('count') - 1
+                        bridging_count.save()
+
+                        bridger_count = instance.bridge.bridgercount
+                        bridger_count.count = F('count') - 1
+                        bridger_count.save()
+
+                    instance.notice.delete()
+            except Exception as e:
+                print(e)
+                pass
+    except:
+        pass
 
 
 @receiver(post_delete, sender=NoticeBridge)

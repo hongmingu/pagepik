@@ -71,6 +71,9 @@ urlpatterns = [
     re_path(r'^re/url/keyword/down/$', base_ajax_views.re_url_keyword_down,
             name='re_url_keyword_down'),
 
+    re_path(r'^re/suobj/help/$', base_ajax_views.re_suobj_help,
+            name='re_suobj_help'),
+
     re_path(r'^re/profile/suobj/delete/$', base_ajax_views.re_profile_suobj_delete,
             name='re_profile_suobj_delete'),
 

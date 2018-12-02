@@ -28,7 +28,7 @@ $(function () {
                 user_id: $('#chosen_user_id').html()
             },
             success: function (data) {
-                if (data.result === true) {
+                if (data.result === 'true') {
                     $('#bridge_text').html('now bridging <span class="glyphicon glyphicon-ok"></span>')
                     var count_bridger = parseInt($('#count_bridger').html()) + 1
                     $('#count_bridger').html(count_bridger)

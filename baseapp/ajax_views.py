@@ -814,14 +814,7 @@ def re_bridge_add(request):
                             with transaction.atomic():
                                 bridge.delete()
 
-                                from django.db.models import F
-                                bridging_count = request.user.bridgingcount
-                                bridging_count.count = F('count') - 1
-                                bridging_count.save()
-                                bridger_count = chosen_user.bridgercount
-                                bridger_count.count = F('count') - 1
-                                bridger_count.save()
-                                result = False
+                                result = 'false'
 
                                 # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
                         except Exception:
@@ -830,14 +823,8 @@ def re_bridge_add(request):
                         try:
                             with transaction.atomic():
                                 bridge = Bridge.objects.create(bridge=chosen_user, user=request.user)
-                                from django.db.models import F
-                                bridging_count = request.user.bridgingcount
-                                bridging_count.count = F('count') + 1
-                                bridging_count.save()
-                                bridger_count = chosen_user.bridgercount
-                                bridger_count.count = F('count') + 1
-                                bridger_count.save()
-                                result = True
+
+                                result = 'true'
 
                                 # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
                         except Exception:
@@ -1061,6 +1048,33 @@ def re_url_keyword_down(request):
 
         return JsonResponse({'res': 2})
 
+
+@ensure_csrf_cookie
+def re_suobj_help(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                suobj_id = request.POST.get('suobj_id', None)
+                suobj = None
+                try:
+                    suobj = SubUrlObject.objects.get(uuid=suobj_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                suobj_help = None
+                try:
+                    suobj_help = SubUrlObjectHelp.objects.get(user=request.user, sub_url_object=suobj)
+                except Exception as e:
+                    pass
+                if suobj_help is not None:
+                    suobj_help.delete()
+                    return JsonResponse({'res': 1, 'result': 'cancel'})
+                else:
+                    suobj_help = SubUrlObjectHelp.objects.create(user=request.user, sub_url_object=suobj)
+                    return JsonResponse({'res': 1, 'result': 'help'})
+
+        return JsonResponse({'res': 2})
+
+
 @ensure_csrf_cookie
 def re_profile_suobj_delete(request):
     if request.method == "POST":
@@ -1114,7 +1128,7 @@ def re_search_all(request):
                            | Q(title__text__icontains=search_word)
                            | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=search_word)
                            | Q(user__usertextname__name__icontains=search_word))).order_by(
-                        '-created').distinct()[:11]
+                        '-created').distinct()[:10]
                 else:
                     suobjs = SubUrlObject.objects.filter(
                         (Q(user__is_bridged__user=request.user) | Q(user=request.user))
@@ -1123,7 +1137,7 @@ def re_search_all(request):
                            | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=search_word)
                            | Q(user__usertextname__name__icontains=search_word)
                            | Q(url_object__loc__icontains=loc))).order_by(
-                        '-created').distinct()[:11]
+                        '-created').distinct()[:10]
             else:
                 suobjs = SubUrlObject.objects.none()
 
@@ -1135,6 +1149,7 @@ def re_search_all(request):
                 sub_output = {
                     'username': suobj.user.userusername.username,
                     'id': suobj.uuid,
+                    'title': suobj.title.text,
                     'url': suobj.url_object.get_url(),
                     'keyword_output': sub_raw_keywords_output
                 }

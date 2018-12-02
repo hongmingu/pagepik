@@ -126,7 +126,7 @@ class SubUrlObject(models.Model):
     title = models.ForeignKey(Title, on_delete=models.CASCADE, null=True, blank=True)
     url_object = models.ForeignKey(UrlObject, on_delete=models.CASCADE, null=True, blank=True)
     uuid = models.CharField(max_length=34, unique=True, null=True, default=None, blank=True)
-
+    help_count = models.PositiveIntegerField(default=0)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -135,6 +135,19 @@ class SubUrlObject(models.Model):
 
     class Meta:
         unique_together = ('user', 'url_object',)
+
+
+class SubUrlObjectHelp(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    sub_url_object = models.ForeignKey(SubUrlObject, on_delete=models.CASCADE, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "pk: %s" % self.pk
+
+    class Meta:
+        unique_together = ('user', 'sub_url_object',)
 
 
 class SubUrlObjectInitialUrl(models.Model):
