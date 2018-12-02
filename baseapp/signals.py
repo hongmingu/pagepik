@@ -39,46 +39,39 @@ def created_bridge(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Bridge)
 def deleted_bridge(sender, instance, **kwargs):
     try:
-        if instance.notice:
-            try:
-                with transaction.atomic():
-                    if instance.notice.checked is False:
-                        notice_count = instance.notice.user.noticecount
-                        notice_count.count = F('count') - 1
-                        notice_count.save()
+        with transaction.atomic():
+            if instance.notice.checked is False:
+                notice_count = instance.notice.user.noticecount
+                notice_count.count = F('count') - 1
+                notice_count.save()
 
-                        bridging_count = instance.user.bridgingcount
-                        bridging_count.count = F('count') - 1
-                        bridging_count.save()
+                bridging_count = instance.user.bridgingcount
+                bridging_count.count = F('count') - 1
+                bridging_count.save()
 
-                        bridger_count = instance.bridge.bridgercount
-                        bridger_count.count = F('count') - 1
-                        bridger_count.save()
+                bridger_count = instance.bridge.bridgercount
+                bridger_count.count = F('count') - 1
+                bridger_count.save()
 
-                    instance.notice.delete()
-            except Exception as e:
-                print(e)
-                pass
-    except:
+            instance.notice.delete()
+    except Exception as e:
+        print(e)
         pass
 
 
 @receiver(post_delete, sender=NoticeBridge)
 def deleted_notice_bridge(sender, instance, **kwargs):
-    try:
-        if instance.notice:
-            try:
-                with transaction.atomic():
-                    if instance.notice.checked is False:
-                        notice_count = instance.notice.user.noticecount
-                        notice_count.count = F('count') - 1
-                        notice_count.save()
-                    instance.notice.delete()
-            except Exception as e:
-                print(e)
-                pass
-    except:
-        pass
+    if instance.notice:
+        try:
+            with transaction.atomic():
+                if instance.notice.checked is False:
+                    notice_count = instance.notice.user.noticecount
+                    notice_count.count = F('count') - 1
+                    notice_count.save()
+                instance.notice.delete()
+        except Exception as e:
+            print(e)
+            pass
 
 
 # ----------------------------------------------------------------------------------
@@ -271,3 +264,50 @@ def deleted_sub_raw_keyword(sender, instance, **kwargs):
     except Exception as e:
         print(e)
         pass
+
+
+@receiver(post_save, sender=SubUrlObjectHelp)
+def created_sub_url_object_help(sender, instance, created, **kwargs):
+    if created:
+        try:
+            with transaction.atomic():
+
+                notice = Notice.objects.create(user=instance.sub_url_object.user, kind=SUB_URL_OBJECT_HELP)
+                notice_suobj = NoticeSubUrlObjectHelp.objects.create(notice=notice, sub_url_object_help=instance)
+                notice_count = instance.sub_url_object.user.noticecount
+                notice_count.count = F('count') + 1
+                notice_count.save()
+
+                sub_url_object = instance.sub_url_object
+                sub_url_object.help_count = F('help_count') + 1
+                sub_url_object.save()
+        except Exception as e:
+            print(e)
+            pass
+
+
+@receiver(post_delete, sender=SubUrlObjectHelp)
+def deleted_sub_url_object_help(sender, instance, **kwargs):
+    try:
+        with transaction.atomic():
+            sub_url_object = instance.sub_url_object
+            sub_url_object.help_count = F('help_count') - 1
+            sub_url_object.save()
+    except Exception as e:
+        print(e)
+        pass
+
+
+@receiver(post_delete, sender=NoticeSubUrlObjectHelp)
+def deleted_notice_sub_url_object_help(sender, instance, **kwargs):
+    if instance.notice:
+        try:
+            with transaction.atomic():
+                if instance.notice.checked is False:
+                    notice_count = instance.notice.user.noticecount
+                    notice_count.count = F('count') - 1
+                    notice_count.save()
+                instance.notice.delete()
+        except Exception as e:
+            print(e)
+            pass

@@ -14,9 +14,11 @@ from django.utils.html import escape, _js_escapes, normalize_newlines
 # private , public은 나중에 한다. 귀찮다.
 
 BRIDGE = 1001
+SUB_URL_OBJECT_HELP = 1002
 
 KINDS_CHOICES = (
     (BRIDGE, "bridge"),
+    (SUB_URL_OBJECT_HELP, "sub_url_object_help"),
 )
 
 
@@ -66,3 +68,13 @@ class NoticeBridge(models.Model):
 
     def __str__(self):
         return "Notice_pk: %s, bridge_user: %s" % (self.notice.pk, self.bridge.user.userusername.username)
+
+
+class NoticeSubUrlObjectHelp(models.Model):
+    notice = models.OneToOneField(Notice, on_delete=models.CASCADE, null=True, blank=True)
+    sub_url_object_help = models.ForeignKey(SubUrlObjectHelp, on_delete=models.CASCADE, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "Notice_pk: %s, bridge_user: %s" % (self.notice.pk, self.sub_url_object_help.user.userusername.username)
