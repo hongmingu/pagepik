@@ -60,6 +60,8 @@ urlpatterns = [
             name='re_bridging_list'),
     re_path(r'^re/bridger/list/$', base_ajax_views.re_bridger_list,
             name='re_bridger_list'),
+    re_path(r'^re/help/list/$', base_ajax_views.re_help_list,
+            name='re_help_list'),
     re_path(r'^re/url/populate/$', base_ajax_views.re_url_populate,
             name='re_url_populate'),
 

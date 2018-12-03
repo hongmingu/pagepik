@@ -753,36 +753,42 @@ def re_profile_suobj(request):
 @ensure_csrf_cookie
 def re_suobj_populate(request):
     if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                suobj_id = request.POST.get('suobj_id', None)
-                suobj = None
-                try:
-                    suobj = SubUrlObject.objects.get(uuid=suobj_id)
-                except Exception as e:
-                    print(e)
-                    return JsonResponse({'res': 0})
-                ################################
-                sub_raw_keywords = SubRawKeyword.objects.filter(sub_url_object=suobj)
-                srk_output = []
-                for sub_raw_keyword in sub_raw_keywords:
-                    srk_output.append(sub_raw_keyword.text)
+        if request.is_ajax():
+            suobj_id = request.POST.get('suobj_id', None)
+            suobj = None
+            try:
+                suobj = SubUrlObject.objects.get(uuid=suobj_id)
+            except Exception as e:
+                print(e)
+                return JsonResponse({'res': 0})
+            ################################
+            sub_raw_keywords = SubRawKeyword.objects.filter(sub_url_object=suobj)
+            srk_output = []
+            for sub_raw_keyword in sub_raw_keywords:
+                srk_output.append(sub_raw_keyword.text)
 
-                output = {
-                    'user_id': suobj.user.username,
-                    'username': suobj.user.userusername.username,
-                    'title': suobj.title.text,
-                    'created': suobj.created,
-                    'loc': suobj.url_object.loc,
-                    'url': suobj.url_object.get_url(),
-                    'srk_output': srk_output,
-                    'url_id': suobj.url_object.uuid,
-                    'suobj_id': suobj.uuid,
-                }
-                # {'user_id', 'username', 'gross(포스트의)', 'date(포스트의)', 'created', 'obj_id',
-                #  ['comment_username', 'comment_text', 'comment_user_id', 'comment_created', 'comment_id']}
+            suobj_help = 'false'
+            if request.user.is_authenticated:
+                if SubUrlObjectHelp.objects.filter(user=request.user, sub_url_object=suobj).exists():
+                    suobj_help = 'true'
 
-                return JsonResponse({'res': 1, 'output': output})
+            output = {
+                'user_id': suobj.user.username,
+                'username': suobj.user.userusername.username,
+                'title': suobj.title.text,
+                'created': suobj.created,
+                'loc': suobj.url_object.loc,
+                'url': suobj.url_object.get_url(),
+                'srk_output': srk_output,
+                'url_id': suobj.url_object.uuid,
+                'suobj_id': suobj.uuid,
+                'suobj_help': suobj_help,
+                'help_count': suobj.help_count
+            }
+            # {'user_id', 'username', 'gross(포스트의)', 'date(포스트의)', 'created', 'obj_id',
+            #  ['comment_username', 'comment_text', 'comment_user_id', 'comment_created', 'comment_id']}
+
+            return JsonResponse({'res': 1, 'output': output})
 
         return JsonResponse({'res': 2})
 
@@ -849,22 +855,22 @@ def re_bridging_list(request):
                 except User.DoesNotExist:
                     return JsonResponse({'res': 0})
 
-
+                step = 31
                 next = None
                 output = []
                 if user is not None:
                     if next_id == '':
-                        bridgings = Bridge.objects.filter(user=user).order_by('created')[:31]
+                        bridgings = Bridge.objects.filter(user=user).order_by('created')[:step]
                     else:
                         try:
                             last_bridging = Bridge.objects.get(bridge__username=next_id, user=user)
                         except:
                             return JsonResponse({'res': 0})
-                        bridgings = Bridge.objects.filter(Q(user=user) & Q(pk__gte=last_bridging.pk)).order_by('created')[:31]
+                        bridgings = Bridge.objects.filter(Q(user=user) & Q(pk__gte=last_bridging.pk)).order_by('created')[:step]
                     count = 0
                     for bridge in bridgings:
                         count = count+1
-                        if count == 31:
+                        if count == step:
                             next = bridge.bridge.username
                             break
                         sub_output = {
@@ -890,27 +896,69 @@ def re_bridger_list(request):
                     user = User.objects.get(username=user_id)
                 except User.DoesNotExist:
                     return JsonResponse({'res': 0})
-
+                step = 31
                 next = None
                 output = []
                 if user is not None:
                     if next_id == '':
-                        bridgers = Bridge.objects.filter(bridge=user).order_by('created')[:31]
+                        bridgers = Bridge.objects.filter(bridge=user).order_by('created')[:step]
                     else:
                         try:
                             last_bridger = Bridge.objects.get(bridge=user, user__username=next_id)
                         except Exception as e:
                             return JsonResponse({'res': 0})
-                        bridgers = Bridge.objects.filter(Q(bridge=user) & Q(pk__gte=last_bridger.pk)).order_by('created')[:31]
+                        bridgers = Bridge.objects.filter(Q(bridge=user) & Q(pk__gte=last_bridger.pk)).order_by('created')[:step]
                     count = 0
                     for bridge in bridgers:
                         count = count+1
-                        if count == 31:
+                        if count == step:
                             next = bridge.user.username
                             break
                         sub_output = {
                             'username': bridge.user.userusername.username,
                             'photo': bridge.user.userphoto.file_50_url(),
+                        }
+                        output.append(sub_output)
+
+                return JsonResponse({'res': 1, 'output': output, 'next': next})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_help_list(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                suobj_id = request.POST.get('suobj_id', None)
+                next_id = request.POST.get('next_user_id', None)
+                suobj = None
+                try:
+                    suobj = SubUrlObject.objects.get(uuid=suobj_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                step = 31
+
+                next = None
+                output = []
+                if suobj is not None:
+                    if next_id == '':
+                        suobj_helps = SubUrlObjectHelp.objects.filter(sub_url_object=suobj).order_by('created')[:step]
+                    else:
+                        try:
+                            last_suobj_help = SubUrlObjectHelp.objects.get(sub_url_object=suobj, user__username=next_id)
+                        except:
+                            return JsonResponse({'res': 0})
+                        suobj_helps = SubUrlObjectHelp.objects.filter(Q(sub_url_object=suobj) & Q(pk__gte=last_suobj_help.pk)).order_by('created')[:step]
+                    count = 0
+                    for item in suobj_helps:
+                        count = count+1
+                        if count == step:
+                            next = item.user.username
+                            break
+                        sub_output = {
+                            'username': item.user.userusername.username,
+                            'photo': item.user.userphoto.file_50_url(),
                         }
                         output.append(sub_output)
 
@@ -1595,7 +1643,6 @@ def re_user_search_keyword(request):
 
             order = int(order)
             step = 10
-
 
             from django.db.models.functions import Length
 
