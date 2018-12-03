@@ -6,7 +6,6 @@ var suobj_populate = function suobj_populate(id) {
                 suobj_id: id,
             },
             success: function (data) {
-                //{'user_id', 'username', 'gross(포스트의)', 'date(포스트의)', 'created', 'obj_id', ['comment_username', 'comment_text', 'comment_user_id', 'comment_created', 'comment_id']}
                 if (data.res === 1) {
                     var user_id = $('#user_id').html()
                     var srks = ''
@@ -159,6 +158,7 @@ $(function () {
     }).on("hidden.bs.modal", function () {
         $('#modal_help_list').empty()
         $('#next_user_id').html('')
+        $('#clicked_suobj_id').html('')
 
     });
 
@@ -190,7 +190,5 @@ $(function () {
             }
         })
     })
-
-
 })
 // more load 구현
