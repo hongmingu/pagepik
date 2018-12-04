@@ -804,7 +804,6 @@ def re_bridge_add(request):
                     chosen_user = User.objects.get(username=chosen_user_id)
                 except User.DoesNotExist:
                     return JsonResponse({'res': 0})
-
                 if chosen_user is not None:
                     # 어이없는 스스로 팔로우 방지
                     if chosen_user == request.user:
@@ -822,8 +821,8 @@ def re_bridge_add(request):
 
                                 result = 'false'
 
-                                # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
-                        except Exception:
+                        except Exception as e:
+                            print(e)
                             return JsonResponse({'res': 0})
                     else:
                         try:
@@ -833,7 +832,8 @@ def re_bridge_add(request):
                                 result = 'true'
 
                                 # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
-                        except Exception:
+                        except Exception as e:
+                            print(e)
                             return JsonResponse({'res': 0})
                     return JsonResponse({'res': 1, 'result': result})
 
@@ -1502,15 +1502,17 @@ def re_bridge_feed(request):
             if request.is_ajax():
                 end_id = request.POST.get('end_id', None)
                 step = 20
+                help_step = 20
                 suobjs = None
-
-                suobj_help = SubUrlObjectHelp.objects.filter(
-                    user__is_bridged__user=request.user).order_by(
-                    '-created').distinct('sub_url_object')
+                suobj_helps = None
 
                 if end_id == '':
                     suobjs = SubUrlObject.objects.filter(Q(user__is_bridged__user=request.user)
                                                          ).order_by('-created').distinct()[:step]
+
+                    suobj_helps = SubUrlObjectHelp.objects.filter(
+                        Q(user__is_bridged__user=request.user)).exclude(Q(sub_url_object__user=request.user)).order_by(
+                        '-created').distinct()[:help_step]
                 else:
                     end_suobj = None
                     try:
@@ -1522,18 +1524,48 @@ def re_bridge_feed(request):
                                                          & Q(pk__lt=end_suobj.pk)).order_by(
                         '-created').distinct()[:step]
 
+                    suobj_helps = SubUrlObjectHelp.objects.filter(
+                        Q(user__is_bridged__user=request.user)
+                        & Q(created__lt=end_suobj.created)).exclude(Q(sub_url_object__user=request.user)).order_by(
+                        '-created').distinct()[:help_step]
+
+                from itertools import chain
+                from operator import attrgetter
+                # ascending oreder
+                result_list = sorted(
+                    chain(suobjs, suobj_helps),
+                    key=attrgetter('created'))
+
                 output = []
+                for item in result_list:
+                    kind = ''
+                    identity = ''
+                    username = ''
+
+                    if str(item).startswith('suobj'):
+                        kind = 'suobj'
+                        identity = item.uuid
+                        username = item.user.userusername.username
+
+                    elif str(item).startswith('help'):
+                        kind = 'help'
+                        identity = item.sub_url_object.uuid
+                        username = item.user.userusername.username
+
+                    sub_output = {
+                        'kind': kind,
+                        'id': identity,
+                        'username': username
+
+                    }
+                    output.append(sub_output)
+
                 count = 0
                 end = None
                 for item in suobjs:
                     count = count + 1
                     if count == step:
                         end = item.uuid
-                    sub_output = {
-                        'id': item.uuid,
-                    }
-
-                    output.append(sub_output)
 
                 return JsonResponse({'res': 1, 'output': output, 'end': end})
 
@@ -1566,10 +1598,18 @@ def re_home(request):
                 sub_keyword_list = []
                 while keyword_count < 3:
                     keyword_count = keyword_count + 1
-                    sub_keyword_order = random.randint(0, sub_keyword_count - 1)
+                    if sub_keyword_count < 2:
+                        if sub_keyword_count == 1:
+                            sub_keyword_order = 0
+                        else:
+                            keyword_count = 3
+                            break
+                    else:
+                        sub_keyword_order = random.randint(0, sub_keyword_count - 1)
                     sub_keyword = sub_keywords[sub_keyword_order]
                     sub_keyword_list.append(sub_keyword.keyword.text)
 
+                sub_keyword_list = sorted(set(sub_keyword_list), key=lambda x: sub_keyword_list.index(x))
                 qs1_list = []
                 for item in sub_keyword_list:
                     suobj_obj = None
@@ -1629,6 +1669,15 @@ def re_home(request):
                             end = item.uuid
                         sub_qs = SubUrlObjectHelp.objects.filter(sub_url_object=item)
                         sub_count = sub_qs.count()
+
+                        if sub_count < 2:
+                            if sub_count == 1:
+                                sub_order = 0
+                            else:
+                                break
+                        else:
+                            sub_order = random.randint(0, sub_keyword_count - 1)
+
                         sub_order = random.randint(0, sub_count-1)
                         sub_user = sub_qs[sub_order]
 
@@ -1643,10 +1692,11 @@ def re_home(request):
 
                 from itertools import chain
                 from operator import attrgetter
+                from operator import itemgetter
                 # ascending oreder
                 output = sorted(
                     chain(qs1_list, qs2_list),
-                    key=attrgetter('created'))
+                    key=itemgetter('created'))
 
                 return JsonResponse({'res': 1, 'output': output, 'end': end})
 

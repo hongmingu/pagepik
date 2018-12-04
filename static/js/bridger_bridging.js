@@ -10,8 +10,8 @@ $(function () {
     });
 })
 $(function () {
-    if($('#user_id').html()!==$('#chosen_user_id').html()){
-        if($('#bridge').hasClass('hidden')){
+    if ($('#user_id').html() !== $('#chosen_user_id').html()) {
+        if ($('#bridge').hasClass('hidden')) {
             $('#bridge').removeClass('hidden')
         }
     }
@@ -28,15 +28,19 @@ $(function () {
                 user_id: $('#chosen_user_id').html()
             },
             success: function (data) {
-                if (data.result === 'true') {
-                    $('#bridge_text').html('bridging <span class="glyphicon glyphicon-ok"></span>')
-                    var count_bridger = parseInt($('#count_bridger').html()) + 1
-                    $('#count_bridger').html(count_bridger)
-                } else {
-                    $('#bridge_text').html('bridge')
-                    var count_bridger = parseInt($('#count_bridger').html()) - 1
-                    $('#count_bridger').html(count_bridger)
+                console.log(data)
+                if (data.res === 1) {
+                    if (data.result === 'true') {
+                        $('#bridge_text').html('bridging <span class="glyphicon glyphicon-ok"></span>')
+                        var count_bridger = parseInt($('#count_bridger').html()) + 1
+                        $('#count_bridger').html(count_bridger)
+                    } else {
+                        $('#bridge_text').html('bridge')
+                        var count_bridger = parseInt($('#count_bridger').html()) - 1
+                        $('#count_bridger').html(count_bridger)
+                    }
                 }
+
             }
         })
     })

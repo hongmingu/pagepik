@@ -13,11 +13,11 @@ from object.numbers import *
 @receiver(post_save, sender=Bridge)
 def created_bridge(sender, instance, created, **kwargs):
     if created:
-        if instance.user == instance.follow:
+        if instance.user == instance.bridge:
             return
         try:
             with transaction.atomic():
-                notice = Notice.objects.create(user=instance.follow, kind=BRIDGE, uuid=uuid.uuid4().hex)
+                notice = Notice.objects.create(user=instance.bridge, kind=BRIDGE, uuid=uuid.uuid4().hex)
                 notice_bridge = NoticeBridge.objects.create(notice=notice, bridge=instance)
 
 

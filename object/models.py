@@ -131,7 +131,7 @@ class SubUrlObject(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "pk: %s" % self.pk
+        return "suobj pk: %s" % self.pk
 
     class Meta:
         unique_together = ('user', 'url_object',)
@@ -144,7 +144,7 @@ class SubUrlObjectHelp(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "pk: %s" % self.pk
+        return "help pk: %s" % self.pk
 
     class Meta:
         unique_together = ('user', 'sub_url_object',)

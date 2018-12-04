@@ -9,6 +9,7 @@
     <script src="{% static 'js/navbar.js' %}"></script>
     <script src="{% static 'js/a_selected.js' %}"></script>
     <script src="{% static 'js/date_differ.js' %}"></script>
+    <script src="{% static 'js/bridge_feed.js' %}"></script>
 
     <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
     {% if user.is_authenticated %}
@@ -55,58 +56,7 @@
 
 </body>
 <script>
-    $(function () {
-        $.ajax({
-            url: '/re/bridge/feed/', type: 'post', dataType: 'json', cache: false,
-            data: {
-                end_id: $('#end_id').html()
-            },
-            success: function (data) {
-                $.each(data.output, function (key, value) {
-                    var appender = '<div class="row div_base" id="post_div_' + value.id + '">' +
-                        '<script defer>' +
-                        '    home_populate("' + value.id + '")' +
-                        '<' + '/script></div>'
-                    $('#content').append(appender)
-                })
-                if (data.end === null) {
-                    $('#more_load').addClass('hidden')
-                    $('#end_id').html('')
-                } else {
-                    $('#more_load').addClass('hidden')
-                    $('#end_id').html(data.end)
-                }
 
-            }
-        })
-
-        $('#more_load').click(function (e) {
-            e.preventDefault()
-            $.ajax({
-                url: '/re/bridge/feed/', type: 'post', dataType: 'json', cache: false,
-                data: {
-                    end_id: $('#end_id').html()
-                },
-                success: function (data) {
-                    $.each(data.output, function (key, value) {
-                        var appender = '<div class="row div_base" id="post_div_' + value.id + '">' +
-                            '<script defer>' +
-                            '    home_populate("' + value.id + '")' +
-                            '<' + '/script></div>'
-                        $('#content').append(appender)
-                    })
-                    if (data.end === null) {
-                        $('#more_load').addClass('hidden')
-                        $('#end_id').html('')
-                    } else {
-                        $('#more_load').addClass('hidden')
-                        $('#end_id').html(data.end)
-                    }
-
-                }
-            })
-        })
-    })
 </script>
 
 

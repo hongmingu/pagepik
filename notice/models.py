@@ -46,7 +46,18 @@ class Notice(models.Model):
                 result = {'username': get_result.user.userusername.username,
                           'user_photo': get_result.user.userphoto.file_50_url()}
             return result
-
+        elif self.kind == SUB_URL_OBJECT_HELP:
+            try:
+                get_result = self.noticesuburlobjecthelp.sub_url_object_help
+            except Exception as e:
+                print(e)
+                pass
+            if get_result is not None:
+                result = {'suobj_id': get_result.sub_url_object.uuid,
+                          'username': get_result.user.userusername.username,
+                          'user_photo': get_result.user.userphoto.file_50_url(),
+                          'title': escape(get_result.sub_url_object.title.text)[0:10]}
+            return result
         return None
 
 
