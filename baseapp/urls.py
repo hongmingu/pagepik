@@ -98,7 +98,8 @@ urlpatterns = [
 
     re_path(r'^re/bridge/feed/$', base_ajax_views.re_bridge_feed,
             name='re_bridge_feed'),
-
+    re_path(r'^re/home/$', base_ajax_views.re_home,
+            name='re_home'),
 
     re_path(r'^re/user/search/suobj/$', base_ajax_views.re_user_search_suobj,
             name='re_user_search_suobj'),

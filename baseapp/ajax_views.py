@@ -1503,6 +1503,11 @@ def re_bridge_feed(request):
                 end_id = request.POST.get('end_id', None)
                 step = 20
                 suobjs = None
+
+                suobj_help = SubUrlObjectHelp.objects.filter(
+                    user__is_bridged__user=request.user).order_by(
+                    '-created').distinct('sub_url_object')
+
                 if end_id == '':
                     suobjs = SubUrlObject.objects.filter(Q(user__is_bridged__user=request.user)
                                                          ).order_by('-created').distinct()[:step]
@@ -1535,6 +1540,117 @@ def re_bridge_feed(request):
         return JsonResponse({'res': 2})
 
 
+@ensure_csrf_cookie
+def re_home(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                end_id = request.POST.get('end_id', None)
+                step = 20
+                suobjs = None
+                suobj_help = SubUrlObject.objects.exclude(
+                    suburlobjecthelp__user__is_bridged__user=request.user).order_by(
+                    '-created').distinct('sub_url_object')[:10]
+
+                import random
+
+                # filter_q = Q()
+                # for sub_keyword in sub_keyword_sample:
+                #     filter_q = filter_q | Q(suburlobjectsubkeyword__sub_keyword__keyword__text=sub_keyword.keyword.text)
+                # suobj_qs1 = SubUrlObject.objects.filter(filter_q).order_by('-created')[:step]
+                # sub_keyword_order = random.randint(0, sub_keyword_count-1)
+
+                sub_keywords = SubKeyword.objects.filter(user=request.user)
+                sub_keyword_count = sub_keywords.count()
+                keyword_count = 0
+                sub_keyword_list = []
+                while keyword_count < 3:
+                    keyword_count = keyword_count + 1
+                    sub_keyword_order = random.randint(0, sub_keyword_count - 1)
+                    sub_keyword = sub_keywords[sub_keyword_order]
+                    sub_keyword_list.append(sub_keyword.keyword.text)
+
+                qs1_list = []
+                for item in sub_keyword_list:
+                    suobj_obj = None
+                    if end_id=='':
+                        suobj_obj = SubUrlObject.objects.filter(
+                            Q(suburlobjectsubkeyword__sub_keyword__keyword__text=item)).exclude(
+                            Q(user=request.user) | Q(user__is_bridged__user=request.user)
+                        ).first()
+                    else:
+                        try:
+                            end_suobj = SubUrlObject.objects.get(uuid=end_id)
+                        except Exception as e:
+                            print(e)
+                            return JsonResponse({'res': 0})
+                        suobj_obj = SubUrlObject.objects.filter(
+                            Q(suburlobjectsubkeyword__sub_keyword__keyword__text=item)
+                            & Q(created__lt=end_suobj.created)).exclude(
+                            Q(user=request.user) | Q(user__is_bridged__user=request.user)
+                        ).first()
+                    if suobj_obj is not None:
+                        sub_output = {
+                            'uuid': suobj_obj.uuid,
+                            'obj_type': 'keyword',
+                            'keyword': item,
+                            'created': suobj_obj.created
+                        }
+                        qs1_list.append(sub_output)
+
+
+                qs2_list = []
+                suobj_qs2 = None
+                if end_id == '':
+                    suobj_qs2 = SubUrlObject.objects.filter(
+                        Q(suburlobjecthelp__isnull=False)).exclude(
+                        Q(suburlobjecthelp__user__is_bridged__user=request.user)
+                        | Q(user__is_bridged__user=request.user)).order_by(
+                        '-suburlobjecthelp__created', '-created').distinct()[:step]
+
+                else:
+                    try:
+                        end_suobj = SubUrlObject.objects.get(uuid=end_id)
+                    except Exception as e:
+                        print(e)
+                        return JsonResponse({'res': 0})
+
+                    suobj_qs2 = SubUrlObject.objects.filter(
+                        Q(suburlobjecthelp__isnull=False)
+                        & Q(suburlobjecthelp__created__lt=end_suobj.suburlobjecthelp_set.last().created)).exclude(
+                        Q(suburlobjecthelp__user__is_bridged__user=request.user)
+                        | Q(user__is_bridged__user=request.user)).order_by(
+                        '-suburlobjecthelp__created', '-created').distinct()[:step]
+                end = None
+                if suobj_qs2 is not None:
+                    count = 0
+                    for item in suobj_qs2:
+                        if count == step:
+                            end = item.uuid
+                        sub_qs = SubUrlObjectHelp.objects.filter(sub_url_object=item)
+                        sub_count = sub_qs.count()
+                        sub_order = random.randint(0, sub_count-1)
+                        sub_user = sub_qs[sub_order]
+
+                        sub_output = {
+                            'uuid': item.uuid,
+                            'obj_type': 'help',
+                            'helped_user': sub_user.user.userusername.username,
+                            'help_count': item.help_count,
+                            'created': item.created
+                        }
+                        qs2_list.append(sub_output)
+
+                from itertools import chain
+                from operator import attrgetter
+                # ascending oreder
+                output = sorted(
+                    chain(qs1_list, qs2_list),
+                    key=attrgetter('created'))
+
+                return JsonResponse({'res': 1, 'output': output, 'end': end})
+
+        return JsonResponse({'res': 2})
 
 @ensure_csrf_cookie
 def re_user_search_suobj(request):

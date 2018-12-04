@@ -11,7 +11,7 @@
     <script src="{% static 'js/nav_badge_populate.js' %}"></script>
     <script src="{% static 'js/a_selected.js' %}"></script>
     <script src="{% static 'js/date_differ.js' %}"></script>
-    <script src="{% static 'js/date_differ.js' %}"></script>
+    <script src="{% static 'js/home.js' %}"></script>
 </head>
 <body class="light_background_color height_100">
 <!--navbar start-->
@@ -22,6 +22,7 @@
 {% include 'others/bootstrap_tester.html' %}
 
 <div class="hidden" id="page_kind">home</div>
+<div class="hidden" id="end_id"></div>
 {% if user.is_authenticated %}
     <div class="hidden" id="user_id">{{ user.username }}</div>
 {% else %}
@@ -42,12 +43,6 @@
         </div>
     </div>
 </div>
-{% include 'baseapp/_modal_need_login.html' %}
+{% include 'baseapp/_modal_populate.html' %}
 </body>
-<script>
-    $(function () {
-
-    })
-</script>
-
 </html>

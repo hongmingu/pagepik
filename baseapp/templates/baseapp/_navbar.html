@@ -2,17 +2,23 @@
     <div class="container-fluid padding_right_0">
         <ul class="nav navbar-nav navbar_ul_base">
             <li>
+                {% if user.is_authenticated %}
                 <a class="padding_15_i" id="a_home" href="/">
                     <i id="i_home" class="glyphicon glyphicon-home"></i>
                 </a>
+                {% else %}
+                <a class="padding_15_i" id="a_home" href="{% url 'baseapp:main_create_log_in' %}">
+                    <i id="i_home" class="glyphicon glyphicon-home"></i>
+                </a>
+                {% endif %}
             </li>
             <li>
                 {% if user.is_authenticated %}
-                <a class="padding_15_i" id="a_feed" href="/bridge/feed/">
+                <a class="padding_15_i" id="a_feed" href="{% url 'baseapp:bridge_feed' %}">
                     <i id="i_feed" class="glyphicon glyphicon-comment"></i>
                 </a>
                 {% else %}
-                <a class="padding_15_i" id="a_feed" href="/">
+                <a class="padding_15_i" id="a_feed" href="{% url 'baseapp:main_create_log_in' %}">
                     <i id="i_feed" class="glyphicon glyphicon-comment"></i>
                 </a>
                 {% endif %}
@@ -24,7 +30,7 @@
                     <i id="i_user" class="glyphicon glyphicon-user"></i>
                 </a>
                 {% else %}
-                <a class="padding_15_i" id="a_user" href="/">
+                <a class="padding_15_i" id="a_user" href="{% url 'baseapp:main_create_log_in' %}">
                     <i id="i_user" class="glyphicon glyphicon-user"></i>
                 </a>
                 {% endif %}
@@ -34,11 +40,11 @@
             <li id="nav_div_ul_li_bsearch">
 
                 {% if user.is_authenticated %}
-                <a class="padding_15_i" id="a_note" href="/note/all/">
+                <a class="padding_15_i" id="a_note" href="{% url 'baseapp:note_all' %}">
                     <i id="i_note" class="glyphicon glyphicon-certificate"></i>
                 </a>
                 {% else %}
-                <a class="padding_15_i" id="a_note" href="/">
+                <a class="padding_15_i" id="a_note" href="{% url 'baseapp:main_create_log_in' %}">
                     <i id="i_note" class="glyphicon glyphicon-certificate"></i>
                 </a>
                 {% endif %}
@@ -81,14 +87,14 @@
         <div class="modal-body modal-body_menu">
             {% if user.is_authenticated %}
             <div class="row">
-              <p class="h4" align="center"><a href="{% url 'authapp:settings' %}"><span class="clickable padding_5 navbar_modal_menu">Settings</span></a></p>
+              <p class="h4" align="center"><a href="{% url 'authapp:settings' %}"><span class="clickable">Settings</span></a></p>
             </div>
             <div class="row">
-              <p class="h4" align="center"><a href="{% url 'authapp:log_out' %}"><span class="clickable padding_5 navbar_modal_menu">Log out</span></a></p>
+              <p class="h4" align="center"><a href="{% url 'authapp:log_out' %}"><span class="clickable">Log out</span></a></p>
             </div>
             {% else %}
             <div class="row">
-              <p class="h4" align="center"><a href="{% url 'baseapp:main_create_log_in' %}"><span class="clickable padding_5 navbar_modal_menu">Log in / Create new account</span></a></p>
+              <p class="h4" align="center"><a href="{% url 'baseapp:main_create_log_in' %}"><span class="clickable">Log in / Create new account</span></a></p>
             </div>
             {% endif %}
         </div>
