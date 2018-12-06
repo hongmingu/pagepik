@@ -5,27 +5,34 @@ $(function () {
             end_id: $('#end_id').html()
         },
         success: function (data) {
+            console.log(data)
             $.each(data.output, function (key, value) {
                 var appender;
                 switch (value.notice_kind) {
                     case 1001:
-                        appender = '<div class="note_wrapper">\n' +
+                        appender = '<div class="note_wrapper">' +
                             '<div class="note_img_wrapper">' +
                             '<a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a>' +
-                            '</div>\n' +
+                            '</div>' +
                             '<div class="note_text_wrapper">' +
+                            '<span class="note_text_explain">bridge from</span>' +
                             '<a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>' +
-                            'follow you.' +
-                            '</div>\n' +
+                            '</div>' +
                             '</div>'
-                        //follow
+                        //bridge
                         break;
                     case 1002:
-                        appender = '<div class="note_wrapper">\n' +
-                            '<div class="note_img_wrapper"><a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a></div>\n' +
-                            '<div class="note_text_wrapper"><a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>follow your <a href="/post/' + value.notice_value.post_id + '/"><span class="note_text_post clickable">post</span></a></div>\n' +
+                        appender = '<div class="note_wrapper">' +
+                            '<div class="note_img_wrapper">' +
+                            '<a href="/' + value.notice_value.username + '/">' +
+                            '<img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a>' +
+                            '</div>' +
+                            '<div class="note_text_wrapper">' +
+                            '<a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>' +
+                            '<span class="note_text_explain">found it helpful</span>' +
+                            '<a href="/object/' + value.notice_value.suobj_id + '/"><span class="note_text_title clickable">' + value.notice_value.title + '</span></a></div>' +
                             '</div>'
-                        //post_follow
+                        //help
                         break;
                     default:
                         break;
@@ -56,21 +63,27 @@ $(function () {
                     var appender;
                     switch (value.notice_kind) {
                         case 1001:
-                            appender = '<div class="note_wrapper">\n' +
+                            appender = '<div class="note_wrapper">' +
                                 '<div class="note_img_wrapper">' +
                                 '<a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a>' +
                                 '</div>\n' +
                                 '<div class="note_text_wrapper">' +
+                                '<span class="note_text_explain">bridge from</span>' +
                                 '<a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>' +
-                                'follow you.' +
-                                '</div>\n' +
+                                '</div>' +
                                 '</div>'
                             //bridge
                             break;
                         case 1002:
-                            appender = '<div class="note_wrapper">\n' +
-                                '<div class="note_img_wrapper"><a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a></div>\n' +
-                                '<div class="note_text_wrapper"><a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>follow your <a href="/post/' + value.notice_value.post_id + '/"><span class="note_text_post clickable">post</span></a></div>\n' +
+                            appender = '<div class="note_wrapper">' +
+                                '<div class="note_img_wrapper">' +
+                                '<a href="/' + value.notice_value.username + '/">' +
+                                '<img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a>' +
+                                '</div>' +
+                                '<div class="note_text_wrapper">' +
+                                '<a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>' +
+                                '<span class="note_text_explain">found it helpful</span>' +
+                                '<a href="/object/' + value.notice_value.suobj_id + '/"><span class="note_text_title clickable">' + value.notice_value.title + '</span></a></div>' +
                                 '</div>'
                             //help
                             break;

@@ -53,10 +53,14 @@ class Notice(models.Model):
                 print(e)
                 pass
             if get_result is not None:
+                title = get_result.sub_url_object.title.text
+                if len(title) > 10:
+                    title = escape(title)[0:10] + '...'
+                    title = escape(title)
                 result = {'suobj_id': get_result.sub_url_object.uuid,
                           'username': get_result.user.userusername.username,
                           'user_photo': get_result.user.userphoto.file_50_url(),
-                          'title': escape(get_result.sub_url_object.title.text)[0:10]}
+                          'title': title}
             return result
         return None
 
