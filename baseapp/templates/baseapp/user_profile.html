@@ -93,7 +93,7 @@
                 </div>
                 <div id="user_profile_suobj_list"></div>
                 <a href="">
-                    <div class="profile_more_load hidden" id="profile_more_load" align="center">more load</div>
+                    <div class="profile_more_load hidden" id="more_load" align="center">more load</div>
                 </a>
             </div>
         </div>
@@ -144,7 +144,6 @@
                 last_suobj_id: $('#last_suobj_id').html()
             },
             success: function (data) {
-                console.log(data)
                 var _modifier = ''
                 var chosen_user_id = $('#chosen_user_id').html()
                 var user_id = $('#user_id').html()
@@ -170,11 +169,56 @@
                 })
                 if (data.last === null) {
                     $('#profile_more_load').addClass('hidden')
+                    $('#last_suobj_id').html('')
                 } else {
                     $('#profile_more_load').removeClass('hidden')
+                    $('#last_suobj_id').html(data.last)
                 }
 
             }
+        })
+        $('#more_load').click(function (e) {
+            e.preventDefault()
+            $.ajax({
+                url: '/re/profile/suobj/', type: 'post', dataType: 'json', cache: false,
+                data: {
+                    chosen_user_id: $('#chosen_user_id').html(),
+                    last_suobj_id: $('#last_suobj_id').html()
+                },
+                success: function (data) {
+                    var _modifier = ''
+                    var chosen_user_id = $('#chosen_user_id').html()
+                    var user_id = $('#user_id').html()
+                    $.each(data.output, function (key, value) {
+
+                        if (chosen_user_id === user_id) {
+                            _modifier = '<div align="right"><a href="/update/url/' + value.id + '/"><span class="user_profile_post_update">update</span></a><span>  </span><a href=""><span class="profile_suobj_delete">delete</span></a></div>'
+                        }
+                        var appender = '<div id="suobj_wrapper_with_modi_' + value.id + '">' +
+                            '<div class="row div_base" id="suobj_wrapper_' + value.id + '">' +
+                            '<script defer>' +
+                            '    suobj_populate("' + value.id + '")' +
+                            '<' + '/script>' +
+                            '</div>' + _modifier +
+                            '</div>'
+                        var jq_appender = $(appender)
+                        jq_appender.find('.profile_suobj_delete').on('click', function (e) {
+                            e.preventDefault()
+                            $('#suobj_to_delete').html(value.id)
+                            $('#modal_suobj_delete').modal('show')
+                        })
+                        $('#user_profile_suobj_list').append(jq_appender)
+                    })
+                    if (data.last === null) {
+                        $('#profile_more_load').addClass('hidden')
+                        $('#last_suobj_id').html('')
+                    } else {
+                        $('#profile_more_load').removeClass('hidden')
+                        $('#last_suobj_id').html(data.last)
+                    }
+
+                }
+            })
         })
     })
 
