@@ -96,6 +96,7 @@ def search_all(request):
         q = request.GET.get('q', None)
         if q is None:
             q = ''
+        q = q.strip()
         word = q
         return render(request, 'baseapp/search_all.html', {'word': word})
 
@@ -107,6 +108,7 @@ def search_user(request):
         q = request.GET.get('q', None)
         if q is None:
             q = ''
+        q = q.strip()
         word = q
         return render(request, 'baseapp/search_user.html', {'word': word})
 
@@ -118,6 +120,7 @@ def search_my(request):
         q = request.GET.get('q', None)
         if q is None:
             q = ''
+        q = q.strip()
         word = q
         return render(request, 'baseapp/search_my.html', {'word': word})
 
@@ -129,6 +132,7 @@ def search_bridge(request):
         q = request.GET.get('q', None)
         if q is None:
             q = ''
+        q = q.strip()
         word = q
         return render(request, 'baseapp/search_bridge.html', {'word': word})
 
@@ -138,6 +142,7 @@ def search_keyword(request):
         q = request.GET.get('q', None)
         if q is None:
             q = ''
+        q = q.strip()
         word = q
         return render(request, 'baseapp/search_keyword.html', {'word': word})
 
@@ -147,6 +152,7 @@ def search_url(request):
         q = request.GET.get('q', None)
         if q is None:
             q = ''
+        q = q.strip()
         word = q
         return render(request, 'baseapp/search_url.html', {'word': word})
 
@@ -182,6 +188,7 @@ def user_search(request, user_username):
         q = request.GET.get('q', None)
         if q is None:
             q = ''
+        q = q.strip()
         word = q
         try:
             chosen_user = User.objects.get(userusername__username=user_username)
