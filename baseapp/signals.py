@@ -13,12 +13,12 @@ from object.numbers import *
 @receiver(post_save, sender=Bridge)
 def created_bridge(sender, instance, created, **kwargs):
     if created:
-        if instance.user == instance.bridge:
-            return
+
         try:
             with transaction.atomic():
-                notice = Notice.objects.create(user=instance.bridge, kind=BRIDGE, uuid=uuid.uuid4().hex)
-                notice_bridge = NoticeBridge.objects.create(notice=notice, bridge=instance)
+                if not instance.user == instance.bridge:
+                    notice = Notice.objects.create(user=instance.bridge, kind=BRIDGE, uuid=uuid.uuid4().hex)
+                    notice_bridge = NoticeBridge.objects.create(notice=notice, bridge=instance)
 
 
                 bridging_count = instance.user.bridgingcount
@@ -259,9 +259,9 @@ def created_sub_url_object_help(sender, instance, created, **kwargs):
     if created:
         try:
             with transaction.atomic():
-
-                notice = Notice.objects.create(user=instance.sub_url_object.user, kind=SUB_URL_OBJECT_HELP, uuid=uuid.uuid4().hex)
-                notice_suobj = NoticeSubUrlObjectHelp.objects.create(notice=notice, sub_url_object_help=instance)
+                if not instance.user == instance.sub_url_object.user:
+                    notice = Notice.objects.create(user=instance.sub_url_object.user, kind=SUB_URL_OBJECT_HELP, uuid=uuid.uuid4().hex)
+                    notice_suobj = NoticeSubUrlObjectHelp.objects.create(notice=notice, sub_url_object_help=instance)
 
                 sub_url_object = instance.sub_url_object
                 sub_url_object.help_count = F('help_count') + 1
@@ -285,13 +285,12 @@ def deleted_sub_url_object_help(sender, instance, **kwargs):
 
 @receiver(post_delete, sender=NoticeSubUrlObjectHelp)
 def deleted_notice_sub_url_object_help(sender, instance, **kwargs):
-    if instance.notice:
-        try:
-            with transaction.atomic():
-                instance.notice.delete()
-        except Exception as e:
-            print(e)
-            pass
+    try:
+        with transaction.atomic():
+            instance.notice.delete()
+    except Exception as e:
+        print(e)
+        pass
 
 
 
