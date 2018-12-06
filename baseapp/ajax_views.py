@@ -1894,6 +1894,7 @@ def re_user_search_suobj(request):
                     sub_raw_keywords_output.append(sub_raw_keyword.text)
                 sub_output = {
                     'username': suobj.user.userusername.username,
+                    'title': suobj.title.text,
                     'id': suobj.uuid,
                     'url': suobj.url_object.get_url(),
                     'keyword_output': sub_raw_keywords_output

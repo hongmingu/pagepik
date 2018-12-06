@@ -79,7 +79,11 @@
                             $('#content_result_keyword').append('<div class="h4">end results</div>')
                         } else {
                             $.each(data.output, function (key, value) {
-                                var appender = ''
+                                var appender = '<div>' +
+                                    '<a href="/search/all/?q=' + value + '">' +
+                                    '<span class="search_keyword">' + value + '</span>' +
+                                    '</a>' +
+                                    '</div>'
                                 $('#content_result_keyword').append(appender)
 
                             })
@@ -116,7 +120,11 @@
 
                         } else {
                             $.each(data.output, function (key, value) {
-                                var appender = ''
+                                var appender = '<div>' +
+                                    '<a href="/search/all/?q=' + value + '">' +
+                                    '<span class="search_keyword">' + value + '</span>' +
+                                    '</a>' +
+                                    '</div>'
                                 $('#content_result_keyword').append(appender)
 
                             })
@@ -153,7 +161,21 @@
 
                         } else {
                             $.each(data.output, function (key, value) {
-                                var appender = ''
+                                var keyword = ''
+                                $.each(value.keyword_output, function (key, value) {
+                                    keyword = keyword + '<span class="search_suobj_keyword">' + value + '</span>'
+                                })
+                                var appender = '<div class="search_suobj_wrapper">' +
+                                    '<div>' +
+                                    '<a href="/' + value.username + '/"><span class="search_suobj_username">' + value.username + '</span></a>' +
+                                    '<a href="/object/' + value.id + '/"><span class="search_suobj_detail">detail</span></a>' +
+                                    '</div>' +
+                                    '<a href="' + value.url + '">' +
+                                    '<div><span class="search_suobj_title">' + value.title + '</span></div>' +
+                                    '<div><span class="search_suobj_url">' + value.url + '</span></div>' +
+                                    '</a>' +
+                                    '<div class="search_suobj_keyword_wrapper">' + keyword + '</div>' +
+                                    '</div>'
                                 $('#content_result_suobj').append(appender)
 
                             })
@@ -190,7 +212,21 @@
 
                         } else {
                             $.each(data.output, function (key, value) {
-                                var appender = ''
+                                var keyword = ''
+                                $.each(value.keyword_output, function (key, value) {
+                                    keyword = keyword + '<span class="search_suobj_keyword">' + value + '</span>'
+                                })
+                                var appender = '<div class="search_suobj_wrapper">' +
+                                    '<div>' +
+                                    '<a href="/' + value.username + '/"><span class="search_suobj_username">' + value.username + '</span></a>' +
+                                    '<a href="/object/' + value.id + '/"><span class="search_suobj_detail">detail</span></a>' +
+                                    '</div>' +
+                                    '<a href="' + value.url + '">' +
+                                    '<div><span class="search_suobj_title">' + value.title + '</span></div>' +
+                                    '<div><span class="search_suobj_url">' + value.url + '</span></div>' +
+                                    '</a>' +
+                                    '<div class="search_suobj_keyword_wrapper">' + keyword + '</div>' +
+                                    '</div>'
                                 $('#content_result_suobj').append(appender)
 
                             })

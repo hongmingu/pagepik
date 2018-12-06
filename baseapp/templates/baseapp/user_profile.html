@@ -226,7 +226,7 @@
         $('#profile_search_textarea').on('keypress', function (e) {
             if (e.keyCode == 13 && !e.shiftKey) {
                 var text = $('#profile_search_textarea').val()
-                if (text === '') {
+                if (text.trim() === '') {
                     return false;
                 }
                 var scheme = window.location.protocol == "https:" ? "https://" : "http://";
@@ -238,7 +238,7 @@
         $('#profile_search_btn').click(function (e) {
             e.preventDefault()
             var text = $('#profile_search_textarea').val()
-            if (text === '') {
+            if (text.trim() === '') {
                 return false;
             }
             var scheme = window.location.protocol == "https:" ? "https://" : "http://";

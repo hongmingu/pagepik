@@ -29,7 +29,7 @@ $(function () {
                     appender.on('keypress', function (e) {
                         if (e.keyCode === 13) {
                             var passed_value = $('#search_mobile_input').val()
-                            if (passed_value === '') {
+                            if (passed_value.trim() === '') {
                                 return false;
                             }
                             //need ajax
@@ -41,7 +41,7 @@ $(function () {
                     appender.find('#search_mobile_btn').on('click', function (e) {
                         e.preventDefault()
                         var passed_value = $('#search_mobile_input').val()
-                            if (passed_value === '') {
+                            if (passed_value.trim() === '') {
                                 return false;
                         }
                         //need ajax
@@ -91,7 +91,7 @@ $(function () {
                             appender.on('keypress', function (e) {
                                 if (e.keyCode === 13) {
                                     var passed_value = $('#search_mobile_input').val()
-                                    if (passed_value === '') {
+                                    if (passed_value.trim() === '') {
                                         return false;
                                     }
                                     //need locate
@@ -103,7 +103,7 @@ $(function () {
                             appender.find('#search_mobile_btn').on('click', function (e) {
                                 e.preventDefault()
                                 var passed_value = $('#search_mobile_input').val()
-                                if (passed_value === '') {
+                                if (passed_value.trim() === '') {
                                     return false;
                                 }
                                 var path = '/search/all/?q=' + passed_value
@@ -121,7 +121,7 @@ $(function () {
     $('#search_desktop_input').on('keypress', function (e) {
         if (e.keyCode === 13) {
             var passed_value = $('#search_desktop_input').val()
-            if (passed_value === '') {
+            if (passed_value.trim() === '') {
                 return false;
             }
 var path = '/search/all/?q=' + passed_value
@@ -133,7 +133,7 @@ var path = '/search/all/?q=' + passed_value
     $('#search_desktop_btn').on('click', function (e) {
         e.preventDefault()
         var passed_value = $('#search_desktop_input').val()
-            if (passed_value === '') {
+            if (passed_value.trim() === '') {
                 return false;
         }
         var path = '/search/all/?q=' + passed_value
