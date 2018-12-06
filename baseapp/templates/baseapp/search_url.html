@@ -11,6 +11,7 @@
     <script src="{% static 'js/nav_badge.js' %}"></script>
 
     <script src="{% static 'js/date_differ.js' %}"></script>
+    <script src="{% static 'js/search_url_populate.js' %}"></script>
 
     <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
     {% if user.is_authenticated %}
@@ -50,6 +51,7 @@
         </div>
     </div>
 </div>
+{% include 'baseapp/_modal_search_url_populate.html' %}
 </body>
 <script>
     $(function () {
@@ -71,7 +73,11 @@
 
                         } else {
                             $.each(data.output, function (key, value) {
-                                var appender = ''
+                                var appender = '<div id="url_wrapper_' + value + '">' +
+                                    '<script defer>' +
+                                    '    search_url_populate("' + value + '")' +
+                                    '<' + '/script>' +
+                                    '</div>'
                                 $('#content_result').append(appender)
 
                             })
@@ -107,8 +113,13 @@
 
                         } else {
                             $.each(data.output, function (key, value) {
-                                var appender = ''
+                                var appender = '<div id="url_wrapper_' + value + '">' +
+                                    '<script defer>' +
+                                    '    search_url_populate("' + value + '")' +
+                                    '<' + '/script>' +
+                                    '</div>'
                                 $('#content_result').append(appender)
+
 
                             })
                         }

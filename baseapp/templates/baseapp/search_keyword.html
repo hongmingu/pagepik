@@ -71,9 +71,12 @@
 
                         } else {
                             $.each(data.output, function (key, value) {
-                                var appender = ''
+                                var appender = '<div>' +
+                                    '<a href="/search/all/?q=' + value + '">' +
+                                    '<span class="search_keyword">' + value + '</span>' +
+                                    '</a>' +
+                                    '</div>'
                                 $('#content_result').append(appender)
-
                             })
                         }
 
@@ -107,9 +110,12 @@
 
                         } else {
                             $.each(data.output, function (key, value) {
-                                var appender = ''
+                                var appender = '<div>' +
+                                    '<a href="/search/all/?q=' + value + '">' +
+                                    '<span class="search_keyword">' + value + '</span>' +
+                                    '</a>' +
+                                    '</div>'
                                 $('#content_result').append(appender)
-
                             })
                         }
 

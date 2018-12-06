@@ -111,8 +111,21 @@ def search_user(request):
         return render(request, 'baseapp/search_user.html', {'word': word})
 
 
+def search_my(request):
+    if request.method == "GET":
+        if not request.user.is_authenticated:
+            return redirect(reverse('baseapp:main_create_log_in'))
+        q = request.GET.get('q', None)
+        if q is None:
+            q = ''
+        word = q
+        return render(request, 'baseapp/search_my.html', {'word': word})
+
+
 def search_bridge(request):
     if request.method == "GET":
+        if not request.user.is_authenticated:
+            return redirect(reverse('baseapp:main_create_log_in'))
         q = request.GET.get('q', None)
         if q is None:
             q = ''

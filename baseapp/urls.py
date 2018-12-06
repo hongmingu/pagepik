@@ -19,6 +19,7 @@ urlpatterns = [
             views.user_profile, name='user_profile'),
 
     re_path(r'^search/all/$', views.search_all, name='search_all'),
+    re_path(r'^search/my/$', views.search_my, name='search_my'),
     re_path(r'^search/user/$', views.search_user, name='search_user'),
     re_path(r'^search/bridge/$', views.search_bridge, name='search_bridge'),
     re_path(r'^search/keyword/$', views.search_keyword, name='search_keyword'),

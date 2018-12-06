@@ -1,5 +1,6 @@
 $(function () {
     if ($('#search_word').html() === '') {
+        $('#content_my').append('<div class="h4">need search word</div>')
         $('#content_user').append('<div class="h4">need search word</div>')
         $('#content_bridge').append('<div class="h4">need search word</div>')
         $('#content_keyword').append('<div class="h4">need search word</div>')
@@ -26,18 +27,18 @@ $(function () {
                         $.each(data.my_output, function (key, value) {
                             var keyword = ''
                             $.each(value.keyword_output, function (key, value) {
-                                keyword = keyword + '<span class="search_bridge_keyword">' + value + '</span>'
+                                keyword = keyword + '<span class="search_suobj_keyword">' + value + '</span>'
                             })
-                            var appender = '<div class="search_bridge_wrapper">' +
+                            var appender = '<div class="search_suobj_wrapper">' +
                                 '<div>' +
-                                '<a href="/' + value.username + '/"><span class="search_bridge_username">' + value.username + '</span></a>' +
-                                '<a href="/object/' + value.id + '/"><span class="search_bridge_more">more</span></a>' +
+                                '<a href="/' + value.username + '/"><span class="search_suobj_username">' + value.username + '</span></a>' +
+                                '<a href="/object/' + value.id + '/"><span class="search_suobj_detail">detail</span></a>' +
                                 '</div>' +
                                 '<a href="' + value.url + '">' +
-                                '<div><span class="search_bridge_title">' + value.title + '</span></div>' +
-                                '<div><span class="search_bridge_url">' + value.url + '</span></div>' +
+                                '<div><span class="search_suobj_title">' + value.title + '</span></div>' +
+                                '<div><span class="search_suobj_url">' + value.url + '</span></div>' +
                                 '</a>' +
-                                '<div class="search_bridge_keyword_wrapper">' + keyword + '</div>' +
+                                '<div class="search_suobj_keyword_wrapper">' + keyword + '</div>' +
                                 '</div>'
 
                             $('#content_my').append(appender)
@@ -76,18 +77,18 @@ $(function () {
                         $.each(data.bridge_output, function (key, value) {
                             var keyword = ''
                             $.each(value.keyword_output, function (key, value) {
-                                keyword = keyword + '<span class="search_bridge_keyword">' + value + '</span>'
+                                keyword = keyword + '<span class="search_suobj_keyword">' + value + '</span>'
                             })
-                            var appender = '<div class="search_bridge_wrapper">' +
+                            var appender = '<div class="search_suobj_wrapper">' +
                                 '<div>' +
-                                '<a href="/' + value.username + '/"><span class="search_bridge_username">' + value.username + '</span></a>' +
-                                '<a href="/object/' + value.id + '/"><span class="search_bridge_more">more</span></a>' +
+                                '<a href="/' + value.username + '/"><span class="search_suobj_username">' + value.username + '</span></a>' +
+                                '<a href="/object/' + value.id + '/"><span class="search_suobj_detail">detail</span></a>' +
                                 '</div>' +
                                 '<a href="' + value.url + '">' +
-                                '<div><span class="search_bridge_title">' + value.title + '</span></div>' +
-                                '<div><span class="search_bridge_url">' + value.url + '</span></div>' +
+                                '<div><span class="search_suobj_title">' + value.title + '</span></div>' +
+                                '<div><span class="search_suobj_url">' + value.url + '</span></div>' +
                                 '</a>' +
-                                '<div class="search_bridge_keyword_wrapper">' + keyword + '</div>' +
+                                '<div class="search_suobj_keyword_wrapper">' + keyword + '</div>' +
                                 '</div>'
 
                             $('#content_bridge').append(appender)

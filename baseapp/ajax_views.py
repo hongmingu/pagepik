@@ -1193,6 +1193,7 @@ def re_search_all(request):
                 for sub_raw_keyword in sub_raw_keywords:
                     sub_raw_keywords_output.append(sub_raw_keyword.text)
                 sub_output = {
+                    'username': request.user.userusername.username,
                     'id': my.uuid,
                     'title': my.title.text,
                     'url': my.url_object.get_url(),
@@ -1204,7 +1205,7 @@ def re_search_all(request):
             if request.user.is_authenticated:
                 if loc is None:
                     suobjs = SubUrlObject.objects.filter(
-                        (Q(user__is_bridged__user=request.user) | Q(user=request.user))
+                        (Q(user__is_bridged__user=request.user))
                         & (Q(user__userusername__username__icontains=search_word)
                            | Q(title__text__icontains=search_word)
                            | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=search_word)
@@ -1212,7 +1213,7 @@ def re_search_all(request):
                         '-created').distinct()[:10]
                 else:
                     suobjs = SubUrlObject.objects.filter(
-                        (Q(user__is_bridged__user=request.user) | Q(user=request.user))
+                        (Q(user__is_bridged__user=request.user))
                         & (Q(user__userusername__username__icontains=search_word)
                            | Q(title__text__icontains=search_word)
                            | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=search_word)
@@ -1376,7 +1377,9 @@ def re_search_my(request):
                     for sub_raw_keyword in sub_raw_keywords:
                         sub_raw_keywords_output.append(sub_raw_keyword.text)
                     sub_output = {
+                        'username': suobj.user.userusername.username,
                         'id': suobj.uuid,
+                        'title': suobj.title.text,
                         'url': suobj.url_object.get_url(),
                         'keyword_output': sub_raw_keywords_output
                     }
@@ -1467,6 +1470,7 @@ def re_search_bridge(request):
                     sub_output = {
                         'username': suobj.user.userusername.username,
                         'id': suobj.uuid,
+                        'title': suobj.title.text,
                         'url': suobj.url_object.get_url(),
                         'keyword_output': sub_raw_keywords_output
                     }
