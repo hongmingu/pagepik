@@ -137,7 +137,7 @@ def is_unable_url(url):
 
 def check_success_url(url, o_count, success_list, not_301_redirect_list, user):
     user = user
-    if o_count > 30:
+    if o_count > 100:
         return
     req = None
     headers = {
@@ -1149,6 +1149,7 @@ def re_search_all(request):
     if request.method == "POST":
         if request.is_ajax():
             search_word = request.POST.get('search_word', None)
+            print(search_word)
 
             loc = None
             if not is_unable_url(search_word):
@@ -1167,6 +1168,38 @@ def re_search_all(request):
 
                 user_output.append(sub_output)
 
+            my_output = []
+            if request.user.is_authenticated:
+                if loc is None:
+                    mys = SubUrlObject.objects.filter(
+                        (Q(user=request.user))
+                        & (Q(title__text__icontains=search_word)
+                           | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=search_word)
+                           )).order_by(
+                        '-created').distinct()[:10]
+                else:
+                    mys = SubUrlObject.objects.filter(
+                        (Q(user=request.user))
+                        & (Q(title__text__icontains=search_word)
+                           | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=search_word)
+                           | Q(url_object__loc__icontains=loc))).order_by(
+                        '-created').distinct()[:10]
+            else:
+                mys = SubUrlObject.objects.none()
+
+            for my in mys:
+                sub_raw_keywords = SubRawKeyword.objects.filter(sub_url_object=my).order_by('created')[:5]
+                sub_raw_keywords_output = []
+                for sub_raw_keyword in sub_raw_keywords:
+                    sub_raw_keywords_output.append(sub_raw_keyword.text)
+                sub_output = {
+                    'id': my.uuid,
+                    'title': my.title.text,
+                    'url': my.url_object.get_url(),
+                    'keyword_output': sub_raw_keywords_output
+                }
+
+                my_output.append(sub_output)
             suobj_output = []
             if request.user.is_authenticated:
                 if loc is None:
@@ -1224,6 +1257,7 @@ def re_search_all(request):
 
             return JsonResponse({'res': 1,
                                  'user_output': user_output,
+                                 'my_output': my_output,
                                  'bridge_output': suobj_output,
                                  'keyword_output': keyword_output,
                                  'url_output': url_output})
@@ -1277,25 +1311,105 @@ def re_search_user(request):
 
 
 @ensure_csrf_cookie
+def re_search_my(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                search_word = request.POST.get('search_word', None)
+                end_id = request.POST.get('end_id', None)
+
+                loc = None
+                if not is_unable_url(search_word):
+                    loc = url_without_scheme(search_word)
+
+                step = 10
+                sub_raw_keyword_step = 5
+
+                if end_id == '':
+                    if loc is None:
+                        suobjs = SubUrlObject.objects.filter(
+                            (Q(user=request.user)) &
+                            (Q(title__text__icontains=search_word)
+                             | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=search_word)
+                             )).order_by(
+                            '-created').distinct()[:step]
+                    else:
+                        suobjs = SubUrlObject.objects.filter(
+                            (Q(user=request.user)) &
+                            (Q(title__text__icontains=search_word)
+                             | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=search_word)
+                             | Q(url_object__loc__icontains=loc))).order_by(
+                            '-created').distinct()[:step]
+                else:
+                    try:
+                        end_suobjs = SubUrlObject.objects.get(uuid=end_id)
+                    except Exception as e:
+                        print(e)
+                        return JsonResponse({'res': 0})
+                    if loc is None:
+                        suobjs = SubUrlObject.objects.filter(
+                            ((Q(user=request.user)) &
+                             (Q(title__text__icontains=search_word)
+                             | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=
+                                 search_word)))
+                            & Q(pk__lt=end_suobjs.pk)).order_by(
+                            '-created').distinct()[:step]
+                    else:
+                        suobjs = SubUrlObject.objects.filter(
+                            ((Q(user=request.user)) &
+                             (Q(title__text__icontains=search_word)
+                              | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=
+                                  search_word)
+                              | Q(url_object__loc__icontains=loc)))
+                            & Q(pk__lt=end_suobjs.pk)).order_by(
+                            '-created').distinct()[:step]
+                output = []
+                count = 0
+                end = None
+                for suobj in suobjs:
+                    count = count + 1
+                    if count == step:
+                        end = suobj.uuid
+                    sub_raw_keywords = SubRawKeyword.objects.filter(
+                        sub_url_object=suobj).order_by('created')[:sub_raw_keyword_step]
+                    sub_raw_keywords_output = []
+                    for sub_raw_keyword in sub_raw_keywords:
+                        sub_raw_keywords_output.append(sub_raw_keyword.text)
+                    sub_output = {
+                        'id': suobj.uuid,
+                        'url': suobj.url_object.get_url(),
+                        'keyword_output': sub_raw_keywords_output
+                    }
+
+                    output.append(sub_output)
+
+                return JsonResponse({'res': 1,
+                                     'output': output,
+                                     'end': end})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
 def re_search_bridge(request):
     if request.method == "POST":
-        if request.is_ajax():
-            search_word = request.POST.get('search_word', None)
-            end_id = request.POST.get('end_id', None)
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                search_word = request.POST.get('search_word', None)
+                end_id = request.POST.get('end_id', None)
 
-            loc = None
-            if not is_unable_url(search_word):
-                loc = url_without_scheme(search_word)
+                loc = None
+                if not is_unable_url(search_word):
+                    loc = url_without_scheme(search_word)
 
-            step = 10
-            sub_raw_keyword_step = 5
+                step = 10
+                sub_raw_keyword_step = 5
 
-            if request.user.is_authenticated:
                 if end_id == '':
                     if loc is None:
 
                         suobjs = SubUrlObject.objects.filter(
-                            (Q(user__is_bridged__user=request.user) | Q(user=request.user)) &
+                            (Q(user__is_bridged__user=request.user)) &
                             (Q(user__userusername__username__icontains=search_word)
                              | Q(title__text__icontains=search_word)
                              | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=search_word)
@@ -1303,7 +1417,7 @@ def re_search_bridge(request):
                             '-created').distinct()[:step]
                     else:
                         suobjs = SubUrlObject.objects.filter(
-                            (Q(user__is_bridged__user=request.user) | Q(user=request.user)) &
+                            (Q(user__is_bridged__user=request.user)) &
                             (Q(user__userusername__username__icontains=search_word)
                              | Q(title__text__icontains=search_word)
                              | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=search_word)
@@ -1318,7 +1432,7 @@ def re_search_bridge(request):
                         return JsonResponse({'res': 0})
                     if loc is None:
                         suobjs = SubUrlObject.objects.filter(
-                            ((Q(user__is_bridged__user=request.user) | Q(user=request.user)) &
+                            ((Q(user__is_bridged__user=request.user)) &
                              (Q(user__userusername__username__icontains=search_word)
                              | Q(title__text__icontains=search_word)
                              | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=
@@ -1328,7 +1442,7 @@ def re_search_bridge(request):
                             '-created').distinct()[:step]
                     else:
                         suobjs = SubUrlObject.objects.filter(
-                            ((Q(user__is_bridged__user=request.user) | Q(user=request.user)) &
+                            ((Q(user__is_bridged__user=request.user)) &
                              (Q(user__userusername__username__icontains=search_word)
                               | Q(title__text__icontains=search_word)
                               | Q(suburlobjectsubkeyword__sub_keyword__keyword__text__icontains=
@@ -1337,33 +1451,31 @@ def re_search_bridge(request):
                               | Q(url_object__loc__icontains=loc)))
                             & Q(pk__lt=end_suobjs.pk)).order_by(
                             '-created').distinct()[:step]
-            else:
-                suobjs = SubUrlObject.objects.none()
 
-            output = []
-            count = 0
-            end = None
-            for suobj in suobjs:
-                count = count + 1
-                if count == step:
-                    end = suobj.uuid
-                sub_raw_keywords = SubRawKeyword.objects.filter(
-                    sub_url_object=suobj).order_by('created')[:sub_raw_keyword_step]
-                sub_raw_keywords_output = []
-                for sub_raw_keyword in sub_raw_keywords:
-                    sub_raw_keywords_output.append(sub_raw_keyword.text)
-                sub_output = {
-                    'username': suobj.user.userusername.username,
-                    'id': suobj.uuid,
-                    'url': suobj.url_object.get_url(),
-                    'keyword_output': sub_raw_keywords_output
-                }
+                output = []
+                count = 0
+                end = None
+                for suobj in suobjs:
+                    count = count + 1
+                    if count == step:
+                        end = suobj.uuid
+                    sub_raw_keywords = SubRawKeyword.objects.filter(
+                        sub_url_object=suobj).order_by('created')[:sub_raw_keyword_step]
+                    sub_raw_keywords_output = []
+                    for sub_raw_keyword in sub_raw_keywords:
+                        sub_raw_keywords_output.append(sub_raw_keyword.text)
+                    sub_output = {
+                        'username': suobj.user.userusername.username,
+                        'id': suobj.uuid,
+                        'url': suobj.url_object.get_url(),
+                        'keyword_output': sub_raw_keywords_output
+                    }
 
-                output.append(sub_output)
+                    output.append(sub_output)
 
-            return JsonResponse({'res': 1,
-                                 'output': output,
-                                 'end': end})
+                return JsonResponse({'res': 1,
+                                     'output': output,
+                                     'end': end})
 
         return JsonResponse({'res': 2})
 
@@ -1553,7 +1665,7 @@ def re_bridge_feed(request):
                         username = item.user.userusername.username
 
                     sub_output = {
-                        'kind': kind,
+                        'obj_type': kind,
                         'id': identity,
                         'username': username
 
@@ -1631,7 +1743,7 @@ def re_home(request):
                         ).first()
                     if suobj_obj is not None:
                         sub_output = {
-                            'uuid': suobj_obj.uuid,
+                            'id': suobj_obj.uuid,
                             'obj_type': 'keyword',
                             'keyword': item,
                             'created': suobj_obj.created
@@ -1682,10 +1794,9 @@ def re_home(request):
                         sub_user = sub_qs[sub_order]
 
                         sub_output = {
-                            'uuid': item.uuid,
+                            'id': item.uuid,
                             'obj_type': 'help',
-                            'helped_user': sub_user.user.userusername.username,
-                            'help_count': item.help_count,
+                            'username': sub_user.user.userusername.username,
                             'created': item.created
                         }
                         qs2_list.append(sub_output)

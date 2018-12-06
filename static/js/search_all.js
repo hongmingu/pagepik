@@ -13,6 +13,39 @@ $(function () {
             success: function (data) {
                 console.log(data)
                 if (data.res === 1) {
+                    if (data.my_output.length === 0) {
+                        if ($('#user_id') === '') {
+                            $('#content_my').append('<a href="/"><div class="h4">need to login</div></a>')
+                        }
+                        $('#content_my').append('<div class="h4">no results</div>')
+                        $('#more_my').addClass('hidden')
+
+
+                    } else {
+                        $('#more_my').removeClass('hidden')
+                        $.each(data.my_output, function (key, value) {
+                            var keyword = ''
+                            $.each(value.keyword_output, function (key, value) {
+                                keyword = keyword + '<span class="search_bridge_keyword">' + value + '</span>'
+                            })
+                            var appender = '<div class="search_bridge_wrapper">' +
+                                '<div>' +
+                                '<a href="/' + value.username + '/"><span class="search_bridge_username">' + value.username + '</span></a>' +
+                                '<a href="/object/' + value.id + '/"><span class="search_bridge_more">more</span></a>' +
+                                '</div>' +
+                                '<a href="' + value.url + '">' +
+                                '<div><span class="search_bridge_title">' + value.title + '</span></div>' +
+                                '<div><span class="search_bridge_url">' + value.url + '</span></div>' +
+                                '</a>' +
+                                '<div class="search_bridge_keyword_wrapper">' + keyword + '</div>' +
+                                '</div>'
+
+                            $('#content_my').append(appender)
+
+                        })
+                    }
+
+
                     //post set
                     if (data.user_output.length === 0) {
                         $('#content_user').append('<div class="h4">no results</div>')
@@ -50,9 +83,9 @@ $(function () {
                                 '<a href="/' + value.username + '/"><span class="search_bridge_username">' + value.username + '</span></a>' +
                                 '<a href="/object/' + value.id + '/"><span class="search_bridge_more">more</span></a>' +
                                 '</div>' +
-                                '<a href="'+value.url+'">' +
-                                '<div><span class="search_bridge_title">'+value.title+'</span></div>' +
-                                '<div><span class="search_bridge_url">'+value.url+'</span></div>' +
+                                '<a href="' + value.url + '">' +
+                                '<div><span class="search_bridge_title">' + value.title + '</span></div>' +
+                                '<div><span class="search_bridge_url">' + value.url + '</span></div>' +
                                 '</a>' +
                                 '<div class="search_bridge_keyword_wrapper">' + keyword + '</div>' +
                                 '</div>'

@@ -28,7 +28,7 @@
 <!--navbar end-->
 <!--page info-->
 {% include 'others/bootstrap_tester.html' %}
-<div class="hidden" id="page_kind">user</div>
+<div class="hidden" id="page_kind"></div>
 
 {% if user.is_authenticated %}
     <div class="hidden" id="user_id">{{ user.username }}</div>

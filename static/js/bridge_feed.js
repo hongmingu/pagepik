@@ -7,7 +7,21 @@ $(function () {
         success: function (data) {
             console.log(data)
             $.each(data.output, function (key, value) {
-                var appender = ''
+                var obj_type = ''
+                if (value.obj_type === 'help') {
+                    obj_type = '<div>' +
+                        '<a href="/' + value.username + '/">' +
+                        '<span class="home_pop_username">' + value.username + '</span>' +
+                        '</a>' +
+                        '<span class="home_pop_help">found this helpful</span>' +
+                        '</div>'
+                }
+                var suobj = '<div class="row div_base" id="suobj_wrapper_' + value.id + '">' +
+                    '<script defer>' +
+                    '    suobj_populate("' + value.id + '")' +
+                    '<' + '/script>' +
+                    '</div>'
+                var appender = '<div id="obj_' + value.id + '">' + obj_type + suobj + '</div>'
                 $('#content').append(appender)
             })
             if (data.end === null) {
@@ -31,7 +45,21 @@ $(function () {
             success: function (data) {
                 console.log(data)
                 $.each(data.output, function (key, value) {
-                    var appender = ''
+                    var obj_type = ''
+                    if (value.obj_type === 'help') {
+                        obj_type = '<div>' +
+                            '<a href="/' + value.username + '/">' +
+                            '<span class="home_pop_username">' + value.username + '</span>' +
+                            '</a>' +
+                            '<span class="home_pop_help">found this helpful</span>' +
+                            '</div>'
+                    }
+                    var suobj = '<div class="row div_base" id="suobj_wrapper_' + value.id + '">' +
+                        '<script defer>' +
+                        '    suobj_populate("' + value.id + '")' +
+                        '<' + '/script>' +
+                        '</div>'
+                    var appender = '<div id="obj_' + value.id + '">' + obj_type + suobj + '</div>'
                     $('#content').append(appender)
                 })
                 if (data.end === null) {
@@ -41,6 +69,7 @@ $(function () {
                     $('#more_load').addClass('hidden')
                     $('#end_id').html(data.end)
                 }
+
             }
         })
     })

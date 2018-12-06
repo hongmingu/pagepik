@@ -81,6 +81,9 @@ urlpatterns = [
 
     re_path(r'^re/search/all/$', base_ajax_views.re_search_all,
             name='re_search_all'),
+    re_path(r'^re/search/my/$', base_ajax_views.re_search_my,
+            name='re_search_my'),
+
     re_path(r'^re/search/user/$', base_ajax_views.re_search_user,
             name='re_search_user'),
     re_path(r'^re/search/bridge/$', base_ajax_views.re_search_bridge,
