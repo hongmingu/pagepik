@@ -337,6 +337,8 @@ def re_register_url(request):
                     is_discrete = False
 
                 keyword_list = request.POST.getlist('keyword_list[]')
+                if len(keyword_list) == 0:
+                    return JsonResponse({'res': 0})
 
                 url_object = None
                 try:
@@ -519,6 +521,12 @@ def re_update_complete_url(request):
                         sub_url_object.save()
 
                 keyword_list = request.POST.getlist('keyword_list[]')
+                delete_list = request.POST.getlist('delete_list[]')
+
+                if len(keyword_list) <= len(delete_list):
+                    return JsonResponse({'res': 0})
+                if len(keyword_list) == 0:
+                    return JsonResponse({'res': 0})
 
                 new_keyword_list = []
 
@@ -547,7 +555,7 @@ def re_update_complete_url(request):
                                                                               sub_keyword=sub_keyword[0],
                                                                               sub_url_object=sub_url_object,
                                                                               user=request.user)
-                delete_list = request.POST.getlist('delete_list[]')
+
                 new_delete_list = []
                 for item in delete_list:
                     new_delete_list.append(item.strip())

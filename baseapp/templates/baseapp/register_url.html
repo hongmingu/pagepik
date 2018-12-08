@@ -383,7 +383,7 @@
         })
         $('#complete_keyword').click(function (e) {
             if ($('.added_keyword').length === 0) {
-                $('#modal_register').modal('show')
+                    $('#keyword_clue').html('need some keyword')
                 return false
             }
             e.preventDefault()
@@ -414,35 +414,6 @@
                 }
             });
 
-        })
-        $('#pass_register').click(function (e) {
-            e.preventDefault()
-            var send_array = []
-            $('.added_keyword').each(function () {
-                send_array.push($(this).html())
-            })
-            $.ajax({
-                url: '/re/register/url/', type: 'post', dataType: 'json', cache: false,
-                data: {
-                    discrete_loc: $('#discrete_loc').html(),
-                    discrete_scheme: $('#discrete_scheme').html(),
-                    in_not_301: $('#in_not_301').html(),
-                    is_discrete: $('#is_discrete').html(),
-                    loc: $('#loc').html(),
-                    scheme: $('#scheme').html(),
-                    title: $('#title').html(),
-                    url: $('#url').html(),
-                    init_url: $('#init_url').html(),
-                    keyword_list: send_array
-                },
-                success: function (data) {
-                    if (data.res === 1) {
-                        var scheme = window.location.protocol == "https:" ? "https://" : "http://";
-                        var update_location = scheme + window.location.host + "/object/" + data.id + '/';
-                        location.href = update_location
-                    }
-                }
-            });
         })
         // added keywords 는 $('.added_keyword').length 를 이용해 30개를 맥스로 하자. 수정시에도 이걸 이용하면 편할 것이다.
         // 그리고 수정시엔 keyword to add 랑 keyword to delete 를 만들고 그 아래 컴플릿을 해서 장고 서버에서도 다루기 쉽게 하자.
