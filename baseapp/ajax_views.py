@@ -106,6 +106,12 @@ def is_unable_url(url):
     # from urlparse import urlparse  # Python 2
     if not (url.startswith('http://') or url.startswith('https://')):
         url = 'https://' + url
+    https_www = 'https://www.macawl.'
+    https = 'https://macawl.'
+    http_www = 'http://www.macawl.'
+    http = 'http://macawl.'
+    if url.startswith(https_www) or url.startswith(https) or url.startswith(http_www) or url.startswith(http):
+        return True
 
     regex = re.compile(
         r'^(?:http|ftp)s?://'  # http:// or https://
