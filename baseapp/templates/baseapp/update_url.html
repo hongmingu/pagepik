@@ -94,7 +94,6 @@
                 id: $('#id').html(),
             },
             success: function (data) {
-                console.log(data)
                 if (data.res === 1) {
                     $('#add_keyword_title').html(data.title)
                     $('#add_keyword_url').html(data.url)
@@ -142,7 +141,6 @@
                 },
                 success: function (data) {
                     $('#refresh_title').html('refresh title')
-                    console.log(data)
                     if (data.res === 1) {
                         $('#refresh').html('true')
                         $('#add_keyword_title').html(data.title)
@@ -276,15 +274,20 @@
         })
 
         $('#complete_keyword').click(function (e) {
+            e.preventDefault()
+            if ($('#complete_keyword').html() === 'waiting...') {
+                return false
+            }
+
             if ($('.added_keyword').length === 0) {
                 $('#keyword_clue').html('need some keyword')
                 return false
             }
-            if ($('.added_keyword').length === $('.added_keyword').length) {
+            if ($('.added_keyword').length === $('.deleted_keyword').length) {
                 $('#keyword_clue').html('need some keyword. do not delete all keyword.')
                 return false
             }
-            e.preventDefault()
+
             var send_array = []
             $('.added_keyword').each(function () {
                 send_array.push($(this).html())
@@ -293,6 +296,8 @@
             $('.deleted_keyword').each(function () {
                 delete_array.push($(this).html())
             })
+
+            $('#complete_keyword').html('waiting...')
             $.ajax({
                 url: '/re/update/complete/url/', type: 'post', dataType: 'json', cache: false,
                 data: {
@@ -304,6 +309,8 @@
                     delete_list: delete_array
                 },
                 success: function (data) {
+                    $('#complete_keyword').html('complete')
+
                     if (data.res === 1) {
                         var scheme = window.location.protocol == "https:" ? "https://" : "http://";
                         var update_location = scheme + window.location.host + "/object/" + $('#id').html() + '/';

@@ -382,15 +382,23 @@
 
         })
         $('#complete_keyword').click(function (e) {
+
+            e.preventDefault()
+
+            if ($('#complete_keyword').html() === 'waiting...') {
+                return false
+            }
+
             if ($('.added_keyword').length === 0) {
                     $('#keyword_clue').html('need some keyword')
                 return false
             }
-            e.preventDefault()
             var send_array = []
             $('.added_keyword').each(function () {
                 send_array.push($(this).html())
             })
+
+            $('#complete_keyword').html('waiting...')
             $.ajax({
                 url: '/re/register/url/', type: 'post', dataType: 'json', cache: false,
                 data: {
@@ -406,6 +414,7 @@
                     keyword_list: send_array
                 },
                 success: function (data) {
+                    $('#complete_keyword').html('complete')
                     if (data.res === 1) {
                         var scheme = window.location.protocol == "https:" ? "https://" : "http://";
                         var update_location = scheme + window.location.host + "/object/" + data.id + '/';
