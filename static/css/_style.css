@@ -701,3 +701,6 @@ a:active {
 .modal_pop_menu_input{
     width: 90%!important;
 }
+.pro_textarea{
+    resize: none!important;
+}

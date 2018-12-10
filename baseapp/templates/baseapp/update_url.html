@@ -33,8 +33,10 @@
 <div class="hidden" id="id">{{ id }}</div>
 {% if user.is_authenticated %}
     <div class="hidden" id="user_id">{{ user.username }}</div>
+    <div class="hidden" id="user_username">{{ user.userusername.username }}</div>
 {% else %}
     <div class="hidden" id="user_id"></div>
+    <div class="hidden" id="user_username"></div>
 {% endif %}
 <div class="hidden" id="refresh">false</div>
 <div class="hidden" id="status_code"></div>
@@ -313,7 +315,7 @@
 
                     if (data.res === 1) {
                         var scheme = window.location.protocol == "https:" ? "https://" : "http://";
-                        var update_location = scheme + window.location.host + "/object/" + $('#id').html() + '/';
+                        var update_location = scheme + window.location.host + '/' + $('#user_username').html() + '/';
                         location.href = update_location
                     }
                 }

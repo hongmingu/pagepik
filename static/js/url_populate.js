@@ -169,13 +169,15 @@ $(function () {
                         }
 
 
-                        _keyword = '<span>' + value.keyword + '</span>' +
+                        _keyword = '<span class="url_pop_keyword_wrapper">' +
+                            '<span class="url_pop_keyword">' + value.keyword + '</span>' +
                             _register +
-                            '<span id="url_pop_reg_count_' + id + '">' + value.reg_count + '</span>' +
+                            '<span class="url_pop_reg_count" id="url_pop_reg_count_' + id + '">' + value.reg_count + '</span>' +
                             _up +
-                            '<span id="url_pop_up_count_' + id + '">' + value.up_count + '</span>' +
+                            '<span class="url_pop_up_count" id="url_pop_up_count_' + id + '">' + value.up_count + '</span>' +
                             _down +
-                            '<span id="url_pop_down_count_' + id + '">' + value.down_count + '</span>'
+                            '<span class="url_pop_down_count" id="url_pop_down_count_' + id + '">' + value.down_count + '</span>' +
+                            '</span>'
 
 
                         $('#keyword_list').append(_keyword)
