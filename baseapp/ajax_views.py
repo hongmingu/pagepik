@@ -1774,7 +1774,9 @@ def re_home(request):
                     suobj_qs2 = SubUrlObject.objects.filter(
                         Q(suburlobjecthelp__isnull=False)).exclude(
                         Q(suburlobjecthelp__user__is_bridged__user=request.user)
-                        | Q(user__is_bridged__user=request.user)).order_by(
+                        | Q(user__is_bridged__user=request.user)
+                        | Q(user=request.user)
+                        | Q(suburlobjecthelp__user=request.user)).order_by(
                         '-suburlobjecthelp__created', '-created').distinct()[:step]
 
                 else:
@@ -1788,7 +1790,9 @@ def re_home(request):
                         Q(suburlobjecthelp__isnull=False)
                         & Q(suburlobjecthelp__created__lt=end_suobj.suburlobjecthelp_set.last().created)).exclude(
                         Q(suburlobjecthelp__user__is_bridged__user=request.user)
-                        | Q(user__is_bridged__user=request.user)).order_by(
+                        | Q(user__is_bridged__user=request.user)
+                        | Q(user=request.user)
+                        | Q(suburlobjecthelp__user=request.user)).order_by(
                         '-suburlobjecthelp__created', '-created').distinct()[:step]
                 end = None
                 if suobj_qs2 is not None:

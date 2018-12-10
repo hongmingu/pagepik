@@ -49,8 +49,12 @@
                     <div align="right"><a href=""><span class="glyphicon glyphicon-option-horizontal" id="pop_menu"></span></a></div>
                     <a href="{{ url_object.get_url }}" target="_blank" rel="noopener noreferrer">
                         <div>
-                            <div>{{ url_object.get_url }}</div>
-                            <div>{{ url_object.title_set.last.text }}</div>
+                            <div class="url_info_title_wrapper">
+                                <span class="url_info_title">{{ url_object.title_set.last.text }}</span>
+                            </div>
+                            <div class="url_info_url_wrapper">
+                                <span class="url_info_url">{{ url_object.get_url }}</span>
+                            </div>
                         </div>
                     </a>
                     <div id="keyword_list"></div>

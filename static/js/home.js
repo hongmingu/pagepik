@@ -11,7 +11,7 @@ $(function () {
                 $.each(data.output, function (key, value) {
                     var obj_type = ''
                     if (value.obj_type === 'help') {
-                        obj_type = '<div>' +
+                        obj_type = '<div class="home_help_keyword">' +
                             '<a href="/' + value.username + '/">' +
                             '<span class="home_pop_username">' + value.username + '</span>' +
                             '</a>' +
@@ -19,18 +19,19 @@ $(function () {
                             '</div>'
 
                     } else if (value.obj_type === 'keyword') {
-                        obj_type = '<div>' +
+                        obj_type = '<div class="home_help_keyword">' +
                             '<span class="home_pop_by">by keyword: </span>' +
                             '<span class="home_pop_keyword">' + value.keyword + '</span>' +
                             '</div>'
                     }
                     if (!($('#obj_' + value.id).length > 0)) {
                         var suobj = '<div class="row div_base" id="suobj_wrapper_' + value.id + '">' +
+                            obj_type +
                             '<script defer>' +
                             '    suobj_populate("' + value.id + '")' +
                             '<' + '/script>' +
                             '</div>'
-                        var appender = '<div id="obj_' + value.id + '">' + obj_type + suobj + '</div>'
+                        var appender = '<div id="obj_' + value.id + '">' + suobj + '</div>'
                         $('#content').append(appender)
                     }
                 })

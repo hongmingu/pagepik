@@ -14,18 +14,18 @@ var suobj_populate = function suobj_populate(id) {
                     })
                     var suobj_help = ''
                     if (data.output.suobj_help === 'true') {
-                        suobj_help = '<a href=""><span class="pop_helpful" id="pop_help_' + data.output.suobj_id + '">helped</span></a>'
+                        suobj_help = '<a href=""><span class="pop_helped" id="pop_help_' + data.output.suobj_id + '">helped</span></a>'
                     } else {
-                        suobj_help = '<a href=""><span class="pop_helped" id="pop_help_' + data.output.suobj_id + '">helpful</span></a>'
+                        suobj_help = '<a href=""><span class="pop_helpful" id="pop_help_' + data.output.suobj_id + '">helpful</span></a>'
                     }
-                    var help_count = '<a href=""><span class="pop_help_count" id="pop_help_count_' + data.output.suobj_id + '">' + data.output.help_count + '</span><span class="pop_help_text">helps</span></a>'
+                    var help_count = '<a href=""><span class="pop_help_count" id="pop_help_count_' + data.output.suobj_id + '">' + data.output.help_count + '</span></a><span class="pop_help_text">helps</span>'
 
                     var appender = $('<div id="pop_' + id + '">' +
                         '<div align="right"><a href=""><span class="glyphicon glyphicon-option-horizontal pop_menu"></span></a></div>' +
                         '<div><a href="/' + data.output.username + '/"><span class="pop_username">' + data.output.username + '</span></a></div>' +
-                        '<div><a href="' + data.output.url + '" target="_blank" rel="noopener noreferrer"><span class="pop_title">' + data.output.title + '</span></a></div>' +
+                        '<div class="pop_title_wrapper"><a href="' + data.output.url + '" target="_blank" rel="noopener noreferrer"><span class="pop_title">' + data.output.title + '</span></a></div>' +
                         '<div><a href="' + data.output.url + '" target="_blank" rel="noopener noreferrer"><span class="pop_url">' + data.output.url + '</span></a></div>' +
-                        '<a href="/url/' + data.output.url_id + '/"><div class="pop_public_info">url info</div></a>' +
+                        '<a href="/url/' + data.output.url_id + '/"><div class="pop_public_info_wrapper"><span class="pop_public_info clickable">url info</span></div></a>' +
                         '<div align="right"><span class="pop_created">' + date_differ(data.output.created) + '</span></div>' +
                         '<div class="srk_list">' + srks + '</div>' +
                         '<div>' + help_count + suobj_help + '</div>' +
