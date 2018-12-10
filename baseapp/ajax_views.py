@@ -235,8 +235,7 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list, user):
                         pass
                     if sub_url_object is not None:
                         user_has_it = sub_url_object.uuid
-# ________________________________________________
-# 이제 여기서 update_url 로 바로 넘어가게 하는 템플릿을 register_url에 만들어라.
+
                     sub_appender = {'url': got_url,
                                     'loc': loc,
                                     'title': title,
