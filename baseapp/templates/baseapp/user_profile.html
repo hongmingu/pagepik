@@ -52,36 +52,37 @@
                         <img class="img_300_300" src="{{ chosen_user.userphoto.file_300_url }}">
                     </div>
 
-                    <div align="center"><span>{{ chosen_user.usertextname.name }}</span></div>
-                    <div align="center"><span>{{ chosen_user.userusername.username }}</span></div>
+                    <div align="center"><span class="pro_name">{{ chosen_user.usertextname.name }}</span></div>
+                    <div align="center"><span class="pro_username">{{ chosen_user.userusername.username }}</span></div>
 
                     <div class="row">
-                        <div class="col-xs-6" align="right"><span>bridging: </span>
-                            <a href="#"><span id="count_bridging">{{ chosen_user.bridgingcount.count }}</span></a>
+                        <div class="col-xs-6" align="right"><span class="pro_bridge_label">bridging: </span>
+                            <a href="#"><span class="pro_bridge_count" id="count_bridging">{{ chosen_user.bridgingcount.count }}</span></a>
                         </div>
-                        <div class="col-xs-6" align="left"><span>bridgers: </span>
-                            <a href="#"><span id="count_bridger">{{ chosen_user.bridgercount.count }}</span></a>
+                        <div class="col-xs-6" align="left"><span class="pro_bridge_label">bridgers: </span>
+                            <a href="#"><span class="pro_bridge_count" id="count_bridger">{{ chosen_user.bridgercount.count }}</span></a>
                         </div>
                     </div>
 
                     {% if bridging == None %}
                         <a href="">
                             <div class="hidden" align="center" id="bridge">
-                                <span class="clickable" id="bridge_text">bridge</span>
+                                <span class="clickable pro_bridge" id="bridge_text">bridge</span>
                             </div>
                         </a>
                     {% else %}
                         <a href="">
                             <div class="hidden" align="center" id="bridge">
-                                <span class="clickable" id="bridge_text">bridging <span
+                                <span class="clickable pro_bridge" id="bridge_text">bridging <span
                                         class="glyphicon glyphicon-ok"></span></span>
                             </div>
                         </a>
                     {% endif %}
+                <br/>
                     <div align="center">
                         <form>
                             <div class="input-group input-group-sm">
-                                <textarea class="form-control pro_textarea" id="profile_search_textarea"></textarea>
+                                <textarea class="form-control pro_textarea" id="profile_search_textarea" placeholder="search at {{ chosen_user.userusername.username }}"></textarea>
                                 <div class="input-group-btn">
                                     <button class="btn btn-default" id="profile_search_btn">
                                         <i class="glyphicon glyphicon-send"></i>

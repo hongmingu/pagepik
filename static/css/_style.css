@@ -704,3 +704,22 @@ a:active {
 .pro_textarea{
     resize: none!important;
 }
+.pro_bridge_label{
+    font-size: 14px;
+}
+.pro_bridge_count{
+    font-size: 14px;
+}
+.pro_name{
+    font-size: 16px;
+}
+.pro_username{
+    font-size: 16px; font-weight: bold;
+}
+.pro_bridge{
+    font-size: 12px;
+    font-weight: bold;
+    background-color: var(--main-logoblue-color, darkblue);
+    color: var(--main-logoyellow-color, goldenrod);
+    padding: 1px;
+}

@@ -9,7 +9,7 @@ $(function () {
             $.each(data.output, function (key, value) {
                 var obj_type = ''
                 if (value.obj_type === 'help') {
-                    obj_type = '<div>' +
+                    obj_type = '<div class="home_help_keyword">' +
                         '<a href="/' + value.username + '/">' +
                         '<span class="home_pop_username">' + value.username + '</span>' +
                         '</a>' +
@@ -17,12 +17,16 @@ $(function () {
                         '</div>'
                 }
                 var suobj = '<div class="row div_base" id="suobj_wrapper_' + value.id + '">' +
+                    obj_type +
                     '<script defer>' +
                     '    suobj_populate("' + value.id + '")' +
                     '<' + '/script>' +
                     '</div>'
-                var appender = '<div id="obj_' + value.id + '">' + obj_type + suobj + '</div>'
-                $('#content').append(appender)
+
+                if (!($('#obj_' + value.id).length > 0)) {
+                    var appender = '<div id="obj_' + value.id + '">' + suobj + '</div>'
+                    $('#content').append(appender)
+                }
             })
             if (data.end === null) {
                 $('#more_load').addClass('hidden')
