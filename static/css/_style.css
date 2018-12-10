@@ -723,3 +723,11 @@ a:active {
     color: var(--main-logoyellow-color, goldenrod);
     padding: 1px;
 }
+.pro_update{
+    padding: 1px;
+    background-color: lightgreen;
+}
+.pro_delete{
+    padding: 1px;
+    background-color: var(--main-aselected-color, lightyellow);
+}

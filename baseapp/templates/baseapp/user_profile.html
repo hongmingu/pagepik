@@ -151,7 +151,7 @@
                 $.each(data.output, function (key, value) {
 
                     if (chosen_user_id === user_id) {
-                        _modifier = '<div align="right"><a href="/update/url/' + value.id + '/"><span class="user_profile_post_update">update</span></a><span>  </span><a href=""><span class="profile_suobj_delete">delete</span></a></div>'
+                        _modifier = '<div align="right"><a href="/update/url/' + value.id + '/"><span class="pro_update clickable">update</span></a><span>  </span><a href=""><span class="pro_delete clickable">delete</span></a></div>'
                     }
                     var appender = '<div id="suobj_wrapper_with_modi_' + value.id + '">' +
                         '<div class="row div_base" id="suobj_wrapper_' + value.id + '">' +
@@ -193,7 +193,7 @@
                     $.each(data.output, function (key, value) {
 
                         if (chosen_user_id === user_id) {
-                            _modifier = '<div align="right"><a href="/update/url/' + value.id + '/"><span class="user_profile_post_update">update</span></a><span>  </span><a href=""><span class="profile_suobj_delete">delete</span></a></div>'
+                            _modifier = '<div align="right"><a href="/update/url/' + value.id + '/"><span class="pro_update clickable">update</span></a><span>  </span><a href=""><span class="pro_delete clickable">delete</span></a></div>'
                         }
                         var appender = '<div id="suobj_wrapper_with_modi_' + value.id + '">' +
                             '<div class="row div_base" id="suobj_wrapper_' + value.id + '">' +
