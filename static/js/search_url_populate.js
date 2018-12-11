@@ -8,17 +8,20 @@ var search_url_populate = function search_url_populate(id) {
             },
             success: function (data) {
                 if (data.res === 1) {
-                    var appender = '<div align="right">' +
-                        '<a href=""><span class="glyphicon glyphicon-option-horizontal" id="pop_menu_' + id + '"></span></a>' +
+                    var appender = '<div class="div_base">'+
+                        '<div align="right">' +
+                        '<a href=""><span class="glyphicon glyphicon-option-horizontal url_pop_menu" id="pop_menu_' + id + '"></span></a>' +
                         '</div>' +
                         '<a href="' + data.full_url + '" target="_blank" rel="noopener noreferrer">' +
-                        '<div>' +
-                        '<div>' + data.full_url + '</div><div>' + data.title + '</div>' +
+                        '<div class="url_pop_main_wrapper">' +
+                        '<div class="url_pop_title_wrapper"><span class="url_pop_title">' + data.title  + '</span></div>' +
+                        '<div class="url_pop_url_wrapper"><span class="url_pop_url">' + data.full_url + '</span></div>' +
                         '</div>' +
                         '</a>' +
                         '<div id="keyword_list_' + id + '"></div>' +
                         '<div class="hidden" id="last_url_keyword_' + id + '"></div>' +
-                        '<a href=""><div class="hidden" id="keyword_more_' + id + '">more load</div></a>'
+                        '<a href=""><div class="hidden" id="keyword_more_' + id + '">more load</div></a>' +
+                        '</div>'
                     $('#url_wrapper_' + id).append(appender)
 
                     $.ajax({

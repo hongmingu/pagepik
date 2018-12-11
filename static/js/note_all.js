@@ -15,8 +15,8 @@ $(function () {
                             '<a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a>' +
                             '</div>' +
                             '<div class="note_text_wrapper">' +
-                            '<span class="note_text_explain">bridge from</span>' +
                             '<a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>' +
+                            '<span class="note_text_explain">new bridge</span>' +
                             '</div>' +
                             '</div>'
                         //bridge

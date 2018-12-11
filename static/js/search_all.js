@@ -29,12 +29,12 @@ $(function () {
                             $.each(value.keyword_output, function (key, value) {
                                 keyword = keyword + '<span class="search_suobj_keyword">' + value + '</span>'
                             })
-                            var appender = '<div class="search_suobj_wrapper">' +
+                            var appender = '<div class="search_suobj_wrapper div_base">' +
                                 '<div>' +
                                 '<a href="/' + value.username + '/"><span class="search_suobj_username">' + value.username + '</span></a>' +
                                 '<a href="/object/' + value.id + '/"><span class="search_suobj_detail">detail</span></a>' +
                                 '</div>' +
-                                '<a href="' + value.url + '">' +
+                                '<a href="/object/' + value.id + '/">' +
                                 '<div><span class="search_suobj_title">' + value.title + '</span></div>' +
                                 '<div><span class="search_suobj_url">' + value.url + '</span></div>' +
                                 '</a>' +
@@ -79,12 +79,12 @@ $(function () {
                             $.each(value.keyword_output, function (key, value) {
                                 keyword = keyword + '<span class="search_suobj_keyword">' + value + '</span>'
                             })
-                            var appender = '<div class="search_suobj_wrapper">' +
+                            var appender = '<div class="search_suobj_wrapper div_base">' +
                                 '<div>' +
                                 '<a href="/' + value.username + '/"><span class="search_suobj_username">' + value.username + '</span></a>' +
                                 '<a href="/object/' + value.id + '/"><span class="search_suobj_detail">detail</span></a>' +
                                 '</div>' +
-                                '<a href="' + value.url + '">' +
+                                '<a href="/object/' + value.id + '/">' +
                                 '<div><span class="search_suobj_title">' + value.title + '</span></div>' +
                                 '<div><span class="search_suobj_url">' + value.url + '</span></div>' +
                                 '</a>' +
