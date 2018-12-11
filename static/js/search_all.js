@@ -120,12 +120,15 @@ $(function () {
                     } else {
                         $('#more_url').removeClass('hidden')
                         $.each(data.url_output, function (key, value) {
-                            var appender = '<div id="url_wrapper_' + value + '">' +
-                                '<script defer>' +
-                                '    search_url_populate("' + value + '")' +
-                                '<' + '/script>' +
-                                '</div>'
-                            $('#content_url').append(appender)
+                            if (!($('#url_wrapper_' + value).length > 0)) {
+                                var appender = '<div id="url_wrapper_' + value + '">' +
+                                    '<script defer>' +
+                                    '    search_url_populate("' + value + '")' +
+                                    '<' + '/script>' +
+                                    '</div>'
+                                $('#content_url').append(appender)
+                            }
+
                         })
                     }
 

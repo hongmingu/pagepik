@@ -9,7 +9,7 @@ var search_url_populate = function search_url_populate(id) {
             success: function (data) {
                 if (data.res === 1) {
                     var appender = '<div align="right">' +
-                        '<a href=""><span class="glyphicon glyphicon-option-horizontal" id="pop_menu_'+id+'"></span></a>' +
+                        '<a href=""><span class="glyphicon glyphicon-option-horizontal" id="pop_menu_' + id + '"></span></a>' +
                         '</div>' +
                         '<a href="' + data.full_url + '" target="_blank" rel="noopener noreferrer">' +
                         '<div>' +
@@ -57,16 +57,18 @@ var search_url_populate = function search_url_populate(id) {
                                     }
 
 
-                                    _keyword = '<span>' + value.keyword + '</span>' +
+                                    _keyword = '<span class="url_pop_keyword_wrapper">' +
+                                        '<span class="url_pop_keyword">' + value.keyword + '</span>' +
                                         _register +
-                                        '<span id="url_pop_reg_count_' + id + '">' + value.reg_count + '</span>' +
+                                        '<span class="url_pop_reg_count" id="url_pop_reg_count_' + id + '">' + value.reg_count + '</span>' +
                                         _up +
-                                        '<span id="url_pop_up_count_' + id + '">' + value.up_count + '</span>' +
+                                        '<span class="url_pop_up_count" id="url_pop_up_count_' + id + '">' + value.up_count + '</span>' +
                                         _down +
-                                        '<span id="url_pop_down_count_' + id + '">' + value.down_count + '</span>'
+                                        '<span class="url_pop_down_count" id="url_pop_down_count_' + id + '">' + value.down_count + '</span>' +
+                                        '</span>'
 
 
-                                    $('#keyword_list_'+con_id).append(_keyword)
+                                    $('#keyword_list_' + con_id).append(_keyword)
 
                                     $('#url_pop_up_' + id).on('click', function (e) {
                                         e.preventDefault()
@@ -196,16 +198,18 @@ var search_url_populate = function search_url_populate(id) {
                                         }
 
 
-                                        _keyword = '<span>' + value.keyword + '</span>' +
+                                        _keyword = '<span class="url_pop_keyword_wrapper">' +
+                                            '<span class="url_pop_keyword">' + value.keyword + '</span>' +
                                             _register +
-                                            '<span id="url_pop_reg_count_' + id + '">' + value.reg_count + '</span>' +
+                                            '<span class="url_pop_reg_count" id="url_pop_reg_count_' + id + '">' + value.reg_count + '</span>' +
                                             _up +
-                                            '<span id="url_pop_up_count_' + id + '">' + value.up_count + '</span>' +
+                                            '<span class="url_pop_up_count" id="url_pop_up_count_' + id + '">' + value.up_count + '</span>' +
                                             _down +
-                                            '<span id="url_pop_down_count_' + id + '">' + value.down_count + '</span>'
+                                            '<span class="url_pop_down_count" id="url_pop_down_count_' + id + '">' + value.down_count + '</span>' +
+                                            '</span>'
 
 
-                                        $('#keyword_list_'+con_id).append(_keyword)
+                                        $('#keyword_list_' + con_id).append(_keyword)
 
                                         $('#url_pop_up_' + id).on('click', function (e) {
                                             e.preventDefault()
@@ -299,9 +303,9 @@ var search_url_populate = function search_url_populate(id) {
                         })
 
                     })
-                    $('#pop_menu_'+id).click(function (e) {
+                    $('#pop_menu_' + id).click(function (e) {
                         e.preventDefault()
-                        $('#search_link_source').html('/url/'+id+'/')
+                        $('#search_link_source').html('/url/' + id + '/')
                         $('#modal_pop_menu').modal('show')
                     })
 

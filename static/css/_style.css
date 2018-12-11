@@ -731,3 +731,6 @@ a:active {
     padding: 1px;
     background-color: var(--main-aselected-color, lightyellow);
 }
+.more_load{
+    background-color: var(--main-aselected-color, lightyellow);
+}
