@@ -201,6 +201,8 @@ def check_success_url(url, o_count, success_list, not_301_redirect_list, user):
                         page = metadata_parser.MetadataParser(url=got_url, search_head_only=False, url_headers=headers)
                     except Exception as e:
                         print(e)
+                        return
+
                     no_args_url = furl_obj.remove(args=True, fragment=True).url
                     f = furl(got_url)
 
