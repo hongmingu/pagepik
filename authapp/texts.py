@@ -55,5 +55,5 @@ LOGIN_FAILED = 'Login has failed'
 LOGIN_EMAIL_NOT_EXIST = 'Email does not exist'
 LOGIN_USERNAME_NOT_EXIST = 'Username does not exist'
 
-SITE_NAME = 'Avastove'
-SITE_DOMAIN = 'www.avastove.com'
+SITE_NAME = 'Macawl'
+SITE_DOMAIN = 'www.macawl.com'

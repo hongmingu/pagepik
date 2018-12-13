@@ -13,15 +13,7 @@
     <script src="{% static 'js/date_differ.js' %}"></script>
     <script src="{% static 'js/search_url_populate.js' %}"></script>
 
-    <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
-    {% if user.is_authenticated %}
-    {% else %}
-    {% endif %}
-
-    <style>
-    </style>
-
-
+    <script src="{% static 'js/search_url.js' %}"></script>
 </head>
 <body class="light_background_color height_100">
 <!--navbar start-->
@@ -53,91 +45,4 @@
 </div>
 {% include 'baseapp/_modal_search_url_populate.html' %}
 </body>
-<script>
-    $(function () {
-        if ($('#search_word').html() === '') {
-            $('#content_result').append('<div class="h4">no results</div>')
-        } else {
-            $.ajax({
-                url: '/re/search/url/', type: 'post', dataType: 'json', cache: false,
-                data: {
-                    search_word: $('#search_word').html(),
-                    order: $('#order').html()
-                },
-                success: function (data) {
-                    console.log(data)
-                    if (data.res === 1) {
-                        //user set
-                        if (data.output.length === 0) {
-                            $('#content_result').append('<div class="h4">end results</div>')
-
-                        } else {
-                            $.each(data.output, function (key, value) {
-                                var appender = '<div id="url_wrapper_' + value + '">' +
-                                    '<script defer>' +
-                                    '    search_url_populate("' + value + '")' +
-                                    '<' + '/script>' +
-                                    '</div>'
-                                $('#content_result').append(appender)
-
-                            })
-                        }
-
-                        if (data.end === "true") {
-                            $('#more_load').addClass('hidden')
-                        } else if (data.end === "false") {
-                            $('#more_load').removeClass('hidden')
-                        }
-                        $('#order').html(data.order)
-                    }
-
-
-                }
-            })
-        }
-
-        $('#more_load').on('click', function (e) {
-            e.preventDefault()
-            $.ajax({
-                url: '/re/search/url/', type: 'post', dataType: 'json', cache: false,
-                data: {
-                    search_word: $('#search_word').html(),
-                    order: $('#order').html()
-                },
-                success: function (data) {
-                    console.log(data)
-                    if (data.res === 1) {
-                        //user set
-                        if (data.output.length === 0) {
-                            $('#content_result').append('<div class="h4">end results</div>')
-
-                        } else {
-                            $.each(data.output, function (key, value) {
-                                var appender = '<div id="url_wrapper_' + value + '">' +
-                                    '<script defer>' +
-                                    '    search_url_populate("' + value + '")' +
-                                    '<' + '/script>' +
-                                    '</div>'
-                                $('#content_result').append(appender)
-
-
-                            })
-                        }
-
-                        if (data.end === "true") {
-                            $('#more_load').addClass('hidden')
-                        } else if (data.end === "false") {
-                            $('#more_load').removeClass('hidden')
-                        }
-                        $('#order').html(data.order)
-                    }
-
-
-                }
-            })
-        })
-
-
-    })
-</script>
 </html>
