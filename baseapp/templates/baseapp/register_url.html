@@ -126,7 +126,6 @@
                     },
                     success: function (data) {
                         $('#check').html('check')
-                        console.log(data)
                         if (data.res === 1) {
                             if (data.output.length === 0) {
                                 $('#url_clue').html('cannot find url')
@@ -224,7 +223,6 @@
                 },
                 success: function (data) {
                     $('#check').html('check')
-                    console.log(data)
                     if (data.res === 1) {
                         if (data.output.length === 0) {
                             $('#url_clue').html('cannot find url')

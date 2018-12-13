@@ -222,6 +222,31 @@ def created_sub_url_object(sender, instance, created, **kwargs):
             pass
 
 
+@receiver(post_save, sender=SubUrlObjectSubKeyword)
+def created_sub_url_object_sub_keyword(sender, instance, created, **kwargs):
+    if created:
+        try:
+            with transaction.atomic():
+                sub_url_object_sub_keyword_start, created = SubUrlObjectSubKeywordStart.objects.get_or_create(
+                    sub_url_object_sub_keyword=instance)
+                if created:
+                    url_keyword = None
+                    try:
+                        url_keyword = UrlKeyword.objects.get(url_object=instance.sub_url_object.url_object,
+                                                             keyword=instance.sub_keyword.keyword)
+                    except Exception as e:
+                        print(e)
+                        pass
+                    if url_keyword is not None:
+                        sub_url_object_sub_keyword_start.up_count = url_keyword.up_count
+                        sub_url_object_sub_keyword_start.down_count = url_keyword.down_count
+                        sub_url_object_sub_keyword_start.register_count = url_keyword.register_count
+                        sub_url_object_sub_keyword_start.save()
+        except Exception as e:
+            print(e)
+            pass
+
+
 @receiver(post_save, sender=SubRawKeyword)
 def created_sub_raw_keyword(sender, instance, created, **kwargs):
     if created:

@@ -192,6 +192,16 @@ class SubUrlObjectSubKeyword(models.Model):
         unique_together = ('sub_url_object', 'sub_keyword',)
 
 
+class SubUrlObjectSubKeywordStart(models.Model):
+    sub_url_object_sub_keyword = models.OneToOneField(SubUrlObjectSubKeyword, on_delete=models.CASCADE, null=True, blank=True)
+    up_count = models.PositiveIntegerField(default=0)
+    down_count = models.PositiveIntegerField(default=0)
+    register_count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return "text: %s" % self.pk
+
+
 class SubRawKeyword(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     sub_url_object = models.ForeignKey(SubUrlObject, on_delete=models.CASCADE, null=True, blank=True)
