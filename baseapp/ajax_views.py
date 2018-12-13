@@ -780,7 +780,7 @@ def re_suobj_populate(request):
             sub_raw_keywords = SubRawKeyword.objects.filter(sub_url_object=suobj)
             srk_output = []
             for sub_raw_keyword in sub_raw_keywords:
-                srk_output.append(sub_raw_keyword.text)
+                srk_output.append(escape(sub_raw_keyword.text))
 
             suobj_help = 'false'
             if request.user.is_authenticated:
@@ -800,8 +800,6 @@ def re_suobj_populate(request):
                 'suobj_help': suobj_help,
                 'help_count': suobj.help_count
             }
-            # {'user_id', 'username', 'gross(포스트의)', 'date(포스트의)', 'created', 'obj_id',
-            #  ['comment_username', 'comment_text', 'comment_user_id', 'comment_created', 'comment_id']}
 
             return JsonResponse({'res': 1, 'output': output})
 
@@ -1044,7 +1042,7 @@ def re_url_keyword(request):
                 if UrlKeywordDown.objects.filter(user=request.user, url_keyword=url_keyword).exists():
                     down = 'true'
                 sub_output = {
-                    'keyword': url_keyword.keyword.text,
+                    'keyword': escape(url_keyword.keyword.text),
                     'keyword_id': url_keyword.uuid,
                     'reg_count': url_keyword.register_count,
                     'up_count': url_keyword.up_count,
@@ -1164,8 +1162,6 @@ def re_search_all(request):
     if request.method == "POST":
         if request.is_ajax():
             search_word = request.POST.get('search_word', None)
-            print(search_word)
-
             loc = None
             if not is_unable_url(search_word):
                 loc = url_without_scheme(search_word)
@@ -1178,7 +1174,7 @@ def re_search_all(request):
             for user in users:
                 sub_output = {
                     'username': user.userusername.username,
-                    'user_text_name': user.usertextname.name,
+                    'user_text_name': escape(user.usertextname.name),
                 }
 
                 user_output.append(sub_output)
@@ -1210,7 +1206,7 @@ def re_search_all(request):
                 sub_output = {
                     'username': request.user.userusername.username,
                     'id': my.uuid,
-                    'title': my.title.text,
+                    'title': escape(my.title.text),
                     'url': my.url_object.get_url(),
                     'keyword_output': sub_raw_keywords_output
                 }
@@ -1246,7 +1242,7 @@ def re_search_all(request):
                 sub_output = {
                     'username': suobj.user.userusername.username,
                     'id': suobj.uuid,
-                    'title': suobj.title.text,
+                    'title': escape(suobj.title.text),
                     'url': suobj.url_object.get_url(),
                     'keyword_output': sub_raw_keywords_output
                 }
@@ -1258,7 +1254,7 @@ def re_search_all(request):
 
             keywords = Keyword.objects.filter(text__icontains=search_word).order_by(Length('text').asc())[:10]
             for keyword in keywords:
-                keyword_output.append(keyword.text)
+                keyword_output.append(escape(keyword.text))
 
             url_output = []
             if loc is None:
@@ -1390,11 +1386,11 @@ def re_search_my(request):
                         sub_url_object=suobj).order_by('created')[:sub_raw_keyword_step]
                     sub_raw_keywords_output = []
                     for sub_raw_keyword in sub_raw_keywords:
-                        sub_raw_keywords_output.append(sub_raw_keyword.text)
+                        sub_raw_keywords_output.append(escape(sub_raw_keyword.text))
                     sub_output = {
                         'username': suobj.user.userusername.username,
                         'id': suobj.uuid,
-                        'title': suobj.title.text,
+                        'title': escape(suobj.title.text),
                         'url': suobj.url_object.get_url(),
                         'keyword_output': sub_raw_keywords_output
                     }
@@ -1481,11 +1477,11 @@ def re_search_bridge(request):
                         sub_url_object=suobj).order_by('created')[:sub_raw_keyword_step]
                     sub_raw_keywords_output = []
                     for sub_raw_keyword in sub_raw_keywords:
-                        sub_raw_keywords_output.append(sub_raw_keyword.text)
+                        sub_raw_keywords_output.append(escape(sub_raw_keyword.text))
                     sub_output = {
                         'username': suobj.user.userusername.username,
                         'id': suobj.uuid,
-                        'title': suobj.title.text,
+                        'title': escape(suobj.title.text),
                         'url': suobj.url_object.get_url(),
                         'keyword_output': sub_raw_keywords_output
                     }
@@ -1521,7 +1517,7 @@ def re_search_keyword(request):
             output = []
 
             for keyword in keywords:
-                output.append(keyword.text)
+                output.append(escape(keyword.text))
 
             return JsonResponse({'res': 1,
                                  'output': output,
@@ -1764,7 +1760,7 @@ def re_home(request):
                         sub_output = {
                             'id': suobj_obj.uuid,
                             'obj_type': 'keyword',
-                            'keyword': item,
+                            'keyword': escape(item),
                             'created': suobj_obj.created
                         }
                         qs1_list.append(sub_output)
@@ -1913,7 +1909,7 @@ def re_user_search_suobj(request):
                     sub_raw_keywords_output.append(sub_raw_keyword.text)
                 sub_output = {
                     'username': suobj.user.userusername.username,
-                    'title': suobj.title.text,
+                    'title': escape(suobj.title.text),
                     'id': suobj.uuid,
                     'url': suobj.url_object.get_url(),
                     'keyword_output': sub_raw_keywords_output
@@ -1958,7 +1954,7 @@ def re_user_search_keyword(request):
             output = []
 
             for keyword in keywords:
-                output.append(keyword.text)
+                output.append(escape(keyword.text))
 
             return JsonResponse({'res': 1,
                                  'output': output,
