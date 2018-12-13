@@ -217,6 +217,7 @@ def created_sub_url_object(sender, instance, created, **kwargs):
         try:
             with transaction.atomic():
                 sub_raw_keyword_count = SubRawKeywordCount.objects.create(sub_url_object=instance)
+                suobj_comment_count = SubUrlObjectCommentCount.objects.create(sub_url_object=instance)
         except Exception as e:
             print(e)
             pass
@@ -315,6 +316,48 @@ def deleted_notice_sub_url_object_help(sender, instance, **kwargs):
             instance.notice.delete()
     except Exception as e:
         print(e)
+        pass
+
+
+# notice post_comment
+@receiver(post_save, sender=SubUrlObjectComment)
+def created_sub_url_object_comment(sender, instance, created, **kwargs):
+    if created:
+        try:
+            with transaction.atomic():
+                if not instance.user == instance.sub_url_object.user:
+                    notice = Notice.objects.create(user=instance.sub_url_object.user,
+                                                   kind=SUB_URL_OBJECT_COMMENT,
+                                                   uuid=uuid.uuid4().hex)
+                    notice_suobj_comment = NoticeSubUrlObjectComment.objects.create(notice=notice,
+                                                                                    sub_url_object_comment=instance)
+
+                suobj_comment_count = instance.sub_url_object.suburlobjectcommentcount
+                suobj_comment_count.count = F('count') + 1
+                suobj_comment_count.save()
+        except Exception as e:
+            print(e)
+            pass
+
+
+@receiver(post_delete, sender=SubUrlObjectComment)
+def deleted_sub_url_object_comment(sender, instance, **kwargs):
+    try:
+        with transaction.atomic():
+            suobj_comment_count = instance.sub_url_object.suburlobjectcommentcount
+            suobj_comment_count.count = F('count') - 1
+            suobj_comment_count.save()
+    except Exception as e:
+        print(e)
+        pass
+
+
+@receiver(post_delete, sender=NoticeSubUrlObjectComment)
+def deleted_notice_sub_url_object_comment(sender, instance, **kwargs):
+    try:
+        with transaction.atomic():
+            instance.notice.delete()
+    except Exception:
         pass
 
 

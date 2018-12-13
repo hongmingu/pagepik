@@ -678,6 +678,46 @@ a:active {
     color: var(--main-logoyellow-color, goldenrod);
 
 }
+.pop_comment_textarea {
+    resize: none;
+}
+
+.pop_new_comment_content {
+    background-color: var(--main-light-bcolor, #c4e3f3);
+}
+
+
+.pop_comment {
+    font-size: 12px;
+}
+
+.pop_comment_count {
+    font-size: 12px;
+    margin-left: 2px;
+}
+
+.pop_comment_username {
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.pop_comment_text {
+    font-size: 12px;
+}
+
+.pop_comment_created {
+    font-size: 12px;
+    background-color: var(--main-light-bcolor, whitesmoke);
+    margin-left: 4px;
+}
+
+.pop_comment_delete {
+    font-size: 12px;
+}
+
+.pop_comment_more_load {
+    background-color: var(--main-light-bcolor, lightblue);
+}
 
 .url_info_title {
     font-size: 20px;
@@ -881,5 +921,8 @@ a:active {
     font-weight: bold; margin-left: 4px; margin-right: 4px;
 }
 .note_text_title{
+    font-weight: bold; margin-left: 4px; margin-right: 4px;
+}
+.note_text_comment{
     font-weight: bold; margin-left: 4px; margin-right: 4px;
 }

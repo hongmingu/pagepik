@@ -77,6 +77,13 @@ urlpatterns = [
     re_path(r'^re/suobj/help/$', base_ajax_views.re_suobj_help,
             name='re_suobj_help'),
 
+    re_path(r'^re/comment/add/$', base_ajax_views.re_comment_add,
+            name='re_comment_add'),
+    re_path(r'^re/comment/delete/$', base_ajax_views.re_comment_delete,
+            name='re_comment_delete'),
+    re_path(r'^re/comment/more/load/$', base_ajax_views.re_comment_more_load,
+            name='re_comment_more_load'),
+
     re_path(r'^re/profile/suobj/delete/$', base_ajax_views.re_profile_suobj_delete,
             name='re_profile_suobj_delete'),
 

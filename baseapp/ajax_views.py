@@ -787,6 +787,18 @@ def re_suobj_populate(request):
                 if SubUrlObjectHelp.objects.filter(user=request.user, sub_url_object=suobj).exists():
                     suobj_help = 'true'
 
+            comment_output = []
+            comments = SubUrlObjectComment.objects.filter(sub_url_object=suobj).order_by('created')[:3]
+            for comment in comments:
+                sub_output = {
+                    'comment_username': comment.user.userusername.username,
+                    'comment_user_id': comment.user.username,
+                    'comment_text': escape(comment.text),
+                    'comment_id': comment.uuid,
+                    'comment_created': comment.created
+                }
+                comment_output.append(sub_output)
+
             output = {
                 'user_id': suobj.user.username,
                 'username': suobj.user.userusername.username,
@@ -798,7 +810,9 @@ def re_suobj_populate(request):
                 'url_id': suobj.url_object.uuid,
                 'suobj_id': suobj.uuid,
                 'suobj_help': suobj_help,
-                'help_count': suobj.help_count
+                'help_count': suobj.help_count,
+                'comment_count': suobj.suburlobjectcommentcount.count,
+                'comment_output': comment_output,
             }
 
             return JsonResponse({'res': 1, 'output': output})
@@ -1961,4 +1975,109 @@ def re_user_search_keyword(request):
                                  'order': order + step,
                                  'end': end})
 
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_comment_add(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                suobj_id = request.POST.get('suobj_id', None)
+                text = request.POST.get('text', None)
+                text = text.strip()
+                try:
+                    suobj = SubUrlObject.objects.get(uuid=suobj_id)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+                try:
+                    with transaction.atomic():
+                        suobj_comment = SubUrlObjectComment.objects.create(sub_url_object=suobj,
+                                                                           user=request.user,
+                                                                           uuid=uuid.uuid4().hex,
+                                                                           text=text)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+
+                return JsonResponse({'res': 1, 'comment_id': suobj_comment.uuid, 'comment_text': escape(suobj_comment.text)})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_comment_delete(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                comment_id = request.POST.get('comment_id', None)
+                suobj_id = request.POST.get('suobj_id', None)
+                suobj = None
+                try:
+                    suobj = SubUrlObject.objects.get(uuid=suobj_id)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+
+                comment = None
+                try:
+                    comment = SubUrlObjectComment.objects.get(uuid=comment_id, sub_url_object=suobj, user=request.user)
+                except Exception as e:
+                    try:
+                        comment = SubUrlObjectComment.objects.get(uuid=comment_id,
+                                                                  sub_url_object=suobj,
+                                                                  sub_url_object__user=request.user)
+                    except Exception as e:
+                        return JsonResponse({'res': 0})
+
+                try:
+                    with transaction.atomic():
+                        comment.delete()
+                except Exception:
+                    return JsonResponse({'res': 0})
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_comment_more_load(request):
+    if request.method == "POST":
+        # comment more load 에선 로그인이 필요없게 하였다.
+        if request.is_ajax():
+            suobj_id = request.POST.get('suobj_id', None)
+            end_comment_id = request.POST.get('end_comment_id', None)
+            suobj = None
+            step = 20
+            try:
+                suobj = SubUrlObject.objects.get(uuid=suobj_id)
+            except Exception as e:
+                return JsonResponse({'res': 0})
+
+            suobj_comment_end = None
+            try:
+                suobj_comment_end = SubUrlObjectComment.objects.get(uuid=end_comment_id)
+            except Exception as e:
+                return JsonResponse({'res': 0})
+
+            suobj_comments = SubUrlObjectComment.objects.filter(sub_url_object=suobj,
+                                                                pk__gt=suobj_comment_end.pk).order_by('created')[:step]
+            output = []
+            end = None
+            count = 0
+
+            for comment in suobj_comments:
+                count = count + 1
+                if count == step:
+                    end = comment.uuid
+                sub_output = {
+                    'comment_username': comment.user.userusername.username,
+                    'comment_user_id': comment.user.username,
+                    'comment_text': escape(comment.text),
+                    'comment_id': comment.uuid,
+                    'comment_created': comment.created
+                }
+                output.append(sub_output)
+
+            return JsonResponse({'res': 1, 'output': output, 'end': end})
         return JsonResponse({'res': 2})

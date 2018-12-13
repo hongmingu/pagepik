@@ -15,10 +15,12 @@ from django.utils.html import escape, _js_escapes, normalize_newlines
 
 BRIDGE = 1001
 SUB_URL_OBJECT_HELP = 1002
+SUB_URL_OBJECT_COMMENT = 1003
 
 KINDS_CHOICES = (
     (BRIDGE, "bridge"),
     (SUB_URL_OBJECT_HELP, "sub_url_object_help"),
+    (SUB_URL_OBJECT_COMMENT, "sub_url_object_comment"),
 )
 
 
@@ -62,6 +64,22 @@ class Notice(models.Model):
                           'user_photo': get_result.user.userphoto.file_50_url(),
                           'title': title}
             return result
+        elif self.kind == SUB_URL_OBJECT_COMMENT:
+            try:
+                get_result = self.noticesuburlobjectcomment.sub_url_object_comment
+            except Exception as e:
+                print(e)
+                pass
+            if get_result is not None:
+                comment_text = get_result.text
+                if len(comment_text) > 10:
+                    comment_text = escape(comment_text)[0:10] + '...'
+                    comment_text = escape(comment_text)
+                result = {'obj_id': get_result.sub_url_object.uuid,
+                          'username': get_result.user.userusername.username,
+                          'user_photo': get_result.user.userphoto.file_50_url(),
+                          'comment_text': comment_text}
+            return result
         return None
 
 
@@ -93,3 +111,13 @@ class NoticeSubUrlObjectHelp(models.Model):
 
     def __str__(self):
         return "Notice_pk: %s, bridge_user: %s" % (self.notice.pk, self.sub_url_object_help.user.userusername.username)
+
+
+class NoticeSubUrlObjectComment(models.Model):
+    notice = models.OneToOneField(Notice, on_delete=models.CASCADE, null=True, blank=True)
+    sub_url_object_comment = models.ForeignKey(SubUrlObjectComment, on_delete=models.CASCADE, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "Notice_pk: %s, bridge_user: %s" % (self.notice.pk, self.sub_url_object_comment.user.userusername.username)

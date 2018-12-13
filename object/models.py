@@ -165,6 +165,30 @@ class SubUrlObjectInitialUrl(models.Model):
         unique_together = ('url', 'sub_url_object',)
 
 
+class SubUrlObjectComment(models.Model):
+    sub_url_object = models.ForeignKey(SubUrlObject, on_delete=models.CASCADE, null=True, blank=True)
+    text = models.TextField(max_length=1000, null=True, blank=True)
+    uuid = models.CharField(max_length=34, unique=True, default=None, null=True, blank=True)
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "post comment: %s" % self.pk
+
+
+class SubUrlObjectCommentCount(models.Model):
+    sub_url_object = models.OneToOneField(SubUrlObject, on_delete=models.CASCADE, null=True, blank=True)
+    count = models.PositiveIntegerField(default=0)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "post: %s" % self.sub_url_object.pk
+
+
 class SubKeyword(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     keyword = models.ForeignKey(Keyword, on_delete=models.CASCADE, null=True, blank=True)

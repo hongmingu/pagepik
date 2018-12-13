@@ -34,6 +34,16 @@ $(function () {
                             '</div>'
                         //help
                         break;
+                    case 1003:
+                        appender = '<div class="note_wrapper">' +
+                            '<div class="note_img_wrapper"><a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a></div>' +
+                            '<div class="note_text_wrapper"><a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>' +
+                            '<span class="note_text_explain">comment: </span>' +
+                            '<a href="/object/' + value.notice_value.obj_id + '/"><span class="note_text_comment clickable">' + value.notice_value.comment_text + '</span></a>' +
+                            '</div>' +
+                            '</div>'
+                        //comment
+                        break;
                     default:
                         break;
                 }
@@ -86,6 +96,17 @@ $(function () {
                                 '<a href="/object/' + value.notice_value.suobj_id + '/"><span class="note_text_title clickable">' + value.notice_value.title + '</span></a></div>' +
                                 '</div>'
                             //help
+                            break;
+
+                        case 1003:
+                            appender = '<div class="note_wrapper">' +
+                                '<div class="note_img_wrapper"><a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a></div>' +
+                                '<div class="note_text_wrapper"><a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>' +
+                                '<span class="note_text_explain">comment: </span>' +
+                                '<a href="/object/' + value.notice_value.obj_id + '/"><span class="note_text_comment clickable">' + value.notice_value.comment_text + '</span></a>' +
+                                '</div>' +
+                                '</div>'
+                            //comment
                             break;
                         default:
                             break;
