@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, post_delete, pre_save
+from django.db.models.signals import post_save, post_delete, pre_save, pre_delete
 from django.dispatch import receiver
 from object.models import *
 from relation.models import *
@@ -19,7 +19,6 @@ def created_bridge(sender, instance, created, **kwargs):
                 if not instance.user == instance.bridge:
                     notice = Notice.objects.create(user=instance.bridge, kind=BRIDGE, uuid=uuid.uuid4().hex)
                     notice_bridge = NoticeBridge.objects.create(notice=notice, bridge=instance)
-
 
                 bridging_count = instance.user.bridgingcount
                 bridging_count.count = F('count') + 1
@@ -67,7 +66,7 @@ def deleted_notice_bridge(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=SubUrlObjectSubKeyword)
-def created_sub_keyword(sender, instance, created, **kwargs):
+def created_sub_url_object_sub_keyword(sender, instance, created, **kwargs):
     if created:
         try:
             with transaction.atomic():
@@ -80,15 +79,27 @@ def created_sub_keyword(sender, instance, created, **kwargs):
                 url_keyword_register = UrlKeywordRegister.objects.get_or_create(url_keyword=url_keyword,
                                                                                 user=instance.sub_keyword.user)
 
+                sub_url_object_sub_keyword_start, created = SubUrlObjectSubKeywordStart.objects.get_or_create(
+                    sub_url_object_sub_keyword=instance)
+                if created:
+                    sub_url_object_sub_keyword_start.up_count = url_keyword.up_count
+                    sub_url_object_sub_keyword_start.down_count = url_keyword.down_count
+                    sub_url_object_sub_keyword_start.register_count = url_keyword.register_count
+                    sub_url_object_sub_keyword_start.save()
         except Exception as e:
             print(e)
             pass
 
 
-@receiver(post_delete, sender=SubUrlObjectSubKeyword)
-def deleted_sub_keyword(sender, instance, **kwargs):
+@receiver(pre_delete, sender=SubUrlObjectSubKeyword)
+def deleted_sub_url_object_sub_keyword(sender, instance, **kwargs):
     try:
         with transaction.atomic():
+            sub_url_object_sub_keyword_exist = SubUrlObjectSubKeyword.objects.filter(
+                sub_keyword=instance.sub_keyword).exists()
+            if not sub_url_object_sub_keyword_exist:
+                sub_keyword = instance.sub_keyword
+                sub_keyword.delete()
             url_keyword = None
             try:
                 url_keyword = UrlKeyword.objects.get(url_object=instance.sub_url_object.url_object,
@@ -102,7 +113,6 @@ def deleted_sub_keyword(sender, instance, **kwargs):
                 return
             url_keyword_register.delete()
 
-                # 이거 놓치지말고 down_count 랑 up_count 도 0 될 때 다 지운다.
     except Exception as e:
         print(e)
         pass
@@ -129,8 +139,6 @@ def deleted_keyword_register(sender, instance, **kwargs):
             url_keyword = instance.url_keyword
             url_keyword.register_count = F('register_count') - 1
             url_keyword.save()
-            if url_keyword.register_count == 0 and url_keyword.up_count == 0 and url_keyword.down_count == 0:
-                url_keyword.delete()
     except Exception as e:
         print(e)
         pass
@@ -166,8 +174,6 @@ def deleted_keyword_up(sender, instance, **kwargs):
             url_keyword = instance.url_keyword
             url_keyword.up_count = F('up_count') - 1
             url_keyword.save()
-            if url_keyword.register_count == 0 and url_keyword.up_count == 0 and url_keyword.down_count == 0:
-                url_keyword.delete()
     except Exception as e:
         print(e)
         pass
@@ -195,15 +201,12 @@ def created_keyword_down(sender, instance, created, **kwargs):
             pass
 
 
-@receiver(post_delete, sender=UrlKeywordDown)
+@receiver(pre_delete, sender=UrlKeywordDown)
 def deleted_keyword_down(sender, instance, **kwargs):
     try:
         with transaction.atomic():
             url_keyword = instance.url_keyword
             url_keyword.down_count = F('down_count') - 1
-            url_keyword.save()
-            if url_keyword.register_count == 0 and url_keyword.up_count == 0 and url_keyword.down_count == 0:
-                url_keyword.delete()
     except Exception as e:
         print(e)
         pass
@@ -223,29 +226,7 @@ def created_sub_url_object(sender, instance, created, **kwargs):
             pass
 
 
-@receiver(post_save, sender=SubUrlObjectSubKeyword)
-def created_sub_url_object_sub_keyword(sender, instance, created, **kwargs):
-    if created:
-        try:
-            with transaction.atomic():
-                sub_url_object_sub_keyword_start, created = SubUrlObjectSubKeywordStart.objects.get_or_create(
-                    sub_url_object_sub_keyword=instance)
-                if created:
-                    url_keyword = None
-                    try:
-                        url_keyword = UrlKeyword.objects.get(url_object=instance.sub_url_object.url_object,
-                                                             keyword=instance.sub_keyword.keyword)
-                    except Exception as e:
-                        print(e)
-                        pass
-                    if url_keyword is not None:
-                        sub_url_object_sub_keyword_start.up_count = url_keyword.up_count
-                        sub_url_object_sub_keyword_start.down_count = url_keyword.down_count
-                        sub_url_object_sub_keyword_start.register_count = url_keyword.register_count
-                        sub_url_object_sub_keyword_start.save()
-        except Exception as e:
-            print(e)
-            pass
+
 
 
 @receiver(post_save, sender=SubRawKeyword)
@@ -270,10 +251,15 @@ def deleted_sub_raw_keyword(sender, instance, **kwargs):
             sub_raw_keyword_count.save()
 
             sub_keyword = instance.sub_keyword
-            sub_raw_keywords_exist = SubRawKeyword.objects.filter(sub_keyword=sub_keyword).exists()
+            sub_url_object = instance.sub_url_object
+            sub_raw_keywords_exist = SubRawKeyword.objects.filter(sub_keyword=sub_keyword,
+                                                                  sub_url_object=sub_url_object,
+                                                                  user=instance.user).exists()
 
             if not sub_raw_keywords_exist:
-                sub_keyword.delete()
+                sub_url_object_sub_keyword_delete = SubUrlObjectSubKeyword.objects.filter(sub_url_object=sub_url_object,
+                                                                                          sub_keyword=sub_keyword
+                                                                                          ).delete()
 
     except Exception as e:
         print(e)

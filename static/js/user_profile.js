@@ -48,7 +48,7 @@ $(function () {
                     '</div>' + _modifier +
                     '</div>'
                 var jq_appender = $(appender)
-                jq_appender.find('.profile_suobj_delete').on('click', function (e) {
+                jq_appender.find('.pro_delete').on('click', function (e) {
                     e.preventDefault()
                     $('#suobj_to_delete').html(value.id)
                     $('#modal_suobj_delete').modal('show')
@@ -90,7 +90,7 @@ $(function () {
                         '</div>' + _modifier +
                         '</div>'
                     var jq_appender = $(appender)
-                    jq_appender.find('.profile_suobj_delete').on('click', function (e) {
+                    jq_appender.find('.pro_delete').on('click', function (e) {
                         e.preventDefault()
                         $('#suobj_to_delete').html(value.id)
                         $('#modal_suobj_delete').modal('show')

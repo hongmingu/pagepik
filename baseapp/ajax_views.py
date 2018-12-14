@@ -1017,6 +1017,7 @@ def re_url_keyword(request):
             url_id = request.POST.get('url_id', None)
             last_id = request.POST.get('last_id', None)
             url_object = None
+            step = 30
             try:
                 url_object = UrlObject.objects.get(uuid=url_id)
             except Exception as e:
@@ -1024,7 +1025,11 @@ def re_url_keyword(request):
 
             url_keywords = None
             if last_id == '':
-                url_keywords = UrlKeyword.objects.filter(url_object=url_object).order_by('up_count')[:30]
+                url_keywords = UrlKeyword.objects.filter(url_object=url_object).exclude(
+                    register_count=0,
+                    up_count=0,
+                    down_count=0
+                ).order_by('-up_count')[:step]
             else:
                 last_url_keyword = None
                 try:
@@ -1033,7 +1038,11 @@ def re_url_keyword(request):
                     return JsonResponse({'res': 0})
                 url_keywords = UrlKeyword.objects.filter(
                     Q(url_object=url_object) & Q(up_count__lte=last_url_keyword.up_count)
-                ).exclude(uuid=last_id).order_by('up_count')[:30]
+                ).exclude(Q(uuid=last_id)
+                          | Q(register_count=0,
+                              up_count=0,
+                              down_count=0)
+                          ).order_by('-up_count')[:step]
 
             output = []
             count = 0
@@ -1041,7 +1050,7 @@ def re_url_keyword(request):
 
             for url_keyword in url_keywords:
                 count = count+1
-                if count == 30:
+                if count == step:
                     last = url_keyword.uuid
                 # 로그인된 상태
                 register = 'false'
