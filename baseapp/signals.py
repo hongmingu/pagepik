@@ -207,6 +207,8 @@ def deleted_keyword_down(sender, instance, **kwargs):
         with transaction.atomic():
             url_keyword = instance.url_keyword
             url_keyword.down_count = F('down_count') - 1
+            url_keyword.save()
+
     except Exception as e:
         print(e)
         pass
