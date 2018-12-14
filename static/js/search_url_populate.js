@@ -8,13 +8,13 @@ var search_url_populate = function search_url_populate(id) {
             },
             success: function (data) {
                 if (data.res === 1) {
-                    var appender = '<div class="div_base">'+
+                    var appender = '<div class="div_base">' +
                         '<div align="right">' +
                         '<a href=""><span class="glyphicon glyphicon-option-horizontal url_pop_menu" id="pop_menu_' + id + '"></span></a>' +
                         '</div>' +
                         '<a href="' + data.full_url + '" target="_blank" rel="noopener noreferrer">' +
                         '<div class="url_pop_main_wrapper">' +
-                        '<div class="url_pop_title_wrapper"><span class="url_pop_title">' + data.title  + '</span></div>' +
+                        '<div class="url_pop_title_wrapper"><span class="url_pop_title">' + data.title + '</span></div>' +
                         '<div class="url_pop_url_wrapper"><span class="url_pop_url">' + data.full_url + '</span></div>' +
                         '</div>' +
                         '</a>' +
@@ -331,7 +331,7 @@ $(function () {
     $("#modal_pop_menu").on("shown.bs.modal", function () {
         var source = $('#search_link_source').html()
         var scheme = window.location.protocol == "https:" ? "https" : "http";
-        var path = scheme + '://' + window.location.host + source;
+        var path = scheme + '://' + window.location.host + source + '/';
         $('#modal_pop_menu_input').val(path).select();
     }).on("hidden.bs.modal", function () {
         $('#link_source').html('')
@@ -342,7 +342,7 @@ $(function () {
         e.preventDefault()
         var source = $('#search_link_source').html()
         var scheme = window.location.protocol == "https:" ? "https" : "http";
-        var path = scheme + '://' + window.location.host + source;
+        var path = scheme + '://' + window.location.host + source + '/';
         $('#modal_pop_menu_input').val(path).select();
         document.execCommand('Copy')
     })
@@ -350,7 +350,7 @@ $(function () {
         e.preventDefault()
         var source = $('#search_link_source').html()
         var scheme = window.location.protocol == "https:" ? "https" : "http";
-        var path = scheme + '://' + window.location.host + source;
+        var path = scheme + '://' + window.location.host + source + '/';
         location.href = path
     })
 })

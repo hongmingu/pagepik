@@ -278,7 +278,7 @@ $(function () {
     $("#modal_pop_menu").on("shown.bs.modal", function () {
         var source = $('#link_source').html()
         var scheme = window.location.protocol == "https:" ? "https" : "http";
-        var path = scheme + '://' + window.location.host + source;
+        var path = scheme + '://' + window.location.host + source + '/';
         $('#modal_pop_menu_input').val(path).select();
     }).on("hidden.bs.modal", function () {
         $('#modal_pop_menu_input').val('')
@@ -288,7 +288,7 @@ $(function () {
         e.preventDefault()
         var source = $('#link_source').html()
         var scheme = window.location.protocol == "https:" ? "https" : "http";
-        var path = scheme + '://' + window.location.host + source;
+        var path = scheme + '://' + window.location.host + source + '/';
         $('#modal_pop_menu_input').val(path).select();
         document.execCommand('Copy')
     })
@@ -296,7 +296,7 @@ $(function () {
         e.preventDefault()
         var source = $('#link_source').html()
         var scheme = window.location.protocol == "https:" ? "https" : "http";
-        var path = scheme + '://' + window.location.host + source;
+        var path = scheme + '://' + window.location.host + source + '/';
         location.href = path
     })
 })
