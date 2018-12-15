@@ -1,9 +1,27 @@
 <!DOCTYPE html>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Demo</title>
+    <title>macawl {{ chosen_user.userusername.username }}</title>
     {% include 'others/header_static.html' %}
     {% include 'others/favicon.html' %}
+    <meta name="keywords" content="macawl, bookmark, favorite, keyword, search, {{ chosen_user.userusername.username }}"/>
+    <meta name="author" content="{{ chosen_user.userusername.username }}"/>
+    <meta name="title" content="macawl {{ chosen_user.userusername.username }}"/>
+    <meta name="description" content="make your bookmark"/>
+
+    <meta property="og:url" content="https://www.macawl.com{{ request.get_full_path }}"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:title" content="macawl {{ chosen_user.userusername.username }}"/>
+    <meta property="og:site_name" content="macawl"/>
+    <meta property="og:description" content="make your bookmark"/>
+
+    <meta property="og:image" content="{{ chosen_user.userphoto.file_300_url }}"/>
+
+    <meta name="twitter:image" content="{{ chosen_user.userphoto.file_300_url }}">
+
+    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:site" content="@macawl"/>
+    <meta name="twitter:creator" content="@{{ chosen_user.userusername.username }}">
 
     {% load static from staticfiles %}
     <script src="{% static 'js/navbar.js' %}"></script>
@@ -48,10 +66,12 @@
 
                     <div class="row">
                         <div class="col-xs-6" align="right"><span class="pro_bridge_label">bridging: </span>
-                            <a href="#"><span class="pro_bridge_count" id="count_bridging">{{ chosen_user.bridgingcount.count }}</span></a>
+                            <a href="#"><span class="pro_bridge_count"
+                                              id="count_bridging">{{ chosen_user.bridgingcount.count }}</span></a>
                         </div>
                         <div class="col-xs-6" align="left"><span class="pro_bridge_label">bridgers: </span>
-                            <a href="#"><span class="pro_bridge_count" id="count_bridger">{{ chosen_user.bridgercount.count }}</span></a>
+                            <a href="#"><span class="pro_bridge_count"
+                                              id="count_bridger">{{ chosen_user.bridgercount.count }}</span></a>
                         </div>
                     </div>
 
@@ -69,11 +89,12 @@
                             </div>
                         </a>
                     {% endif %}
-                <br/>
+                    <br/>
                     <div align="center">
                         <form>
                             <div class="input-group input-group-sm">
-                                <textarea class="form-control pro_textarea" id="profile_search_textarea" placeholder="search at {{ chosen_user.userusername.username }}"></textarea>
+                                <textarea class="form-control pro_textarea" id="profile_search_textarea"
+                                          placeholder="search at {{ chosen_user.userusername.username }}"></textarea>
                                 <div class="input-group-btn">
                                     <button class="btn btn-default" id="profile_search_btn">
                                         <i class="glyphicon glyphicon-search"></i>

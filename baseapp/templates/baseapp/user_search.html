@@ -1,10 +1,27 @@
 <!DOCTYPE html>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Demo</title>
+    <title>macawl {{ chosen_user.userusername.username }}</title>
     {% include 'others/header_static.html' %}
     {% include 'others/favicon.html' %}
+    <meta name="keywords" content="macawl, bookmark, favorite, keyword, search, {{ chosen_user.userusername.username }}"/>
+    <meta name="author" content="{{ chosen_user.userusername.username }}"/>
+    <meta name="title" content="macawl {{ chosen_user.userusername.username }}"/>
+    <meta name="description" content="make your bookmark"/>
 
+    <meta property="og:url" content="https://www.macawl.com{{ request.get_full_path }}"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:title" content="macawl {{ chosen_user.userusername.username }}"/>
+    <meta property="og:site_name" content="macawl"/>
+    <meta property="og:description" content="make your bookmark"/>
+
+    <meta property="og:image" content="{{ chosen_user.userphoto.file_300_url }}"/>
+
+    <meta name="twitter:image" content="{{ chosen_user.userphoto.file_300_url }}">
+
+    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:site" content="@macawl"/>
+    <meta name="twitter:creator" content="@{{ chosen_user.userusername.username }}">
     {% load static from staticfiles %}
     <script src="{% static 'js/navbar.js' %}"></script>
     <script src="{% static 'js/a_selected.js' %}"></script>
