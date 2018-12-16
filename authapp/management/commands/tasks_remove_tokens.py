@@ -6,8 +6,8 @@ from authapp.models import UserDelete
 from django.utils.timezone import now, timedelta
 
 class Command(BaseCommand):
-    help = 'ping sitemaps on google or bing'
+    help = 'delete expired users'
 
     def handle(self, *args, **options):
-        User.objects.filter(userdelete__created__lte=now()-timedelta(days=14)).delete()
+        user_delete = User.objects.filter(userdelete__created__lte=now()-timedelta(days=14)).delete()
 
