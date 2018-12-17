@@ -133,6 +133,10 @@ class SubUrlObject(models.Model):
     def __str__(self):
         return "suobj pk: %s" % self.pk
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('baseapp:suobj', kwargs={'uuid': self.uuid})
+
     class Meta:
         unique_together = ('user', 'url_object',)
 

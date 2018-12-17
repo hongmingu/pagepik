@@ -3,11 +3,17 @@ from authapp import views as authviews
 from authapp import ajax_views as auth_ajax_views
 from baseapp import ajax_views as base_ajax_views
 from baseapp import views
-
+from django.views.generic import TemplateView
+from baseapp.sitemaps import sitemaps
+from django.contrib.sitemaps import views as sitemap_views
 app_name = 'baseapp'
 
 urlpatterns = [
-
+    re_path(r'^robots\.txt$',
+            TemplateView.as_view(template_name="others/robots.txt", content_type="text/plain"), name="robots"),
+    path('a/sitemap.xml', sitemap_views.index, {'sitemaps': sitemaps, 'sitemap_url_name': 'baseapp:sitemaps'}),
+    path('a/sitemap-<section>.xml', sitemap_views.sitemap, {'sitemaps': sitemaps},
+         name='sitemaps'),
     re_path(r'^$', authviews.main_create_log_in, name='main_create_log_in'),
 
     re_path(r'^register/url/$', views.register_url, name='register_url'),
