@@ -54,7 +54,7 @@ class UserGender(models.Model):
 class UserTextName(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    name = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=30)
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)

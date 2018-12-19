@@ -298,7 +298,7 @@ def main_create_log_in(request):
                 login(request, new_user_create)
                 ####################################################
                 ####################################################
-                return redirect(reverse('baseapp:user_main', kwargs={'user_username': new_user_username.username}))
+                return redirect(reverse('baseapp:main_create_log_in'))
             else:
                 # 여기 로그인 된 경우 작업 해야 한다. 자동으로 기본화면으로 넘어가도록 하라.
                 return render_with_clue_loginform_createform(request, 'authapp/main_second.html',
@@ -543,8 +543,8 @@ def password_reset(request):
             subject=subject, message=message, from_email=options.DEFAULT_FROM_EMAIL,
             recipient_list=email_list
         )
-        # user_primary_email.email
-        return render(request, 'authapp/password_reset_email_sent.html')
+        clue = {'message': asterisk_total(user_primary_email.email)}
+        return render(request, 'authapp/password_reset_email_sent.html', {'clue': clue})
 
     else:
         return render_with_clue_one_form(request, 'authapp/password_reset.html', None, PasswordResetForm())
