@@ -7,8 +7,6 @@
     {% include 'others/header_metas.html' %}
     {% load static from staticfiles %}
     <script src="{% static 'js/navbar.js' %}"></script>
-    <script src="{% static 'js/nav_badge.js' %}"></script>
-    <script src="{% static 'js/nav_badge_populate.js' %}"></script>
     <script src="{% static 'js/a_selected.js' %}"></script>
     <script src="{% static 'js/date_differ.js' %}"></script>
     <script src="{% static 'js/home.js' %}"></script>
@@ -35,7 +33,7 @@
                 <a href="{% url 'baseapp:register_url' %}"><div class="clickable home_register_url" align="center">register url</div></a>
                 <!--여기서 modal -->
                 <div id="content"></div>
-                <a href=""><div class="hidden clickable" align="center" id="more_load">more load</div></a>
+                <a href=""><div class="hidden clickable more_load" align="center" id="more_load">more load</div></a>
 
             </div>
         </div>

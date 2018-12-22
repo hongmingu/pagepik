@@ -678,6 +678,7 @@ a:active {
     color: var(--main-logoyellow-color, goldenrod);
 
 }
+
 .pop_comment_textarea {
     resize: none;
 }
@@ -685,7 +686,6 @@ a:active {
 .pop_new_comment_content {
     background-color: var(--main-light-bcolor, #c4e3f3);
 }
-
 
 .pop_comment {
     font-size: 12px;
@@ -882,47 +882,80 @@ a:active {
     margin: 3px;
 }
 
-.search_user_wrapper{
+.search_user_wrapper {
     margin-bottom: 4px;
 }
-.search_user_username{
+
+.search_user_username {
     font-weight: bold;
 }
-.search_user_textname{
+
+.search_user_textname {
     margin-left: 3px;
 }
-.search_user_img_wrapper{
-    display: inline-block; vertical-align: top;
+
+.search_user_img_wrapper {
+    display: inline-block;
+    vertical-align: top;
 }
-.search_user_detail_wrapper{
+
+.search_user_detail_wrapper {
     margin-left: 6px;
     display: inline-block;
     height: 50px;
 }
-.search_user_img_small{
-    height: 50px; width: 50px;
+
+.search_user_img_small {
+    height: 50px;
+    width: 50px;
 }
-.search_user_detail_username{
-    font-weight: bold; font-size: 16px;
+
+.search_user_detail_username {
+    font-weight: bold;
+    font-size: 16px;
 }
-.search_user_detail_name{
+
+.search_user_detail_name {
     font-size: 14px;
 }
-.note_wrapper{
+
+.note_wrapper {
     margin-bottom: 4px;
 }
-.note_img_wrapper{
-    display: inline-block; width: 50px; height: 50px;
+
+.note_img_wrapper {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
 }
-.note_text_wrapper{
-    display: inline-block; margin-left: 4px;
+
+.note_text_wrapper {
+    display: inline-block;
+    margin-left: 4px;
 }
-.note_text_username{
-    font-weight: bold; margin-left: 4px; margin-right: 4px;
+
+.note_text_username {
+    font-weight: bold;
+    margin-left: 4px;
+    margin-right: 4px;
 }
-.note_text_title{
-    font-weight: bold; margin-left: 4px; margin-right: 4px;
+
+.note_text_title {
+    font-weight: bold;
+    margin-left: 4px;
+    margin-right: 4px;
 }
-.note_text_comment{
-    font-weight: bold; margin-left: 4px; margin-right: 4px;
+
+.note_text_comment {
+    font-weight: bold;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.nav_note_count {
+    background-color: #ff6d66;
+    color: white;
+    font-size: 11px;
+    border-radius: 4px;
+    padding: 1px;
 }

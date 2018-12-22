@@ -103,8 +103,6 @@ class UserPasswordResetToken(models.Model):
     def __str__(self):
         if self.user_primary_email is not None:
             email = self.user_primary_email
-        elif self.user_email is not None:
-            email = self.user_email
         else:
             email = "No email"
         return "PasswordAuthToken for %s" % email
