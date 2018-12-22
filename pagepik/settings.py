@@ -30,6 +30,7 @@ if settings_json['debug']['mode'] == 'dev':
     # SECURITY WARNING: don't run with debug turned on in production!
 
     DEBUG = True
+    DEPLOY = False
 
     ALLOWED_HOSTS = '*'
 
@@ -196,7 +197,7 @@ elif settings_json['debug']['mode'] == 'deploy':
     # SECURITY WARNING: don't run with debug turned on in production!
 
     DEBUG = False
-
+    DEPLOY = True
     ALLOWED_HOSTS = '*'
 
     # Application definition
@@ -350,7 +351,7 @@ elif settings_json['debug']['mode'] == 'deploy_admin':
     # SECURITY WARNING: don't run with debug turned on in production!
 
     DEBUG = True
-
+    DEPLOY = True
     ALLOWED_HOSTS = '*'
 
     # Application definition
